@@ -1,4 +1,4 @@
-require "scim/kit/version"
+require 'scim/kit/version'
 
 module Scim
   module Kit
