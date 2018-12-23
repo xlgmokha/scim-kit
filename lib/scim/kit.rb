@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'scim/kit/version'
+require 'scim/kit/schema'
+require 'scim/kit/resource'
 
 module Scim
   module Kit

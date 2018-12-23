@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'scim/kit'
+require 'json'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
