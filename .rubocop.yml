@@ -1,0 +1,14 @@
+require:
+  - rubocop/cop/internal_affairs
+  - rubocop-rspec
+AllCops:
+  Exclude:
+    - 'coverage/**/*'
+    - 'pkg/**/*'
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+  TargetRubyVersion: 2.5
+
+Naming/FileName:
+  Exclude:
+    - 'lib/scim-kit.rb'
