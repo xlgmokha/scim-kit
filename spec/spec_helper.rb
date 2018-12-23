@@ -2,6 +2,7 @@
 
 require 'bundler/setup'
 require 'scim/kit'
+require 'ffaker'
 require 'json'
 
 RSpec.configure do |config|
