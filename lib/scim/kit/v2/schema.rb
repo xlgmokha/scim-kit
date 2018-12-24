@@ -17,6 +17,11 @@ module Scim
           @id = id
           @name = name
           @location = location
+          @attributes = []
+        end
+
+        def add_attribute(name:)
+          @attributes << AttributeType.new(name: name)
         end
 
         def to_json
@@ -31,7 +36,8 @@ module Scim
             meta: {
               location: location,
               resourceType: 'Schema'
-            }
+            },
+            attributes: @attributes.map(&:to_h)
           }
         end
       end
