@@ -57,31 +57,20 @@ module Scim
         end
 
         def to_h
-          if complex?
-            {
-              name: name, type: type.to_s,
-              description: description,
-              multiValued: multi_valued,
-              required: required,
-              mutability: mutability,
-              returned: returned,
-              uniqueness: uniqueness,
-              subAttributes: @attributes.map(&:to_h)
-            }
-          else
-            x = {
-              name: name, type: type.to_s,
-              description: description,
-              multiValued: multi_valued,
-              required: required,
-              mutability: mutability,
-              returned: returned,
-              uniqueness: uniqueness
-            }
-            x[:caseExact] = case_exact if string? || reference?
-            x[:referenceTypes] = reference_types if reference?
-            x
-          end
+          result = {
+            description: description,
+            multiValued: multi_valued,
+            mutability: mutability,
+            name: name,
+            required: required,
+            returned: returned,
+            type: type.to_s,
+            uniqueness: uniqueness
+          }
+          result[:caseExact] = case_exact if string? || reference?
+          result[:referenceTypes] = reference_types if reference?
+          result[:subAttributes] = @attributes.map(&:to_h) if complex?
+          result
         end
 
         private
