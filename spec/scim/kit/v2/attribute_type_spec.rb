@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::V2::AttributeType do
+  specify { expect { described_class.new(name: 'displayName', type: :string) }.not_to raise_error }
+  specify { expect { described_class.new(name: 'primary', type: :boolean) }.not_to raise_error }
+  specify { expect { described_class.new(name: 'salary', type: :decimal) }.not_to raise_error }
+  specify { expect { described_class.new(name: 'age', type: :integer) }.not_to raise_error }
+  specify { expect { described_class.new(name: 'birthdate', type: :datetime) }.not_to raise_error }
+  specify { expect { described_class.new(name: '$ref', type: :reference) }.not_to raise_error }
+  specify { expect { described_class.new(name: 'emails', type: :complex) }.not_to raise_error }
+  specify { expect { described_class.new(name: 'invalid', type: :invalid) }.to raise_error(ArgumentError) }
+
   describe 'String Attribute' do
     describe 'defaults' do
       subject { described_class.new(name: 'displayName') }

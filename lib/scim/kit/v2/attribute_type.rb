@@ -5,7 +5,7 @@ module Scim
     module V2
       # Represents a scim Attribute type
       class AttributeType
-        VALID = {
+        DATATYPES = {
           string: 'string',
           boolean: 'boolean',
           decimal: 'decimal',
@@ -35,6 +35,8 @@ module Scim
           @returned = Returned::DEFAULT
           @uniqueness = Uniqueness::NONE
           @attributes = []
+
+          raise ArgumentError.new(:type) unless DATATYPES[type]
         end
 
         def mutability=(value)
@@ -76,15 +78,19 @@ module Scim
         private
 
         def complex?
-          type.to_sym == :complex
+          type_is?(:complex)
         end
 
         def string?
-          type.to_sym == :string
+          type_is?(:string)
         end
 
         def reference?
-          type.to_sym == :reference
+          type_is?(:reference)
+        end
+
+        def type_is?(expected_type)
+          type.to_sym == expected_type
         end
       end
     end
