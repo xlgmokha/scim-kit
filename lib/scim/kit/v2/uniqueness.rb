@@ -14,8 +14,8 @@ module Scim
           global: GLOBAL
         }.freeze
 
-        def self.valid?(value)
-          VALID[value.to_sym]
+        def self.find(value)
+          VALID[value.to_sym] || (raise ArgumentError, :uniqueness)
         end
       end
     end

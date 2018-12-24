@@ -19,7 +19,7 @@ RSpec.describe Scim::Kit::V2::Schema do
   specify { expect(result[:meta][:resourceType]).to eql('Schema') }
   specify { expect(result[:meta][:location]).to eql(location) }
 
-  context "with a single simple attribute" do
+  context 'with a single simple attribute' do
     before do
       subject.add_attribute(name: 'displayName')
     end
@@ -33,5 +33,15 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:attributes][0][:mutability]).to eql('readWrite') }
     specify { expect(result[:attributes][0][:returned]).to eql('default') }
     specify { expect(result[:attributes][0][:uniqueness]).to eql('none') }
+
+    context 'with a description' do
+      before do
+        subject.add_attribute(name: 'userName') do |x|
+          x.description = 'my description'
+        end
+      end
+
+      specify { expect(result[:attributes][1][:description]).to eql('my description') }
+    end
   end
 end

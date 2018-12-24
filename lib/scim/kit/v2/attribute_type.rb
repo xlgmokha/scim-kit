@@ -6,45 +6,48 @@ module Scim
       # Represents a scim Attribute type
       class AttributeType
         attr_reader :name, :type
+        attr_accessor :multi_valued
+        attr_accessor :required
+        attr_accessor :case_exact
+        attr_accessor :description
+        attr_reader :mutability
+        attr_reader :returned
+        attr_reader :uniqueness
 
-        def initialize(name:, type: :string, overrides: {})
+        def initialize(name:, type: :string)
           @name = name
           @type = type
-          @overrides = defaults.merge(overrides)
-          ensure_valid!(@overrides)
+          @description = ''
+          @multi_valued = false
+          @required = false
+          @case_exact = false
+          @mutability = Mutability::READ_WRITE
+          @returned = Returned::DEFAULT
+          @uniqueness = Uniqueness::NONE
+        end
+
+        def mutability=(value)
+          @mutability = Mutability.find(value)
+        end
+
+        def returned=(value)
+          @returned = Returned.find(value)
+        end
+
+        def uniqueness=(value)
+          @uniqueness = Uniqueness.find(value)
         end
 
         def to_h
-          @overrides
-        end
-
-        private
-
-        def ensure_valid!(overrides)
-          valid_mutability!(overrides[:mutability])
-          valid_returned!(overrides[:returned])
-          valid_uniqueness!(overrides[:uniqueness])
-        end
-
-        def valid_mutability!(mutability)
-          raise ArgumentError, :mutability unless Mutability.valid?(mutability)
-        end
-
-        def valid_returned!(returned)
-          raise ArgumentError, :returned unless Returned.valid?(returned)
-        end
-
-        def valid_uniqueness!(uniqueness)
-          raise ArgumentError, :uniqueness unless Uniqueness.valid?(uniqueness)
-        end
-
-        def defaults
           {
-            name: name, type: type.to_s, description: '',
-            multiValued: false, required: false, caseExact: false,
-            mutability: Mutability::READ_WRITE,
-            returned: Returned::DEFAULT,
-            uniqueness: Uniqueness::NONE
+            name: name, type: type.to_s,
+            description: description,
+            multiValued: multi_valued,
+            required: required,
+            caseExact: case_exact,
+            mutability: mutability,
+            returned: returned,
+            uniqueness: uniqueness
           }
         end
       end

@@ -21,7 +21,9 @@ module Scim
         end
 
         def add_attribute(name:)
-          @attributes << AttributeType.new(name: name)
+          attribute = AttributeType.new(name: name)
+          yield attribute if block_given?
+          @attributes << attribute
         end
 
         def to_json

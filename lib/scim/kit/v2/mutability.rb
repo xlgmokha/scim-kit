@@ -16,8 +16,8 @@ module Scim
           write_only: WRITE_ONLY
         }.freeze
 
-        def self.valid?(value)
-          VALID.key?(value.to_sym) || VALID.value?(value)
+        def self.find(value)
+          VALID[value.to_sym] || (raise ArgumentError, :mutability)
         end
       end
     end

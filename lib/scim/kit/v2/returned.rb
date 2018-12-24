@@ -16,8 +16,8 @@ module Scim
           request: REQUEST
         }.freeze
 
-        def self.valid?(value)
-          VALID[value.to_sym]
+        def self.find(value)
+          VALID[value.to_sym] || (raise ArgumentError, :returned)
         end
       end
     end
