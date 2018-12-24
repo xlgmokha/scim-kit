@@ -9,6 +9,17 @@ AllCops:
     - 'vendor/**/*'
   TargetRubyVersion: 2.5
 
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*.rb'
+
+Metrics/LineLength:
+  Exclude:
+    - 'spec/**/*.rb'
+
 Naming/FileName:
   Exclude:
     - 'lib/scim-kit.rb'
+
+RSpec/NamedSubject:
+  Enabled: false

@@ -7,7 +7,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-echo [$(date "+%H:%M:%S")] "==> Started at…"
+echo ["$(date "+%H:%M:%S")"] "==> Started at…"
 
 # GC customizations
 export RUBY_GC_MALLOC_LIMIT=79000000
@@ -19,3 +19,4 @@ export RUBY_HEAP_SLOTS_GROWTH_FACTOR=1
 ruby -v
 gem install bundler --no-ri --no-rdoc --conservative
 bin/test
+bin/lint
