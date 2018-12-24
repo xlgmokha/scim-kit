@@ -10,10 +10,10 @@ module Scim
         IMMUTABLE = 'immutable'
         WRITE_ONLY = 'writeOnly'
         VALID = {
-          read_only: 'readOnly',
-          read_write: 'readWrite',
-          immutable: 'immutable',
-          write_only: 'writeOnly'
+          read_only: READ_ONLY,
+          read_write: READ_WRITE,
+          immutable: IMMUTABLE,
+          write_only: WRITE_ONLY
         }.freeze
 
         def self.valid?(value)
