@@ -9,9 +9,9 @@ module Scim
         SERVER = 'server'
         GLOBAL = 'global'
         VALID = {
-          none: 'none',
-          server: 'server',
-          global: 'global'
+          none: NONE,
+          server: SERVER,
+          global: GLOBAL
         }.freeze
 
         def self.valid?(value)

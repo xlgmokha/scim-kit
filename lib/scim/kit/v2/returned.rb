@@ -10,10 +10,10 @@ module Scim
         DEFAULT = 'default'
         REQUEST = 'request'
         VALID = {
-          always: 'always',
-          never: 'never',
-          default: 'default',
-          request: 'request'
+          always: ALWAYS,
+          never: NEVER,
+          default: DEFAULT,
+          request: REQUEST
         }.freeze
 
         def self.valid?(value)
