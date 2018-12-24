@@ -19,6 +19,7 @@ module Scim
         attr_accessor :required
         attr_accessor :case_exact
         attr_accessor :description
+        attr_accessor :reference_types
         attr_reader :mutability
         attr_reader :returned
         attr_reader :uniqueness
@@ -77,7 +78,8 @@ module Scim
               returned: returned,
               uniqueness: uniqueness
             }
-            x[:caseExact] = case_exact if string?
+            x[:caseExact] = case_exact if string? || reference?
+            x[:referenceTypes] = reference_types if reference?
             x
           end
         end
@@ -90,6 +92,10 @@ module Scim
 
         def string?
           type.to_sym == :string
+        end
+
+        def reference?
+          type.to_sym == :reference
         end
       end
     end

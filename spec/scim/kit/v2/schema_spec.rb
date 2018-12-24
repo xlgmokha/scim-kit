@@ -84,4 +84,24 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:attributes][0][:subAttributes][1][:returned]).to eql('default') }
     specify { expect(result[:attributes][0][:subAttributes][1][:uniqueness]).to eql('none') }
   end
+
+  context 'with a reference attribute' do
+    before do
+      subject.add_attribute(name: '$ref', type: 'reference') do |x|
+        x.reference_types = %w[User Group]
+        x.mutability = :read_only
+      end
+    end
+
+    specify { expect(result[:attributes][0][:name]).to eql('$ref') }
+    specify { expect(result[:attributes][0][:type]).to eql('reference') }
+    specify { expect(result[:attributes][0][:referenceTypes]).to match_array(%w[User Group]) }
+    specify { expect(result[:attributes][0][:multiValued]).to be(false) }
+    specify { expect(result[:attributes][0][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:required]).to be(false) }
+    specify { expect(result[:attributes][0][:caseExact]).to be(false) }
+    specify { expect(result[:attributes][0][:mutability]).to eql('readOnly') }
+    specify { expect(result[:attributes][0][:returned]).to eql('default') }
+    specify { expect(result[:attributes][0][:uniqueness]).to eql('none') }
+  end
 end
