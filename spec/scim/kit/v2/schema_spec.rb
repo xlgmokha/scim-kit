@@ -44,4 +44,44 @@ RSpec.describe Scim::Kit::V2::Schema do
       specify { expect(result[:attributes][1][:description]).to eql('my description') }
     end
   end
+
+  context 'with a complex attribute' do
+    before do
+      subject.add_attribute(name: 'emails') do |x|
+        x.multi_valued = true
+        x.add_attribute(name: 'value')
+        x.add_attribute(name: 'primary', type: 'boolean')
+      end
+    end
+
+    specify { expect(result[:attributes][0][:name]).to eql('emails') }
+    specify { expect(result[:attributes][0][:type]).to eql('complex') }
+    specify { expect(result[:attributes][0][:multiValued]).to be(true) }
+    specify { expect(result[:attributes][0][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:required]).to be(false) }
+    specify { expect(result[:attributes][0].key?(:caseExact)).to be(false) }
+    specify { expect(result[:attributes][0][:mutability]).to eql('readWrite') }
+    specify { expect(result[:attributes][0][:returned]).to eql('default') }
+    specify { expect(result[:attributes][0][:uniqueness]).to eql('none') }
+
+    specify { expect(result[:attributes][0][:subAttributes][0][:name]).to eql('value') }
+    specify { expect(result[:attributes][0][:subAttributes][0][:type]).to eql('string') }
+    specify { expect(result[:attributes][0][:subAttributes][0][:multiValued]).to be(false) }
+    specify { expect(result[:attributes][0][:subAttributes][0][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:subAttributes][0][:required]).to be(false) }
+    specify { expect(result[:attributes][0][:subAttributes][0][:caseExact]).to be(false) }
+    specify { expect(result[:attributes][0][:subAttributes][0][:mutability]).to eql('readWrite') }
+    specify { expect(result[:attributes][0][:subAttributes][0][:returned]).to eql('default') }
+    specify { expect(result[:attributes][0][:subAttributes][0][:uniqueness]).to eql('none') }
+
+    specify { expect(result[:attributes][0][:subAttributes][1][:name]).to eql('primary') }
+    specify { expect(result[:attributes][0][:subAttributes][1][:type]).to eql('boolean') }
+    specify { expect(result[:attributes][0][:subAttributes][1][:multiValued]).to be(false) }
+    specify { expect(result[:attributes][0][:subAttributes][1][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:subAttributes][1][:required]).to be(false) }
+    specify { expect(result[:attributes][0][:subAttributes][1].key?(:caseExact)).to be(false) }
+    specify { expect(result[:attributes][0][:subAttributes][1][:mutability]).to eql('readWrite') }
+    specify { expect(result[:attributes][0][:subAttributes][1][:returned]).to eql('default') }
+    specify { expect(result[:attributes][0][:subAttributes][1][:uniqueness]).to eql('none') }
+  end
 end

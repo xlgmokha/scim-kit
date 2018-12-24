@@ -5,6 +5,15 @@ module Scim
     module V2
       # Represents a scim Attribute type
       class AttributeType
+        VALID = {
+          string: 'string',
+          boolean: 'boolean',
+          decimal: 'decimal',
+          integer: 'integer',
+          datetime: 'dateTime',
+          reference: 'reference',
+          complex: 'complex'
+        }.freeze
         attr_reader :name, :type
         attr_accessor :multi_valued
         attr_accessor :required
@@ -24,6 +33,7 @@ module Scim
           @mutability = Mutability::READ_WRITE
           @returned = Returned::DEFAULT
           @uniqueness = Uniqueness::NONE
+          @attributes = []
         end
 
         def mutability=(value)
@@ -38,17 +48,48 @@ module Scim
           @uniqueness = Uniqueness.find(value)
         end
 
+        def add_attribute(name:, type: :string)
+          @type = :complex
+          attribute = AttributeType.new(name: name, type: type)
+          yield attribute if block_given?
+          @attributes << attribute
+        end
+
         def to_h
-          {
-            name: name, type: type.to_s,
-            description: description,
-            multiValued: multi_valued,
-            required: required,
-            caseExact: case_exact,
-            mutability: mutability,
-            returned: returned,
-            uniqueness: uniqueness
-          }
+          if complex?
+            {
+              name: name, type: type.to_s,
+              description: description,
+              multiValued: multi_valued,
+              required: required,
+              mutability: mutability,
+              returned: returned,
+              uniqueness: uniqueness,
+              subAttributes: @attributes.map(&:to_h)
+            }
+          else
+            x = {
+              name: name, type: type.to_s,
+              description: description,
+              multiValued: multi_valued,
+              required: required,
+              mutability: mutability,
+              returned: returned,
+              uniqueness: uniqueness
+            }
+            x[:caseExact] = case_exact if string?
+            x
+          end
+        end
+
+        private
+
+        def complex?
+          type.to_sym == :complex
+        end
+
+        def string?
+          type.to_sym == :string
         end
       end
     end

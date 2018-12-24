@@ -20,8 +20,8 @@ module Scim
           @attributes = []
         end
 
-        def add_attribute(name:)
-          attribute = AttributeType.new(name: name)
+        def add_attribute(name:, type: :string)
+          attribute = AttributeType.new(name: name, type: type)
           yield attribute if block_given?
           @attributes << attribute
         end
