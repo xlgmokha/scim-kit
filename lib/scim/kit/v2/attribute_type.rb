@@ -37,7 +37,7 @@ module Scim
           @uniqueness = Uniqueness::NONE
           @attributes = []
 
-          raise ArgumentError.new(:type) unless DATATYPES[type]
+          raise ArgumentError, :type unless DATATYPES[type.to_sym]
         end
 
         def mutability=(value)

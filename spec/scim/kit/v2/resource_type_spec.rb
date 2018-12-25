@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Scim::Kit::V2::Resource do
+RSpec.describe Scim::Kit::V2::ResourceType do
   subject { described_class.new(location: location) }
 
   let(:location) { FFaker::Internet.uri('https') }

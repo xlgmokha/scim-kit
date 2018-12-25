@@ -5,7 +5,7 @@ module Scim
     module V2
       # Represents a ResourceType Schema
       # https://tools.ietf.org/html/rfc7643#section-6
-      class Resource
+      class ResourceType
         attr_accessor :id
         attr_accessor :name
         attr_accessor :description

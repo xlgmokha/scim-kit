@@ -6,7 +6,7 @@ require 'scim/kit/v2/returned'
 require 'scim/kit/v2/uniqueness'
 require 'scim/kit/v2/mutability'
 require 'scim/kit/v2/schema'
-require 'scim/kit/v2/resource'
+require 'scim/kit/v2/resource_type'
 
 module Scim
   module Kit
