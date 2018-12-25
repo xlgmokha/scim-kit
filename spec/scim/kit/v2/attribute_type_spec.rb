@@ -8,6 +8,7 @@ RSpec.describe Scim::Kit::V2::AttributeType do
   specify { expect { described_class.new(name: 'birthdate', type: :datetime) }.not_to raise_error }
   specify { expect { described_class.new(name: '$ref', type: :reference) }.not_to raise_error }
   specify { expect { described_class.new(name: 'emails', type: :complex) }.not_to raise_error }
+  specify { expect { described_class.new(name: 'photo', type: :binary) }.not_to raise_error }
   specify { expect { described_class.new(name: 'invalid', type: :invalid) }.to raise_error(ArgumentError) }
 
   describe 'String Attribute' do

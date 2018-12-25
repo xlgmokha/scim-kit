@@ -11,6 +11,7 @@ module Scim
           decimal: 'decimal',
           integer: 'integer',
           datetime: 'dateTime',
+          binary: 'binary',
           reference: 'reference',
           complex: 'complex'
         }.freeze
