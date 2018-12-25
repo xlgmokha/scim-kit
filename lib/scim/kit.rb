@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require 'tilt'
+require 'tilt/jbuilder'
 
 require 'scim/kit/version'
 require 'scim/kit/v2/attribute_type'
@@ -7,6 +9,7 @@ require 'scim/kit/v2/uniqueness'
 require 'scim/kit/v2/mutability'
 require 'scim/kit/v2/schema'
 require 'scim/kit/v2/resource_type'
+require 'scim/kit/template'
 
 module Scim
   module Kit

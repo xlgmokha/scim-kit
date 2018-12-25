@@ -10,7 +10,7 @@ module Scim
         RESOURCE_TYPE = 'urn:ietf:params:scim:schemas:core:2.0:ResourceType'
         USER = 'urn:ietf:params:scim:schemas:core:2.0:User'
 
-        attr_reader :id, :name, :location
+        attr_reader :id, :name, :location, :attributes
         attr_accessor :description
 
         def initialize(id:, name:, location:)
@@ -27,20 +27,7 @@ module Scim
         end
 
         def to_json
-          JSON.generate(to_h)
-        end
-
-        def to_h
-          {
-            id: id,
-            name: name,
-            description: description,
-            meta: {
-              location: location,
-              resourceType: 'Schema'
-            },
-            attributes: @attributes.map(&:to_h)
-          }
+          Template.new(self).to_json
         end
       end
     end

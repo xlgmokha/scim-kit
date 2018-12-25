@@ -36,7 +36,6 @@ module Scim
           @returned = Returned::DEFAULT
           @uniqueness = Uniqueness::NONE
           @attributes = []
-
           raise ArgumentError, :type unless DATATYPES[type.to_sym]
         end
 
