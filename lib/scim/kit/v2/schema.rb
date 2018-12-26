@@ -5,6 +5,7 @@ module Scim
     module V2
       # Represents a SCIM Schema
       class Schema
+        include Templatable
         ERROR = 'urn:ietf:params:scim:api:messages:2.0:Error'
         GROUP = 'urn:ietf:params:scim:schemas:core:2.0:Group'
         RESOURCE_TYPE = 'urn:ietf:params:scim:schemas:core:2.0:ResourceType'
@@ -24,10 +25,6 @@ module Scim
           attribute = AttributeType.new(name: name, type: type)
           yield attribute if block_given?
           @attributes << attribute
-        end
-
-        def to_json
-          Template.new(self).to_json
         end
       end
     end

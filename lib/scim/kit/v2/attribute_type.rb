@@ -5,6 +5,7 @@ module Scim
     module V2
       # Represents a scim Attribute type
       class AttributeType
+        include Templatable
         DATATYPES = {
           string: 'string',
           boolean: 'boolean',
@@ -35,7 +36,6 @@ module Scim
           @mutability = Mutability::READ_WRITE
           @returned = Returned::DEFAULT
           @uniqueness = Uniqueness::NONE
-          @attributes = []
           raise ArgumentError, :type unless DATATYPES[type.to_sym]
         end
 
@@ -55,18 +55,14 @@ module Scim
           @type = :complex
           attribute = AttributeType.new(name: name, type: type)
           yield attribute if block_given?
-          @attributes << attribute
-        end
-
-        def to_json
-          Template.new(self).to_json
-        end
-
-        def to_h
-          JSON.parse(to_json, symbolize_names: true)
+          attributes << attribute
         end
 
         private
+
+        def attributes
+          @attributes ||= []
+        end
 
         def complex?
           type_is?(:complex)
