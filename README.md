@@ -1,8 +1,8 @@
 # Scim::Kit
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/scim/kit`. To experiment with that code, run `bin/console` for an interactive prompt.
+Scim::Kit is a library with the purpose of simplifying the generation
+and consumption of SCIM Schema. https://tools.ietf.org/html/rfc7643#section-2
 
-TODO: Delete this and the text above, and describe your gem
 
 ## Installation
 
@@ -22,7 +22,58 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+def user_schema
+  Scim::Kit::V2::Schema.build(
+    id: Scim::Kit::V2::Schema::USER,
+    name: "User",
+    location: scim_v2_schema_url(id: Scim::Kit::V2::Schema::USER)
+  ) do |schema|
+    schema.description = "User Account"
+    schema.add_attribute(name: 'userName') do |x|
+      x.description = "Unique identifier for the User"
+      x.required = true
+      x.uniqueness = :server
+    end
+    schema.add_attribute(name: 'password') do |x|
+      x.description = "The User's cleartext password."
+      x.mutability = :write_only
+      x.required = false
+      x.returned = :never
+    end
+    schema.add_attribute(name: 'emails') do |x|
+      x.multi_valued = true
+      x.description = "Email addresses for the user."
+      x.add_attribute(name: 'value') do |y|
+        y.description = "Email addresses for the user."
+      end
+      x.add_attribute(name: 'primary', type: :boolean) do |y|
+        y.description = "A Boolean value indicating the preferred email"
+      end
+    end
+    schema.add_attribute(name: 'groups') do |x|
+      x.multi_valued = true
+      x.description = "A list of groups to which the user belongs."
+      x.mutability = :read_only
+      x.add_attribute(name: 'value') do |y|
+        y.description = "The identifier of the User's group."
+        y.mutability = :read_only
+      end
+      x.add_attribute(name: '$ref', type: :reference) do |y|
+        y.reference_types = ['User', 'Group']
+        y.description = "The URI of the corresponding 'Group' resource."
+        y.mutability = :read_only
+      end
+      x.add_attribute(name: 'display') do |y|
+        y.description = "A human-readable name."
+        y.mutability = :read_only
+      end
+    end
+  end
+end
+
+puts user_schema.to_json
+```
 
 ## Development
 
