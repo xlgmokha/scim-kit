@@ -7,4 +7,6 @@ json.meta do
   json.resourceType 'Schema'
   json.location location
 end
-json.attributes attributes.map(&:to_h)
+json.attributes attributes do |attribute|
+  Scim::Kit::Template.new(attribute).to_json(json: json)
+end

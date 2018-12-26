@@ -58,21 +58,12 @@ module Scim
           @attributes << attribute
         end
 
+        def to_json
+          Template.new(self).to_json
+        end
+
         def to_h
-          result = {
-            description: description,
-            multiValued: multi_valued,
-            mutability: mutability,
-            name: name,
-            required: required,
-            returned: returned,
-            type: type.to_s,
-            uniqueness: uniqueness
-          }
-          result[:caseExact] = case_exact if string? || reference?
-          result[:referenceTypes] = reference_types if reference?
-          result[:subAttributes] = @attributes.map(&:to_h) if complex?
-          result
+          JSON.parse(to_json, symbolize_names: true)
         end
 
         private
