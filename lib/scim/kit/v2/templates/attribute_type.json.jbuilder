@@ -10,6 +10,7 @@ json.type type
 json.uniqueness uniqueness
 json.caseExact(case_exact) if string? || reference?
 json.referenceTypes(reference_types) if reference?
+json.canonicalValues(canonical_values) if canonical_values
 if complex?
   json.subAttributes attributes do |attribute|
     render attribute, json: json

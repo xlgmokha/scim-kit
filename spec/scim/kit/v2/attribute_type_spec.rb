@@ -58,6 +58,9 @@ RSpec.describe Scim::Kit::V2::AttributeType do
       specify { expect(build(uniqueness: :server).to_h[:uniqueness]).to eql('server') }
       specify { expect(build(uniqueness: :global).to_h[:uniqueness]).to eql('global') }
       specify { expect { build(uniqueness: :invalid) }.to raise_error(ArgumentError) }
+
+      specify { expect(build(reference_types: %w[User Group]).to_h[:referenceTypes]).to match_array(%w[User Group]) }
+      specify { expect(build(canonical_values: %w[User Group]).to_h[:canonicalValues]).to match_array(%w[User Group]) }
     end
   end
 end

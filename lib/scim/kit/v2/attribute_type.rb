@@ -16,13 +16,14 @@ module Scim
           reference: 'reference',
           complex: 'complex'
         }.freeze
-        attr_reader :name, :type
-        attr_accessor :multi_valued
-        attr_accessor :required
+        attr_accessor :canonical_values
         attr_accessor :case_exact
         attr_accessor :description
-        attr_accessor :reference_types
+        attr_accessor :multi_valued
+        attr_accessor :required
         attr_reader :mutability
+        attr_reader :name, :type
+        attr_reader :reference_types
         attr_reader :returned
         attr_reader :uniqueness
 
@@ -56,6 +57,11 @@ module Scim
           attribute = AttributeType.new(name: name, type: type)
           yield attribute if block_given?
           attributes << attribute
+        end
+
+        def reference_types=(value)
+          @type = :reference
+          @reference_types = value
         end
 
         private
