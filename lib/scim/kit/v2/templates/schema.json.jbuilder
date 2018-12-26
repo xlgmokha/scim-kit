@@ -8,5 +8,5 @@ json.meta do
   json.location location
 end
 json.attributes attributes do |attribute|
-  Scim::Kit::Template.new(attribute).to_json(json: json)
+  render attribute, json: json
 end

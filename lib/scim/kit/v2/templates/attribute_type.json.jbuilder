@@ -12,6 +12,6 @@ json.caseExact(case_exact) if string? || reference?
 json.referenceTypes(reference_types) if reference?
 if complex?
   json.subAttributes attributes do |attribute|
-    Scim::Kit::Template.new(attribute).to_json(json: json)
+    render attribute, json: json
   end
 end
