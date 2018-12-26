@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
+json.key_format! camelize: :lower
 json.id id
 json.name name
 json.description description
 json.meta do
-  json.resourceType 'Schema'
+  json.resource_type 'Schema'
   json.location location
 end
 json.attributes attributes do |attribute|
