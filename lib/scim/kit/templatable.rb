@@ -8,6 +8,10 @@ module Scim
         render(self, options)
       end
 
+      def as_json(options = nil)
+        to_h
+      end
+
       def to_h
         JSON.parse(to_json, symbolize_names: true)
       end
