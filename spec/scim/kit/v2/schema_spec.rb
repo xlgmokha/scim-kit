@@ -104,4 +104,18 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:attributes][0][:returned]).to eql('default') }
     specify { expect(result[:attributes][0][:uniqueness]).to eql('none') }
   end
+
+  describe '.build' do
+    subject do
+      described_class.build(id: id, name: name, location: location) do |x|
+        x.description = description
+      end
+    end
+
+    specify { expect(result[:id]).to eql(id) }
+    specify { expect(result[:name]).to eql(name) }
+    specify { expect(result[:description]).to eql(description) }
+    specify { expect(result[:meta][:resourceType]).to eql('Schema') }
+    specify { expect(result[:meta][:location]).to eql(location) }
+  end
 end

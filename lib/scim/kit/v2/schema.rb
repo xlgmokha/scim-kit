@@ -26,6 +26,12 @@ module Scim
           yield attribute if block_given?
           @attributes << attribute
         end
+
+        def self.build(*args)
+          item = new(*args)
+          yield item
+          item
+        end
       end
     end
   end
