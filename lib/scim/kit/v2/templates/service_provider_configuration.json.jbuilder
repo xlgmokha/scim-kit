@@ -7,7 +7,7 @@ json.patch do
   render patch, json: json
 end
 json.bulk do
-  json.supported false
+  render bulk, json: json
 end
 json.filter do
   json.supported false

@@ -11,6 +11,7 @@ module Scim
         attr_accessor :created, :last_modified, :version
         attr_reader :authentication_schemes
         attr_reader :etag, :sort, :change_password, :patch
+        attr_reader :bulk
 
         def initialize(location:)
           @location = location
@@ -20,6 +21,7 @@ module Scim
           @sort = Supportable.new
           @change_password = Supportable.new
           @patch = Supportable.new
+          @bulk = Supportable.new(:max_operations, :max_payload_size)
         end
 
         def add_authentication(type)

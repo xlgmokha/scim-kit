@@ -92,5 +92,17 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
 
       specify { expect(result[:patch][:supported]).to be(true) }
     end
+
+    context "with bulk support" do
+      before do
+        subject.bulk.supported = true
+        subject.bulk.max_operations = 1000
+        subject.bulk.max_payload_size = 1048576
+      end
+
+      specify { expect(result[:bulk][:supported]).to be(true) }
+      specify { expect(result[:bulk][:maxOperations]).to eql(1000) }
+      specify { expect(result[:bulk][:maxPayloadSize]).to eql(1048576) }
+    end
   end
 end
