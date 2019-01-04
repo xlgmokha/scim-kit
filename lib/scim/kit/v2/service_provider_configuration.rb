@@ -10,11 +10,13 @@ module Scim
         attr_accessor :documentation_uri
         attr_accessor :created, :last_modified, :version
         attr_reader :authentication_schemes
+        attr_reader :etag
 
         def initialize(location:)
           @location = location
           @version = @created = @last_modified = Time.now
           @authentication_schemes = []
+          @etag = Supportable.new
         end
 
         def add_authentication(type)

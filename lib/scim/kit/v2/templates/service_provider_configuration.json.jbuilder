@@ -19,7 +19,7 @@ json.sort do
   json.supported false
 end
 json.etag do
-  json.supported false
+  render etag, json: json
 end
 json.authentication_schemes authentication_schemes do |authentication_scheme|
   render authentication_scheme, json: json

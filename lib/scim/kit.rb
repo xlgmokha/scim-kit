@@ -14,6 +14,7 @@ require 'scim/kit/v2/resource_type'
 require 'scim/kit/v2/returned'
 require 'scim/kit/v2/schema'
 require 'scim/kit/v2/service_provider_configuration'
+require 'scim/kit/v2/supportable'
 require 'scim/kit/v2/uniqueness'
 
 module Scim

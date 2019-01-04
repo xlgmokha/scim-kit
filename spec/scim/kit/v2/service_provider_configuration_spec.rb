@@ -68,5 +68,13 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
       specify { expect(result[:authenticationSchemes][0][:documentationUri]).to eql('http://example.com/help/custom.html') }
       specify { expect(result[:authenticationSchemes][0][:type]).to eql('custom') }
     end
+
+    context "with etag support" do
+      before do
+        subject.etag.supported = true
+      end
+
+      specify { expect(result[:etag][:supported]).to be(true) }
+    end
   end
 end
