@@ -70,11 +70,27 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
     end
 
     context "with etag support" do
-      before do
-        subject.etag.supported = true
-      end
+      before { subject.etag.supported = true }
 
       specify { expect(result[:etag][:supported]).to be(true) }
+    end
+
+    context "with sort support" do
+      before { subject.sort.supported = true }
+
+      specify { expect(result[:sort][:supported]).to be(true) }
+    end
+
+    context "with change_password support" do
+      before { subject.change_password.supported = true }
+
+      specify { expect(result[:changePassword][:supported]).to be(true) }
+    end
+
+    context "with patch support" do
+      before { subject.patch.supported = true }
+
+      specify { expect(result[:patch][:supported]).to be(true) }
     end
   end
 end

@@ -4,7 +4,7 @@ json.key_format! camelize: :lower
 json.schemas [Scim::Kit::V2::Schema::SERVICE_PROVIDER_CONFIGURATION]
 json.documentation_uri documentation_uri
 json.patch do
-  json.supported false
+  render patch, json: json
 end
 json.bulk do
   json.supported false
@@ -13,10 +13,10 @@ json.filter do
   json.supported false
 end
 json.change_password do
-  json.supported false
+  render change_password, json: json
 end
 json.sort do
-  json.supported false
+  render sort, json: json
 end
 json.etag do
   render etag, json: json

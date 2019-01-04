@@ -10,13 +10,16 @@ module Scim
         attr_accessor :documentation_uri
         attr_accessor :created, :last_modified, :version
         attr_reader :authentication_schemes
-        attr_reader :etag
+        attr_reader :etag, :sort, :change_password, :patch
 
         def initialize(location:)
           @location = location
           @version = @created = @last_modified = Time.now
           @authentication_schemes = []
           @etag = Supportable.new
+          @sort = Supportable.new
+          @change_password = Supportable.new
+          @patch = Supportable.new
         end
 
         def add_authentication(type)
