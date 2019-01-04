@@ -22,3 +22,10 @@ json.etag do
   json.supported false
 end
 json.authentication_schemes []
+json.meta do
+  json.location location
+  json.resource_type 'ServiceProviderConfig'
+  json.created created.iso8601
+  json.last_modified last_modified.iso8601
+  json.version version.to_i
+end

@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
+  subject { described_class.new(location: location) }
+  let(:location) { FFaker::Internet.uri('https') }
+  let(:now) { Time.now }
+
   describe "#to_json" do
     let(:result) { JSON.parse(subject.to_json, symbolize_names: true) }
 
@@ -13,6 +17,11 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
     specify { expect(result[:sort][:supported]).to be(false) }
     specify { expect(result[:etag][:supported]).to be(false) }
     specify { expect(result[:authenticationSchemes]).to be_empty }
+    specify { expect(result[:meta][:location]).to eql(location) }
+    specify { expect(result[:meta][:resourceType]).to eql('ServiceProviderConfig') }
+    specify { expect(result[:meta][:created]).to eql(now.iso8601) }
+    specify { expect(result[:meta][:lastModified]).to eql(now.iso8601) }
+    specify { expect(result[:meta][:version]).not_to be_nil }
 
     context "with documentation uri" do
       before do
