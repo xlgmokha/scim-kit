@@ -10,7 +10,7 @@ json.bulk do
   render bulk, json: json
 end
 json.filter do
-  json.supported false
+  render filter, json: json
 end
 json.change_password do
   render change_password, json: json

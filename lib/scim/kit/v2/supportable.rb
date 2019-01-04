@@ -14,7 +14,7 @@ module Scim
         end
 
         def method_missing(method, *args)
-          target = method.to_s.gsub(/=/, '').to_sym
+          target = method.to_s.delete('=').to_sym
           if @custom_attributes.key?(target)
             @custom_attributes[target] = args[0]
           else

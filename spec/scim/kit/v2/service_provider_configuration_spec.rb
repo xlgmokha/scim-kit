@@ -69,40 +69,50 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
       specify { expect(result[:authenticationSchemes][0][:type]).to eql('custom') }
     end
 
-    context "with etag support" do
+    context 'with etag support' do
       before { subject.etag.supported = true }
 
       specify { expect(result[:etag][:supported]).to be(true) }
     end
 
-    context "with sort support" do
+    context 'with sort support' do
       before { subject.sort.supported = true }
 
       specify { expect(result[:sort][:supported]).to be(true) }
     end
 
-    context "with change_password support" do
+    context 'with change_password support' do
       before { subject.change_password.supported = true }
 
       specify { expect(result[:changePassword][:supported]).to be(true) }
     end
 
-    context "with patch support" do
+    context 'with patch support' do
       before { subject.patch.supported = true }
 
       specify { expect(result[:patch][:supported]).to be(true) }
     end
 
-    context "with bulk support" do
+    context 'with bulk support' do
       before do
         subject.bulk.supported = true
         subject.bulk.max_operations = 1000
-        subject.bulk.max_payload_size = 1048576
+        subject.bulk.max_payload_size = 1_048_576
       end
 
       specify { expect(result[:bulk][:supported]).to be(true) }
-      specify { expect(result[:bulk][:maxOperations]).to eql(1000) }
-      specify { expect(result[:bulk][:maxPayloadSize]).to eql(1048576) }
+      specify { expect(result[:bulk][:maxOperations]).to be(1000) }
+      specify { expect(result[:bulk][:maxPayloadSize]).to be(1_048_576) }
+    end
+
+    context 'with filter support' do
+      before do
+        subject.filter.supported = true
+        subject.filter.max_results = 200
+      end
+
+      specify { expect(result[:filter][:supported]).to be(true) }
+      specify { expect(result[:filter][:maxResults]).to be(200) }
     end
   end
 end
