@@ -21,7 +21,9 @@ end
 json.etag do
   json.supported false
 end
-json.authentication_schemes []
+json.authentication_schemes authentication_schemes do |authentication_scheme|
+  render authentication_scheme, json: json
+end
 json.meta do
   json.location location
   json.resource_type 'ServiceProviderConfig'
