@@ -8,7 +8,7 @@ module Scim
         render(self, options)
       end
 
-      def as_json(options = nil)
+      def as_json(_options = nil)
         to_h
       end
 
