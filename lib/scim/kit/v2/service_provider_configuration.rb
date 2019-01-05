@@ -8,14 +8,12 @@ module Scim
         include Templatable
         attr_reader :location
         attr_accessor :documentation_uri
-        attr_accessor :created, :last_modified, :version
         attr_reader :authentication_schemes
         attr_reader :etag, :sort, :change_password, :patch
-        attr_reader :bulk, :filter
+        attr_reader :bulk, :filter, :meta
 
         def initialize(location:)
-          @location = location
-          @version = @created = @last_modified = Time.now
+          @meta = Meta.new('ServiceProviderConfig', location)
           @authentication_schemes = []
           @etag = Supportable.new
           @sort = Supportable.new

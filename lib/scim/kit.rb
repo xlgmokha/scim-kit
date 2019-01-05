@@ -10,6 +10,7 @@ require 'scim/kit/version'
 
 require 'scim/kit/v2/attribute_type'
 require 'scim/kit/v2/authentication_scheme'
+require 'scim/kit/v2/meta'
 require 'scim/kit/v2/mutability'
 require 'scim/kit/v2/resource_type'
 require 'scim/kit/v2/returned'
