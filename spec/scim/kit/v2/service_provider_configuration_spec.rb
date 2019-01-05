@@ -52,6 +52,26 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
       specify { expect(result[:authenticationSchemes][0][:type]).to eql('httpbasic') }
     end
 
+    context 'with multiple schemes' do
+      before do
+        subject.add_authentication(:oauthbearertoken, primary: true)
+        subject.add_authentication(:httpbasic)
+      end
+
+      specify { expect(result[:authenticationSchemes][0][:name]).to eql('OAuth Bearer Token') }
+      specify { expect(result[:authenticationSchemes][0][:description]).to eql('Authentication scheme using the OAuth Bearer Token Standard') }
+      specify { expect(result[:authenticationSchemes][0][:specUri]).to eql('http://www.rfc-editor.org/info/rfc6750') }
+      specify { expect(result[:authenticationSchemes][0][:documentationUri]).to eql('http://example.com/help/oauth.html') }
+      specify { expect(result[:authenticationSchemes][0][:type]).to eql('oauthbearertoken') }
+      specify { expect(result[:authenticationSchemes][0][:primary]).to be(true) }
+
+      specify { expect(result[:authenticationSchemes][1][:name]).to eql('HTTP Basic') }
+      specify { expect(result[:authenticationSchemes][1][:description]).to eql('Authentication scheme using the HTTP Basic Standard') }
+      specify { expect(result[:authenticationSchemes][1][:specUri]).to eql('http://www.rfc-editor.org/info/rfc2617') }
+      specify { expect(result[:authenticationSchemes][1][:documentationUri]).to eql('http://example.com/help/httpBasic.html') }
+      specify { expect(result[:authenticationSchemes][1][:type]).to eql('httpbasic') }
+    end
+
     context 'with custom scheme' do
       before do
         subject.add_authentication(:custom) do |x|

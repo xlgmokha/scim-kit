@@ -23,10 +23,10 @@ module Scim
           @filter = Supportable.new(:max_results)
         end
 
-        def add_authentication(type)
-          authentication_scheme = AuthenticationScheme.build_for(type)
-          yield authentication_scheme if block_given?
-          @authentication_schemes << authentication_scheme
+        def add_authentication(type, primary: nil)
+          scheme = AuthenticationScheme.build_for(type, primary: primary)
+          yield scheme if block_given?
+          @authentication_schemes << scheme
         end
       end
     end

@@ -26,15 +26,17 @@ module Scim
         attr_accessor :documentation_uri
         attr_accessor :spec_uri
         attr_accessor :type
+        attr_accessor :primary
 
         def initialize
           yield self if block_given?
         end
 
-        def self.build_for(type)
+        def self.build_for(type, primary: nil)
           defaults = DEFAULTS[type.to_sym] || {}
           new do |x|
             x.type = type
+            x.primary = primary
             x.description = defaults[:description]
             x.documentation_uri = defaults[:documentation_uri]
             x.name = defaults[:name]
