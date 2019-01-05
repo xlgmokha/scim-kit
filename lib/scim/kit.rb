@@ -3,6 +3,7 @@
 require 'tilt'
 require 'tilt/jbuilder'
 
+require 'scim/kit/dynamic_attributes'
 require 'scim/kit/templatable'
 require 'scim/kit/template'
 require 'scim/kit/version'
