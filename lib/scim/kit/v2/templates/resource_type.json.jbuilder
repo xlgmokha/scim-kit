@@ -2,8 +2,7 @@
 
 json.key_format! camelize: :lower
 json.meta do
-  json.resource_type 'ResourceType'
-  json.location location
+  render meta, json: json
 end
 json.schemas [Scim::Kit::V2::Schema::RESOURCE_TYPE]
 json.id id
