@@ -4,7 +4,7 @@ json.key_format! camelize: :lower
 json.meta do
   render meta, json: json
 end
-json.schemas [Scim::Kit::V2::Schema::RESOURCE_TYPE]
+json.schemas [Scim::Kit::V2::Schemas::RESOURCE_TYPE]
 json.id id
 json.name name
 json.description description

@@ -25,9 +25,9 @@ Or install it yourself as:
 ```ruby
 def user_schema
   Scim::Kit::V2::Schema.build(
-    id: Scim::Kit::V2::Schema::USER,
+    id: Scim::Kit::V2::Schemas::USER,
     name: "User",
-    location: scim_v2_schema_url(id: Scim::Kit::V2::Schema::USER)
+    location: scim_v2_schema_url(id: Scim::Kit::V2::Schemas::USER)
   ) do |schema|
     schema.description = "User Account"
     schema.add_attribute(name: 'userName') do |x|

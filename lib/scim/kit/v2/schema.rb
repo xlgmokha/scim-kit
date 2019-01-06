@@ -7,13 +7,6 @@ module Scim
       class Schema
         include Templatable
 
-        CORE = 'urn:ietf:params:scim:schemas:core:2.0'
-        ERROR = 'urn:ietf:params:scim:api:messages:2.0:Error'
-        GROUP = "#{CORE}:Group"
-        RESOURCE_TYPE = "#{CORE}:ResourceType"
-        SERVICE_PROVIDER_CONFIGURATION = "#{CORE}:ServiceProviderConfig"
-        USER = "#{CORE}:User"
-
         attr_reader :id, :name, :location, :attributes
         attr_accessor :description
 

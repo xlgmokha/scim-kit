@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 json.key_format! camelize: :lower
-json.schemas [Scim::Kit::V2::Schema::SERVICE_PROVIDER_CONFIGURATION]
+json.schemas [Scim::Kit::V2::Schemas::SERVICE_PROVIDER_CONFIGURATION]
 json.documentation_uri documentation_uri
 json.patch do
   render patch, json: json
