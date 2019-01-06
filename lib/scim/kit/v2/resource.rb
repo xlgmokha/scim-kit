@@ -13,7 +13,7 @@ module Scim
         def initialize(schema:, location:)
           @meta = Meta.new(schema.id, location)
           @dynamic_attributes = Hash[
-            schema.attributes.map { |x| [x.name.underscore, nil] }
+            schema.attributes.map { |x| [x.name.underscore, Attribute.new(type: x)] }
           ].with_indifferent_access
         end
 
@@ -22,9 +22,9 @@ module Scim
             target = method.to_s.delete('=')
             return super unless respond_to_missing?(target)
 
-            @dynamic_attributes[target] = args[0]
+            @dynamic_attributes[target].value = args[0]
           else
-            @dynamic_attributes[method]
+            @dynamic_attributes[method].value
           end
         end
 
