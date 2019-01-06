@@ -3,7 +3,7 @@
 module Scim
   module Kit
     module V2
-      # Represents a SCIM Schema
+      # Represents a SCIM Attribute
       class Attribute
         attr_reader :type
         attr_accessor :value

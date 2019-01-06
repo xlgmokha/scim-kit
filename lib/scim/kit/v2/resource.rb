@@ -3,7 +3,7 @@
 module Scim
   module Kit
     module V2
-      # Represents a SCIM Schema
+      # Represents a SCIM Resource
       class Resource
         include Templatable
 
@@ -13,7 +13,9 @@ module Scim
         def initialize(schema:, location:)
           @meta = Meta.new(schema.id, location)
           @dynamic_attributes = Hash[
-            schema.attributes.map { |x| [x.name.underscore, Attribute.new(type: x)] }
+            schema.attributes.map do |x|
+              [x.name.underscore, Attribute.new(type: x)]
+            end
           ].with_indifferent_access
         end
 
