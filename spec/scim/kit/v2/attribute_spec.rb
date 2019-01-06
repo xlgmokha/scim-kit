@@ -124,4 +124,13 @@ RSpec.describe Scim::Kit::V2::Attribute do
       specify { expect(subject.value).to eql(Base64.strict_encode64(photo)) }
     end
   end
+
+  context "with reference" do
+    let(:type) { Scim::Kit::V2::AttributeType.new(name: 'group', type: :reference) }
+    let(:uri) { FFaker::Internet.uri('https') }
+
+    before { subject.value = uri }
+
+    specify { expect(subject.value).to eql(uri) }
+  end
 end

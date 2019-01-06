@@ -31,6 +31,8 @@ module Scim
               new_value
           when :binary
             @value = Base64.strict_encode64(new_value)
+          when :reference
+            @value = new_value
           end
 
           if type.canonical_values && !type.canonical_values.empty?
