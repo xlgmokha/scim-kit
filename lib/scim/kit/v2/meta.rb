@@ -14,7 +14,8 @@ module Scim
         def initialize(resource_type, location)
           @resource_type = resource_type
           @location = location
-          @version = @created = @last_modified = Time.now
+          @created = @last_modified = Time.now
+          @version = @created.to_i
         end
       end
     end
