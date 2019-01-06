@@ -29,7 +29,7 @@ module Scim
 
         def initialize(name:, type: :string)
           @name = name
-          @type = type
+          @type = type.to_sym
           @description = ''
           @multi_valued = false
           @required = false
@@ -37,7 +37,7 @@ module Scim
           @mutability = Mutability::READ_WRITE
           @returned = Returned::DEFAULT
           @uniqueness = Uniqueness::NONE
-          raise ArgumentError, :type unless DATATYPES[type.to_sym]
+          raise ArgumentError, :type unless DATATYPES[@type]
         end
 
         def mutability=(value)
