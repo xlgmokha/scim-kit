@@ -2,7 +2,7 @@
 
 module Scim
   module Kit
-    # Allows dynamic assignment of attributes.
+    # Allows dynamic creation of attributes.
     module DynamicAttributes
       def method_missing(method, *args)
         return super unless respond_to_missing?(method)
