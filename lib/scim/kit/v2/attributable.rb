@@ -21,18 +21,26 @@ module Scim
           dynamic_attributes[name]
         end
 
+        def read_attribute(name)
+          attribute = attribute_for(name)
+          return attribute._value if attribute.type.multi_valued
+
+          attribute.type.complex? ? attribute : attribute._value
+        end
+
+        def write_attribute(name, value)
+          attribute_for(name)._value = value
+        end
+
         def create_module_for(type)
           name = type.name.underscore.to_sym
           Module.new do
             define_method(name) do |*_args|
-              attribute = attribute_for(name)
-              return attribute._value if attribute.type.multi_valued
-
-              attribute.type.complex? ? attribute : attribute._value
+              read_attribute(name)
             end
 
             define_method("#{name}=") do |*args|
-              attribute_for(name)._value = args[0]
+              write_attribute(name, args[0])
             end
           end
         end
