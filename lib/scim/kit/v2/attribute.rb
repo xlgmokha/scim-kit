@@ -8,16 +8,16 @@ module Scim
         include Attributable
         include Templatable
         attr_reader :type
-        attr_reader :value
+        attr_reader :_value
 
         def initialize(type:, value: nil)
           @type = type
-          @value = value
+          @_value = value
           define_attributes_for(type.attributes)
         end
 
-        def value=(new_value)
-          @value = type.coerce(new_value)
+        def _value=(new_value)
+          @_value = type.coerce(new_value)
 
           if type.canonical_values &&
              !type.canonical_values.empty? &&

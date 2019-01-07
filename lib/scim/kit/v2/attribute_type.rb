@@ -60,9 +60,9 @@ module Scim
         end
 
         def add_attribute(name:, type: :string)
-          @type = :complex
           attribute = AttributeType.new(name: name, type: type)
           yield attribute if block_given?
+          @type = :complex
           attributes << attribute
         end
 
@@ -83,6 +83,7 @@ module Scim
           if type_is?(:boolean) && ![true, false].include?(value)
             raise ArgumentError, value
           end
+          return value if multi_valued
 
           coercion = COERCION[type]
           coercion ? coercion.call(value) : value
