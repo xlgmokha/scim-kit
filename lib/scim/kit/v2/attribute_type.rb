@@ -16,6 +16,13 @@ module Scim
           reference: 'reference',
           complex: 'complex'
         }.freeze
+        COERCION = {
+          string: ->(x) { x.to_s },
+          decimal: ->(x) { x.to_f },
+          integer: ->(x) { x.to_i },
+          datetime: ->(x) { x.is_a?(::String) ? DateTime.parse(x) : x },
+          binary: ->(x) { Base64.strict_encode64(x) }
+        }.freeze
         attr_accessor :canonical_values
         attr_accessor :case_exact
         attr_accessor :description
@@ -70,6 +77,15 @@ module Scim
 
         def complex?
           type_is?(:complex)
+        end
+
+        def coerce(value)
+          if type_is?(:boolean) && ![true, false].include?(value)
+            raise ArgumentError, value
+          end
+
+          coercion = COERCION[type]
+          coercion ? coercion.call(value) : value
         end
 
         private

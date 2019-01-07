@@ -3,6 +3,7 @@
 module Scim
   module Kit
     module V2
+      # Represents a dynamic attribute
       module Attributable
         attr_reader :dynamic_attributes
 
@@ -22,7 +23,7 @@ module Scim
             @dynamic_attributes[target].value = args[0]
           else
             attribute = @dynamic_attributes[method]
-            attribute.type.complex? ? @dynamic_attributes[method] : @dynamic_attributes[method].value
+            attribute.type.complex? ? attribute : attribute.value
           end
         end
 
