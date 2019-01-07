@@ -155,12 +155,31 @@ RSpec.describe Scim::Kit::V2::Attribute do
     before do
       subject.family_name = 'Garrett'
       subject.given_name = 'Tsuyoshi'
-      puts subject.as_json
     end
 
     specify { expect(subject.family_name).to eql('Garrett') }
     specify { expect(subject.given_name).to eql('Tsuyoshi') }
     specify { expect(subject.as_json[:name][:familyName]).to eql('Garrett') }
     specify { expect(subject.as_json[:name][:givenName]).to eql('Tsuyoshi') }
+  end
+
+  context "with multi valued complex type" do
+    let(:type) do
+      x = Scim::Kit::V2::AttributeType.new(name: 'emails', type: :complex)
+      x.multi_valued = true
+      x.add_attribute(name: 'value')
+      x.add_attribute(name: 'primary', type: :boolean)
+      x
+    end
+    let(:email) { FFaker::Internet.email }
+    let(:other_email) { FFaker::Internet.email }
+
+    before do
+      subject.emails << { value: email, primary: true }
+      subject.emails << { value: other_email, primary: false }
+    end
+
+    specify { expect(subject.emails).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
+    specify { expect(subject.as_json[:emails]).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
   end
 end

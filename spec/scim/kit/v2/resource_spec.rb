@@ -69,4 +69,22 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.as_json[:name][:givenName]).to eql('Tsuyoshi') }
     end
   end
+
+  context "with a complex multi valued attribute" do
+    let(:email) { FFaker::Internet.email }
+    let(:other_email) { FFaker::Internet.email }
+
+    before do
+      schema.add_attribute(name: 'emails') do |x|
+        x.multi_valued = true
+        x.add_attribute(name: 'value')
+        x.add_attribute(name: 'primary', type: :boolean)
+      end
+      subject.emails << { value: email, primary: true }
+      subject.emails << { value: other_email, primary: false }
+    end
+
+    specify { expect(subject.emails).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
+    specify { expect(subject.as_json[:emails]).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
+  end
 end

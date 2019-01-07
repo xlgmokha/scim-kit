@@ -8,27 +8,27 @@ module Scim
         attr_reader :dynamic_attributes
 
         def define_attributes_for(types)
-          @dynamic_attributes = Hash[
-            types.map do |x|
-              [x.name.underscore, Attribute.new(type: x)]
-            end
-          ].with_indifferent_access
-        end
-
-        def method_missing(method, *args)
-          if method.match?(/=/)
-            target = method.to_s.delete('=')
-            return super unless respond_to_missing?(target)
-
-            @dynamic_attributes[target].value = args[0]
-          else
-            attribute = @dynamic_attributes[method]
-            attribute.type.complex? ? attribute : attribute.value
+          @dynamic_attributes = {}.with_indifferent_access
+          types.each do |type|
+            dynamic_attributes[type.name.underscore] = Attribute.new(type: type)
+            self.extend(create_module_for(type))
           end
         end
 
-        def respond_to_missing?(method, _include_private = false)
-          @dynamic_attributes.key?(method) || super
+        private
+
+        def create_module_for(type)
+          name = type.name.underscore.to_sym
+          Module.new do
+            define_method(name) do |*args, &block|
+              attribute = dynamic_attributes[name]
+              attribute.type.complex? ? attribute : attribute.value
+            end
+
+            define_method("#{name}=") do |*args, &block|
+              dynamic_attributes[name].value = args[0]
+            end
+          end
         end
       end
     end
