@@ -6,7 +6,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
   context 'with strings' do
     let(:type) { Scim::Kit::V2::AttributeType.new(name: 'userName', type: :string) }
 
-    context 'valid' do
+    context 'when valid' do
       let(:user_name) { FFaker::Internet.user_name }
 
       before { subject.value = user_name }
@@ -14,7 +14,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
       specify { expect(subject.value).to eql(user_name) }
     end
 
-    context 'given integer' do
+    context 'when integer' do
       let(:number) { rand(100) }
 
       before { subject.value = number }
@@ -22,7 +22,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
       specify { expect(subject.value).to eql(number.to_s) }
     end
 
-    context 'given datetime' do
+    context 'when datetime' do
       let(:datetime) { DateTime.now }
 
       before { subject.value = datetime }
@@ -30,18 +30,19 @@ RSpec.describe Scim::Kit::V2::Attribute do
       specify { expect(subject.value).to eql(datetime.to_s) }
     end
 
-    context 'when canonical values are provided' do
+    context 'when not matching a canonical value' do
       before { type.canonical_values = %w[batman robin] }
 
-      context 'when not matching a canonical value' do
-        specify { expect { subject.value = 'spider man' }.to raise_error(ArgumentError) }
+      specify { expect { subject.value = 'spider man' }.to raise_error(ArgumentError) }
+    end
+
+    context 'when canonical value is given' do
+      before do
+        type.canonical_values = %w[batman robin]
+        subject.value = 'batman'
       end
 
-      context 'when canonical value is given' do
-        before { subject.value = 'batman' }
-
-        specify { expect(subject.value).to eql('batman') }
-      end
+      specify { expect(subject.value).to eql('batman') }
     end
   end
 
@@ -125,7 +126,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
     end
   end
 
-  context "with reference" do
+  context 'with reference' do
     let(:type) { Scim::Kit::V2::AttributeType.new(name: 'group', type: :reference) }
     let(:uri) { FFaker::Internet.uri('https') }
 
