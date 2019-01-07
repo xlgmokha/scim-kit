@@ -19,7 +19,8 @@ module Scim
 
             @dynamic_attributes[target].value = args[0]
           else
-            @dynamic_attributes[method].value
+            attribute = @dynamic_attributes[method]
+            attribute.type.complex? ? @dynamic_attributes[method] : @dynamic_attributes[method].value
           end
         end
 

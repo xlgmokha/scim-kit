@@ -50,4 +50,18 @@ RSpec.describe Scim::Kit::V2::Resource do
 
     specify { expect(subject.user_name).to eql(user_name) }
   end
+
+  context 'with a complex attribute' do
+    before do
+      schema.add_attribute(name: 'name') do |x|
+        x.add_attribute(name: 'familyName')
+        x.add_attribute(name: 'givenName')
+      end
+      subject.name.family_name = 'khan'
+      subject.name.given_name = 'mo'
+    end
+
+    specify { expect(subject.name.family_name).to eql('khan') }
+    specify { expect(subject.name.given_name).to eql('mo') }
+  end
 end

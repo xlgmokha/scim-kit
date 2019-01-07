@@ -68,11 +68,11 @@ module Scim
           @attributes ||= []
         end
 
-        private
-
         def complex?
           type_is?(:complex)
         end
+
+        private
 
         def string?
           type_is?(:string)
