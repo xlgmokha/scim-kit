@@ -134,4 +134,21 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
     specify { expect(subject.value).to eql(uri) }
   end
+
+  context 'with complex type' do
+    let(:type) do
+      x = Scim::Kit::V2::AttributeType.new(name: 'name', type: :complex)
+      x.add_attribute(name: 'familyName')
+      x.add_attribute(name: 'givenName')
+      x
+    end
+
+    before do
+      subject.family_name = 'mo'
+      subject.given_name = 'khan'
+    end
+
+    specify { expect(subject.family_name).to eql('mo') }
+    specify { expect(subject.given_name).to eql('khan') }
+  end
 end

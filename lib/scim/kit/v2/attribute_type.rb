@@ -64,11 +64,11 @@ module Scim
           @reference_types = value
         end
 
-        private
-
         def attributes
           @attributes ||= []
         end
+
+        private
 
         def complex?
           type_is?(:complex)

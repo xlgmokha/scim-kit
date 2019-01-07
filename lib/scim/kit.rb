@@ -9,6 +9,7 @@ require 'scim/kit/templatable'
 require 'scim/kit/template'
 require 'scim/kit/version'
 
+require 'scim/kit/v2/attributable'
 require 'scim/kit/v2/attribute'
 require 'scim/kit/v2/attribute_type'
 require 'scim/kit/v2/authentication_scheme'

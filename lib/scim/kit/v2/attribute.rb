@@ -5,12 +5,14 @@ module Scim
     module V2
       # Represents a SCIM Attribute
       class Attribute
+        include Attributable
         attr_reader :type
         attr_reader :value
 
         def initialize(type:, value: nil)
           @type = type
           @value = value
+          define_attributes_for(type.attributes)
         end
 
         def value=(new_value)
