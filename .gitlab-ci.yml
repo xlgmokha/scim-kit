@@ -1,0 +1,11 @@
+image: ruby:2.6
+
+before_script:
+  - apt-get update && apt-get install -y locales
+  - echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+  - locale-gen
+  - export LC_ALL=en_US.UTF-8
+
+rspec:
+  script:
+    - bin/cibuild
