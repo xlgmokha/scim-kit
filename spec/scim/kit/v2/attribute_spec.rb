@@ -12,6 +12,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
       before { subject.value = user_name }
 
       specify { expect(subject.value).to eql(user_name) }
+      specify { expect(subject.as_json[:userName]).to eql(user_name) }
     end
 
     context 'when integer' do
@@ -53,12 +54,14 @@ RSpec.describe Scim::Kit::V2::Attribute do
       before { subject.value = true }
 
       specify { expect(subject.value).to be(true) }
+      specify { expect(subject.as_json[:hungry]).to be(true) }
     end
 
     context 'when false' do
       before { subject.value = false }
 
       specify { expect(subject.value).to be(false) }
+      specify { expect(subject.as_json[:hungry]).to be(false) }
     end
 
     context 'when string' do
@@ -73,12 +76,14 @@ RSpec.describe Scim::Kit::V2::Attribute do
       before { subject.value = Math::PI }
 
       specify { expect(subject.value).to eql(Math::PI) }
+      specify { expect(subject.as_json[:measurement]).to be(Math::PI) }
     end
 
     context 'when given an integer' do
       before { subject.value = 42 }
 
       specify { expect(subject.value).to eql(42.to_f) }
+      specify { expect(subject.as_json[:measurement]).to be(42.to_f) }
     end
   end
 
@@ -89,6 +94,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
       before { subject.value = 34 }
 
       specify { expect(subject.value).to be(34) }
+      specify { expect(subject.as_json[:age]).to be(34) }
     end
 
     context 'when given float' do
@@ -106,6 +112,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
       before { subject.value = datetime }
 
       specify { expect(subject.value).to eql(datetime) }
+      specify { expect(subject.as_json[:birthdate]).to eql(datetime.iso8601) }
     end
 
     context 'when given a string' do
@@ -123,6 +130,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
       before { subject.value = photo }
 
       specify { expect(subject.value).to eql(Base64.strict_encode64(photo)) }
+      specify { expect(subject.as_json[:photo]).to eql(Base64.strict_encode64(photo)) }
     end
   end
 
@@ -133,6 +141,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
     before { subject.value = uri }
 
     specify { expect(subject.value).to eql(uri) }
+    specify { expect(subject.as_json[:group]).to eql(uri) }
   end
 
   context 'with complex type' do
@@ -144,11 +153,14 @@ RSpec.describe Scim::Kit::V2::Attribute do
     end
 
     before do
-      subject.family_name = 'mo'
-      subject.given_name = 'khan'
+      subject.family_name = 'Garrett'
+      subject.given_name = 'Tsuyoshi'
+      puts subject.as_json
     end
 
-    specify { expect(subject.family_name).to eql('mo') }
-    specify { expect(subject.given_name).to eql('khan') }
+    specify { expect(subject.family_name).to eql('Garrett') }
+    specify { expect(subject.given_name).to eql('Tsuyoshi') }
+    specify { expect(subject.as_json[:name][:familyName]).to eql('Garrett') }
+    specify { expect(subject.as_json[:name][:givenName]).to eql('Tsuyoshi') }
   end
 end

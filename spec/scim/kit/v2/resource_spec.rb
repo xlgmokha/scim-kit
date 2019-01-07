@@ -57,11 +57,16 @@ RSpec.describe Scim::Kit::V2::Resource do
         x.add_attribute(name: 'familyName')
         x.add_attribute(name: 'givenName')
       end
-      subject.name.family_name = 'khan'
-      subject.name.given_name = 'mo'
+      subject.name.family_name = 'Garrett'
+      subject.name.given_name = 'Tsuyoshi'
     end
 
-    specify { expect(subject.name.family_name).to eql('khan') }
-    specify { expect(subject.name.given_name).to eql('mo') }
+    specify { expect(subject.name.family_name).to eql('Garrett') }
+    specify { expect(subject.name.given_name).to eql('Tsuyoshi') }
+
+    describe '#as_json' do
+      specify { expect(subject.as_json[:name][:familyName]).to eql('Garrett') }
+      specify { expect(subject.as_json[:name][:givenName]).to eql('Tsuyoshi') }
+    end
   end
 end

@@ -4,6 +4,8 @@ module Scim
   module Kit
     module V2
       module Attributable
+        attr_reader :dynamic_attributes
+
         def define_attributes_for(types)
           @dynamic_attributes = Hash[
             types.map do |x|

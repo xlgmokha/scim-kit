@@ -6,6 +6,7 @@ module Scim
       # Represents a SCIM Attribute
       class Attribute
         include Attributable
+        include Templatable
         attr_reader :type
         attr_reader :value
 
