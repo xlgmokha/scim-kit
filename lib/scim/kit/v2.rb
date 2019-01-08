@@ -21,6 +21,15 @@ module Scim
   module Kit
     # Version 2 of the SCIM RFC https://tools.ietf.org/html/rfc7644
     module V2
+      class << self
+        def configuration
+          @configuration ||= ::Scim::Kit::V2::Configuration.new
+        end
+
+        def configure
+          yield configuration
+        end
+      end
     end
   end
 end
