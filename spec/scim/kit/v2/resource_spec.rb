@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::V2::Resource do
-  subject { described_class.new(schemas: [schema], location: resource_location) }
+  subject { described_class.new(schemas: schemas, location: resource_location) }
 
+  let(:schemas) { [schema] }
   let(:schema) { Scim::Kit::V2::Schema.new(id: Scim::Kit::V2::Schemas::USER, name: 'User', location: FFaker::Internet.uri('https')) }
   let(:resource_location) { FFaker::Internet.uri('https') }
 
@@ -89,5 +90,19 @@ RSpec.describe Scim::Kit::V2::Resource do
 
     specify { expect(subject.emails).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
     specify { expect(subject.as_json[:emails]).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
+  end
+
+  context 'with multiple schemas' do
+    let(:schemas) { [schema, extension] }
+    let(:extension) { Scim::Kit::V2::Schema.new(id: extension_id, name: 'Extension', location: FFaker::Internet.uri('https')) }
+    let(:extension_id) { 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User' }
+
+    before do
+      extension.add_attribute(name: :department)
+      subject.department = 'voltron'
+    end
+
+    specify { expect(subject.department).to eql('voltron') }
+    specify { expect(subject.as_json[extension_id][:department]).to eql('voltron') }
   end
 end

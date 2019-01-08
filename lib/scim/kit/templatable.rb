@@ -13,7 +13,7 @@ module Scim
       end
 
       def to_h
-        JSON.parse(to_json, symbolize_names: true)
+        JSON.parse(to_json, symbolize_names: true).with_indifferent_access
       end
 
       def render(model, options)

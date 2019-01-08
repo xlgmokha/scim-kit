@@ -35,7 +35,7 @@ module Scim
         attr_reader :uniqueness
 
         def initialize(name:, type: :string)
-          @name = name
+          @name = name.to_s
           @type = type.to_sym
           @description = ''
           @multi_valued = false

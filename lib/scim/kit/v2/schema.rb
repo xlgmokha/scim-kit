@@ -23,6 +23,10 @@ module Scim
           attributes << attribute
         end
 
+        def core?
+          id.include?(Schemas::CORE)
+        end
+
         def self.build(*args)
           item = new(*args)
           yield item
