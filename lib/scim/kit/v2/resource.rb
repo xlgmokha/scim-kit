@@ -12,10 +12,12 @@ module Scim
         attr_reader :meta
         attr_reader :schemas
 
-        def initialize(schema:, location:)
-          @meta = Meta.new(schema.name, location)
-          @schemas = [schema]
-          define_attributes_for(schema.attributes)
+        def initialize(schemas:, location:)
+          @meta = Meta.new(schemas[0].name, location)
+          @schemas = schemas
+          schemas.each do |schema|
+            define_attributes_for(schema.attributes)
+          end
         end
       end
     end

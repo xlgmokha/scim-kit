@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::V2::Resource do
-  subject { described_class.new(schema: schema, location: resource_location) }
+  subject { described_class.new(schemas: [schema], location: resource_location) }
 
   let(:schema) { Scim::Kit::V2::Schema.new(id: Scim::Kit::V2::Schemas::USER, name: 'User', location: FFaker::Internet.uri('https')) }
   let(:resource_location) { FFaker::Internet.uri('https') }
