@@ -192,5 +192,9 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
     specify { expect(subject._value).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
     specify { expect(subject.as_json[:emails]).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
+
+    context "when the hash is invalid" do
+      xspecify { expect { subject._value = [ { blah: 'blah' } ] }.to raise_error(ArgumentError) }
+    end
   end
 end
