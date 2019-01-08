@@ -27,7 +27,9 @@ module Scim
         end
 
         def configure
-          yield configuration
+          builder = ::Scim::Kit::V2::Configuration::Builder.new
+          yield builder
+          builder.apply_to(configuration)
         end
       end
     end

@@ -41,7 +41,7 @@ module Scim
 
         def initialize
           builder = Builder.new
-          yield builder
+          yield builder if block_given?
           builder.apply_to(self)
         end
       end
