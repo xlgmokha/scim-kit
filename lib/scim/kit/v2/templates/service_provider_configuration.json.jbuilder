@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 json.key_format! camelize: :lower
+json.meta do
+  render meta, json: json
+end
 json.schemas [Scim::Kit::V2::Schemas::SERVICE_PROVIDER_CONFIGURATION]
 json.documentation_uri documentation_uri
 json.patch do
@@ -23,7 +26,4 @@ json.etag do
 end
 json.authentication_schemes authentication_schemes do |authentication_scheme|
   render authentication_scheme, json: json
-end
-json.meta do
-  render meta, json: json
 end

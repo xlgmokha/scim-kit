@@ -7,13 +7,14 @@ module Scim
       class Schema
         include Templatable
 
-        attr_reader :id, :name, :location, :attributes
+        attr_reader :id, :name, :attributes, :meta
         attr_accessor :description
 
         def initialize(id:, name:, location:)
           @id = id
           @name = name
-          @location = location
+          @meta = Meta.new('Schema', location)
+          @meta.created = @meta.last_modified = @meta.version = nil
           @attributes = []
         end
 
