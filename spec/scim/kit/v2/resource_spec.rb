@@ -53,6 +53,17 @@ RSpec.describe Scim::Kit::V2::Resource do
     specify { expect(subject.user_name).to eql(user_name) }
   end
 
+  context 'with attribute named "type"' do
+    before do
+      schema.add_attribute(name: 'type')
+      subject.type = 'User'
+    end
+
+    specify { expect(subject.type).to eql('User') }
+    specify { expect(subject.as_json[:type]).to eql('User') }
+    specify { expect(subject.send(:attribute_for, :type).type).to be_instance_of(Scim::Kit::V2::AttributeType) }
+  end
+
   context 'with a complex attribute' do
     before do
       schema.add_attribute(name: 'name') do |x|
