@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 json.key_format! camelize: :lower
+json.schemas schemas.map(&:id)
 json.id id
 json.external_id external_id
 json.meta do

@@ -10,9 +10,11 @@ module Scim
 
         attr_accessor :id, :external_id
         attr_reader :meta
+        attr_reader :schemas
 
         def initialize(schema:, location:)
-          @meta = Meta.new(schema.id, location)
+          @meta = Meta.new(schema.name, location)
+          @schemas = [schema]
           define_attributes_for(schema.attributes)
         end
       end

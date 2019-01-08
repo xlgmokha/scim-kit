@@ -3,7 +3,7 @@
 RSpec.describe Scim::Kit::V2::Resource do
   subject { described_class.new(schema: schema, location: resource_location) }
 
-  let(:schema) { Scim::Kit::V2::Schema.new(id: 'User', name: 'User', location: FFaker::Internet.uri('https')) }
+  let(:schema) { Scim::Kit::V2::Schema.new(id: Scim::Kit::V2::Schemas::USER, name: 'User', location: FFaker::Internet.uri('https')) }
   let(:resource_location) { FFaker::Internet.uri('https') }
 
   context 'with common attributes' do
@@ -30,6 +30,7 @@ RSpec.describe Scim::Kit::V2::Resource do
     specify { expect(subject.meta.version).to eql(version) }
 
     describe '#as_json' do
+      specify { expect(subject.as_json[:schemas]).to match_array([schema.id]) }
       specify { expect(subject.as_json[:id]).to eql(id) }
       specify { expect(subject.as_json[:externalId]).to eql(external_id) }
       specify { expect(subject.as_json[:meta][:resourceType]).to eql('User') }
