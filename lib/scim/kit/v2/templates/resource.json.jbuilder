@@ -10,12 +10,12 @@ end
 schemas.each do |schema|
   if schema.core?
     schema.attributes.each do |type|
-      render dynamic_attributes[type.name.underscore], json: json
+      render dynamic_attributes[type.name], json: json
     end
   else
     json.set! schema.id do
       schema.attributes.each do |type|
-        render dynamic_attributes[type.name.underscore], json: json
+        render dynamic_attributes[type.name], json: json
       end
     end
   end

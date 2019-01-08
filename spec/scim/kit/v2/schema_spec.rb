@@ -24,7 +24,7 @@ RSpec.describe Scim::Kit::V2::Schema do
       subject.add_attribute(name: 'displayName')
     end
 
-    specify { expect(result[:attributes][0][:name]).to eql('displayName') }
+    specify { expect(result[:attributes][0][:name]).to eql('display_name') }
     specify { expect(result[:attributes][0][:type]).to eql('string') }
     specify { expect(result[:attributes][0][:multiValued]).to be(false) }
     specify { expect(result[:attributes][0][:description]).to eql('') }

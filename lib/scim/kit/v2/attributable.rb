@@ -10,7 +10,7 @@ module Scim
         def define_attributes_for(types)
           @dynamic_attributes = {}.with_indifferent_access
           types.each do |type|
-            dynamic_attributes[type.name.underscore] = Attribute.new(type: type)
+            dynamic_attributes[type.name] = Attribute.new(type: type)
             extend(create_module_for(type))
           end
         end
@@ -33,7 +33,7 @@ module Scim
         end
 
         def create_module_for(type)
-          name = type.name.underscore.to_sym
+          name = type.name.to_sym
           Module.new do
             define_method(name) do |*_args|
               read_attribute(name)

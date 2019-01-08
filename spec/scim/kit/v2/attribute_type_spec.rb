@@ -15,9 +15,9 @@ RSpec.describe Scim::Kit::V2::AttributeType do
     describe 'defaults' do
       subject { described_class.new(name: 'displayName') }
 
-      specify { expect(subject.name).to eql('displayName') }
+      specify { expect(subject.name).to eql('display_name') }
       specify { expect(subject.type).to be(:string) }
-      specify { expect(subject.to_h[:name]).to eql('displayName') }
+      specify { expect(subject.to_h[:name]).to eql('display_name') }
       specify { expect(subject.to_h[:type]).to eql('string') }
       specify { expect(subject.to_h[:multiValued]).to be(false) }
       specify { expect(subject.to_h[:description]).to eql('') }
