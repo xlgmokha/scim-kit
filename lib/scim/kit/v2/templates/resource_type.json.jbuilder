@@ -10,4 +10,4 @@ json.name name
 json.description description
 json.endpoint endpoint
 json.schema schema
-json.schema_extensions []
+json.schema_extensions schema_extensions

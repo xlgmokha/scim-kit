@@ -22,4 +22,12 @@ RSpec.describe Scim::Kit::V2::ResourceType do
   specify { expect(subject.to_h[:name]).to eql(subject.name) }
   specify { expect(subject.to_h[:schema]).to eql(subject.schema) }
   specify { expect(subject.to_h[:schemaExtensions]).to match_array([]) }
+
+  context 'with a schema extension' do
+    let(:extension) { 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User' }
+
+    before { subject.schema_extensions.push(extension) }
+
+    specify { expect(subject.to_h[:schemaExtensions]).to match_array([extension]) }
+  end
 end

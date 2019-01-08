@@ -12,11 +12,13 @@ module Scim
         attr_accessor :description
         attr_accessor :endpoint
         attr_accessor :schema
+        attr_accessor :schema_extensions
         attr_reader :meta
 
         def initialize(location:)
           @meta = Meta.new('ResourceType', location)
           @meta.version = @meta.created = @meta.last_modified = nil
+          @schema_extensions = []
         end
 
         def self.build(*args)
