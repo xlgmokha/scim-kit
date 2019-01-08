@@ -9,10 +9,7 @@ module Scim
 
         def define_attributes_for(types)
           @dynamic_attributes = {}.with_indifferent_access
-          types.each do |type|
-            dynamic_attributes[type.name] = Attribute.new(type: type)
-            extend(create_module_for(type))
-          end
+          types.each { |x| attribute(x) }
         end
 
         private
@@ -43,6 +40,11 @@ module Scim
               write_attribute(name, args[0])
             end
           end
+        end
+
+        def attribute(type)
+          dynamic_attributes[type.name] = Attribute.new(type: type)
+          extend(create_module_for(type))
         end
       end
     end
