@@ -116,4 +116,32 @@ RSpec.describe Scim::Kit::V2::Resource do
     specify { expect(subject.department).to eql('voltron') }
     specify { expect(subject.as_json[extension_id][:department]).to eql('voltron') }
   end
+
+  describe "#valid?" do
+    context "when invalid" do
+      before { subject.valid? }
+
+      specify { expect(subject).not_to be_valid }
+      specify { expect(subject.errors[:id]).to be_present }
+    end
+
+    context "when valid" do
+      before { subject.id = SecureRandom.uuid }
+
+      specify { expect(subject).to be_valid }
+    end
+
+    context "when a required attribute is blank" do
+      before do
+        schema.add_attribute(name: 'userName') do |x|
+          x.required = true
+        end
+        subject.id = SecureRandom.uuid
+        subject.valid?
+      end
+
+      specify { expect(subject).not_to be_valid }
+      specify { expect(subject.errors[:user_name]).to be_present }
+    end
+  end
 end
