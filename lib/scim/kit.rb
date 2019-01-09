@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
+require 'active_model'
+require 'active_support/core_ext/hash/indifferent_access'
 require 'tilt'
 require 'tilt/jbuilder'
-require 'active_support/core_ext/hash/indifferent_access'
 
 require 'scim/kit/dynamic_attributes'
 require 'scim/kit/templatable'

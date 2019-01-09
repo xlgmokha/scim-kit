@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'active_model'
 
 module Scim
   module Kit
@@ -36,9 +35,8 @@ module Scim
         end
 
         def validate_attribute(type)
-          attribute = read_attribute(type.name)
-
-          errors.add(type.name, "is required") if type.required && attribute.nil?
+          attribute = attribute_for(type.name)
+          errors.copy!(attribute.errors) unless attribute.valid?
         end
       end
     end

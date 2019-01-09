@@ -41,9 +41,14 @@ RSpec.describe Scim::Kit::V2::Attribute do
     end
 
     context 'when not matching a canonical value' do
-      before { type.canonical_values = %w[batman robin] }
+      before do
+        type.canonical_values = %w[batman robin]
+        subject._value = 'spider man'
+        subject.valid?
+      end
 
-      specify { expect { subject._value = 'spider man' }.to raise_error(ArgumentError) }
+      specify { expect(subject).not_to be_valid }
+      specify { expect(subject.errors[:user_name]).to be_present }
     end
 
     context 'when canonical value is given' do
