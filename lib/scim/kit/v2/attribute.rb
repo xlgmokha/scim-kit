@@ -13,6 +13,7 @@ module Scim
 
         validate :presence_of_value, if: proc { |x| x.type.required }
         validate :inclusion_of_value, if: proc { |x| x.type.canonical_values }
+        validate :validate_array, if: proc { |x| x.type.multi_valued }
 
         def initialize(type:, value: nil)
           @type = type
@@ -36,6 +37,12 @@ module Scim
           return if type.canonical_values.include?(_value)
 
           errors.add(type.name, I18n.t('errors.messages.inclusion'))
+        end
+
+        def validate_array
+          return if _value.respond_to?(:each) && _value.all? { |x| type.valid?(x) }
+
+          errors.add(type.name, I18n.t('errors.messages.invalid'))
         end
       end
     end

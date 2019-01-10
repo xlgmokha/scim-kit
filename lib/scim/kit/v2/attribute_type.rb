@@ -6,6 +6,7 @@ module Scim
       # Represents a scim Attribute type
       class AttributeType
         include Templatable
+        BASE64_FORMAT = %r(\A([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z).freeze
         DATATYPES = {
           string: 'string',
           boolean: 'boolean',
@@ -23,6 +24,13 @@ module Scim
           datetime: ->(x) { x.is_a?(::String) ? DateTime.parse(x) : x },
           binary: ->(x) { Base64.strict_encode64(x) }
         }.freeze
+        VALIDATIONS = {
+          string: ->(x) { x.is_a?(String) },
+          decimal: ->(x) { x.is_a?(Float) },
+          integer: ->(x) { x&.integer? },
+          datetime: ->(x) { x.is_a?(DateTime) },
+          binary: ->(x) { x.is_a?(String) && !!x.match(BASE64_FORMAT) }
+        }
         attr_accessor :canonical_values
         attr_accessor :case_exact
         attr_accessor :description
@@ -87,6 +95,10 @@ module Scim
 
           coercion = COERCION[type]
           coercion ? coercion.call(value) : value
+        end
+
+        def valid?(value)
+          VALIDATIONS[type]&.call(value)
         end
 
         private

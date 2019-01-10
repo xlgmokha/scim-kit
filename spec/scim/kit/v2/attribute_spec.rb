@@ -13,6 +13,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
       specify { expect(subject._value).to eql(user_name) }
       specify { expect(subject.as_json[:userName]).to eql(user_name) }
+      specify { expect(subject).to be_valid }
     end
 
     context 'when multiple values are allowed' do
@@ -22,6 +23,28 @@ RSpec.describe Scim::Kit::V2::Attribute do
       end
 
       specify { expect(subject._value).to match_array(%w[superman batman]) }
+
+      context "when a single value is provided" do
+        before do
+          type.multi_valued = true
+          subject._value = 'batman'
+          subject.valid?
+        end
+
+        specify { expect(subject).not_to be_valid }
+        specify { expect(subject.errors[:user_name]).to be_present }
+      end
+
+      context "when the wrong type is used" do
+        before do
+          type.multi_valued = true
+          subject._value = [1.0, 2.0]
+          subject.valid?
+        end
+
+        specify { expect(subject).not_to be_valid }
+        specify { expect(subject.errors[:user_name]).to be_present }
+      end
     end
 
     context 'when integer' do
