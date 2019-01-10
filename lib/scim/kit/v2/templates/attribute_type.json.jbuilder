@@ -4,7 +4,7 @@ json.key_format! camelize: :lower
 json.description description
 json.multi_valued multi_valued
 json.mutability mutability
-json.name name
+json.name name.camelize(:lower)
 json.required required
 json.returned returned
 json.type type
