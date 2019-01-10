@@ -29,13 +29,13 @@ module Scim
         def presence_of_value
           return unless type.required && _value.blank?
 
-          errors.add(type.name, "can't be blank")
+          errors.add(type.name, I18n.t('errors.messages.blank'))
         end
 
         def inclusion_of_value
           return if type.canonical_values.include?(_value)
 
-          errors.add(type.name, 'is not included in the list')
+          errors.add(type.name, I18n.t('errors.messages.inclusion'))
         end
       end
     end
