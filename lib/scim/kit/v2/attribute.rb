@@ -40,7 +40,8 @@ module Scim
         end
 
         def validate_array
-          return if _value.respond_to?(:each) && _value.all? { |x| type.valid?(x) }
+          return if _value.respond_to?(:each) &&
+                    _value.all? { |x| type.valid?(x) }
 
           errors.add(type.name, I18n.t('errors.messages.invalid'))
         end

@@ -6,7 +6,8 @@ module Scim
       # Represents a scim Attribute type
       class AttributeType
         include Templatable
-        BASE64_FORMAT = %r(\A([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z).freeze
+        B64 = %r(\A([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z).freeze
+        BOOLEAN_VALUES = [true, false].freeze
         DATATYPES = {
           string: 'string',
           boolean: 'boolean',
@@ -25,12 +26,15 @@ module Scim
           binary: ->(x) { Base64.strict_encode64(x) }
         }.freeze
         VALIDATIONS = {
-          string: ->(x) { x.is_a?(String) },
+          binary: ->(x) { x.is_a?(String) && x.match?(B64) },
+          boolean: ->(x) { BOOLEAN_VALUES.include?(x) },
+          # complex: ->(x) { },
+          datetime: ->(x) { x.is_a?(DateTime) },
           decimal: ->(x) { x.is_a?(Float) },
           integer: ->(x) { x&.integer? },
-          datetime: ->(x) { x.is_a?(DateTime) },
-          binary: ->(x) { x.is_a?(String) && !!x.match(BASE64_FORMAT) }
-        }
+          reference: ->(x) { URI.parse(x) },
+          string: ->(x) { x.is_a?(String) }
+        }.freeze
         attr_accessor :canonical_values
         attr_accessor :case_exact
         attr_accessor :description
@@ -88,7 +92,7 @@ module Scim
         end
 
         def coerce(value)
-          if type_is?(:boolean) && ![true, false].include?(value)
+          if type_is?(:boolean) && !BOOLEAN_VALUES.include?(value)
             raise ArgumentError, value
           end
           return value if multi_valued

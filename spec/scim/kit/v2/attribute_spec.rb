@@ -23,28 +23,28 @@ RSpec.describe Scim::Kit::V2::Attribute do
       end
 
       specify { expect(subject._value).to match_array(%w[superman batman]) }
+    end
 
-      context "when a single value is provided" do
-        before do
-          type.multi_valued = true
-          subject._value = 'batman'
-          subject.valid?
-        end
-
-        specify { expect(subject).not_to be_valid }
-        specify { expect(subject.errors[:user_name]).to be_present }
+    context 'when a single value is provided' do
+      before do
+        type.multi_valued = true
+        subject._value = 'batman'
+        subject.valid?
       end
 
-      context "when the wrong type is used" do
-        before do
-          type.multi_valued = true
-          subject._value = [1.0, 2.0]
-          subject.valid?
-        end
+      specify { expect(subject).not_to be_valid }
+      specify { expect(subject.errors[:user_name]).to be_present }
+    end
 
-        specify { expect(subject).not_to be_valid }
-        specify { expect(subject.errors[:user_name]).to be_present }
+    context 'when the wrong type is used' do
+      before do
+        type.multi_valued = true
+        subject._value = [1.0, 2.0]
+        subject.valid?
       end
+
+      specify { expect(subject).not_to be_valid }
+      specify { expect(subject.errors[:user_name]).to be_present }
     end
 
     context 'when integer' do
@@ -222,7 +222,12 @@ RSpec.describe Scim::Kit::V2::Attribute do
     specify { expect(subject.as_json[:emails]).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
 
     context 'when the hash is invalid' do
-      xspecify { expect { subject._value = [{ blah: 'blah' }] }.to raise_error(ArgumentError) }
+      before do
+        subject._value = [{ blah: 'blah' }]
+      end
+
+      specify { expect(subject).not_to be_valid }
+      xspecify { expect(subject.errors[:emails]).to be_present }
     end
   end
 end
