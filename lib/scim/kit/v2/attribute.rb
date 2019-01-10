@@ -33,7 +33,7 @@ module Scim
         end
 
         def inclusion_of_value
-          return unless type.canonical_values && !type.canonical_values.include?(_value)
+          return if type.canonical_values.include?(_value)
 
           errors.add(type.name, 'is not included in the list')
         end
