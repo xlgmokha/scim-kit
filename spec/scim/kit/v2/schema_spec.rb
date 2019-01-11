@@ -15,7 +15,7 @@ RSpec.describe Scim::Kit::V2::Schema do
   specify { expect(result[:meta][:resourceType]).to eql('Schema') }
   specify { expect(result[:meta][:location]).to eql(location) }
 
-  context "with a description" do
+  context 'with a description' do
     before do
       subject.description = description
     end

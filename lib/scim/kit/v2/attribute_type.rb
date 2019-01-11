@@ -107,19 +107,20 @@ module Scim
         end
 
         def valid?(value)
-          return false if multi_valued && !value.respond_to?(:each)
-
           if multi_valued
-            value.each do |x|
-              return false unless (complex? ? valid_complex?(x) : valid_simple?(x))
-            end
-            true
-          else
-            complex? ? valid_complex?(value) : valid_simple?(value)
+            return false unless value.respond_to?(:to_a)
+
+            return value.to_a.all? { |x| validate(x) }
           end
+
+          complex? ? valid_complex?(value) : valid_simple?(value)
         end
 
         private
+
+        def validate(value)
+          complex? ? valid_complex?(value) : valid_simple?(value)
+        end
 
         def valid_simple?(value)
           VALIDATIONS[type]&.call(value)
