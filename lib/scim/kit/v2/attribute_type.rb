@@ -30,7 +30,7 @@ module Scim
           boolean: ->(x) { BOOLEAN_VALUES.include?(x) },
           datetime: ->(x) { x.is_a?(DateTime) },
           decimal: ->(x) { x.is_a?(Float) },
-          integer: ->(x) { x&.integer? },
+          integer: ->(x) { x&.integer? rescue false },
           reference: ->(x) { x =~ /\A#{URI.regexp(%w[http https])}\z/ },
           string: ->(x) { x.is_a?(String) }
         }.freeze
@@ -103,6 +103,10 @@ module Scim
         def valid?(value)
           if complex?
             return false unless value.is_a?(Hash)
+            value.keys.each do |key|
+              attribute = attributes.find { |x| x.name.to_s.underscore == key.to_s.underscore }
+              return false unless attribute.valid?(value[key])
+            end
             true
           else
             if multi_valued

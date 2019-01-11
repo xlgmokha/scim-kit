@@ -89,6 +89,8 @@ RSpec.describe Scim::Kit::V2::AttributeType do
     specify { expect(described_class.new(name: :x, type: :integer)).to be_valid(1) }
     specify { expect(described_class.new(name: :x, type: :integer)).to be_valid(1_000) }
     specify { expect(described_class.new(name: :x, type: :integer)).not_to be_valid(10.0) }
+    specify { expect(described_class.new(name: :x, type: :integer)).not_to be_valid('10') }
+    specify { expect(described_class.new(name: :x, type: :integer)).not_to be_valid([]) }
 
     specify { expect(described_class.new(name: :x, type: :reference)).to be_valid(FFaker::Internet.uri('https')) }
     specify { expect(described_class.new(name: :x, type: :reference)).not_to be_valid('hello') }
@@ -110,6 +112,21 @@ RSpec.describe Scim::Kit::V2::AttributeType do
       specify { expect(subject).to be_valid([email]) }
       specify { expect(subject).not_to be_valid([1]) }
       specify { expect(subject).not_to be_valid(email) }
+    end
+
+    context 'when single valued complex type' do
+      subject { described_class.new(name: :location, type: :complex) }
+
+      before do
+        subject.multi_valued = false
+        subject.add_attribute(name: :name, type: :string)
+        subject.add_attribute(name: :latitude, type: :integer)
+        subject.add_attribute(name: :longitude, type: :integer)
+      end
+
+      specify { expect(subject).to be_valid(name: 'work', latitude: 100, longitude: 100) }
+      specify { expect(subject).not_to be_valid([name: 'work', latitude: 100, longitude: 100]) }
+      specify { expect(subject).not_to be_valid(name: 'work', latitude: 'wrong', longitude: 100) }
     end
 
     context 'when multi valued complex type' do
