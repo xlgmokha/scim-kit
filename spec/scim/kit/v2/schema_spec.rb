@@ -31,7 +31,7 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:attributes][0][:name]).to eql('displayName') }
     specify { expect(result[:attributes][0][:type]).to eql('string') }
     specify { expect(result[:attributes][0][:multiValued]).to be(false) }
-    specify { expect(result[:attributes][0][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:description]).to eql('displayName') }
     specify { expect(result[:attributes][0][:required]).to be(false) }
     specify { expect(result[:attributes][0][:caseExact]).to be(false) }
     specify { expect(result[:attributes][0][:mutability]).to eql('readWrite') }
@@ -61,7 +61,7 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:attributes][0][:name]).to eql('emails') }
     specify { expect(result[:attributes][0][:type]).to eql('complex') }
     specify { expect(result[:attributes][0][:multiValued]).to be(true) }
-    specify { expect(result[:attributes][0][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:description]).to eql('emails') }
     specify { expect(result[:attributes][0][:required]).to be(false) }
     specify { expect(result[:attributes][0].key?(:caseExact)).to be(false) }
     specify { expect(result[:attributes][0][:mutability]).to eql('readWrite') }
@@ -71,7 +71,7 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:attributes][0][:subAttributes][0][:name]).to eql('value') }
     specify { expect(result[:attributes][0][:subAttributes][0][:type]).to eql('string') }
     specify { expect(result[:attributes][0][:subAttributes][0][:multiValued]).to be(false) }
-    specify { expect(result[:attributes][0][:subAttributes][0][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:subAttributes][0][:description]).to eql('value') }
     specify { expect(result[:attributes][0][:subAttributes][0][:required]).to be(false) }
     specify { expect(result[:attributes][0][:subAttributes][0][:caseExact]).to be(false) }
     specify { expect(result[:attributes][0][:subAttributes][0][:mutability]).to eql('readWrite') }
@@ -81,7 +81,7 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:attributes][0][:subAttributes][1][:name]).to eql('primary') }
     specify { expect(result[:attributes][0][:subAttributes][1][:type]).to eql('boolean') }
     specify { expect(result[:attributes][0][:subAttributes][1][:multiValued]).to be(false) }
-    specify { expect(result[:attributes][0][:subAttributes][1][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:subAttributes][1][:description]).to eql('primary') }
     specify { expect(result[:attributes][0][:subAttributes][1][:required]).to be(false) }
     specify { expect(result[:attributes][0][:subAttributes][1].key?(:caseExact)).to be(false) }
     specify { expect(result[:attributes][0][:subAttributes][1][:mutability]).to eql('readWrite') }
@@ -101,7 +101,7 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:attributes][0][:type]).to eql('reference') }
     specify { expect(result[:attributes][0][:referenceTypes]).to match_array(%w[User Group]) }
     specify { expect(result[:attributes][0][:multiValued]).to be(false) }
-    specify { expect(result[:attributes][0][:description]).to eql('') }
+    specify { expect(result[:attributes][0][:description]).to eql('$ref') }
     specify { expect(result[:attributes][0][:required]).to be(false) }
     specify { expect(result[:attributes][0][:caseExact]).to be(false) }
     specify { expect(result[:attributes][0][:mutability]).to eql('readOnly') }

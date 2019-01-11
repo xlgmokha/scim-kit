@@ -23,7 +23,7 @@ RSpec.describe Scim::Kit::V2::AttributeType do
       specify { expect(subject.to_h[:name]).to eql('displayName') }
       specify { expect(subject.to_h[:type]).to eql('string') }
       specify { expect(subject.to_h[:multiValued]).to be(false) }
-      specify { expect(subject.to_h[:description]).to eql('') }
+      specify { expect(subject.to_h[:description]).to eql('displayName') }
       specify { expect(subject.to_h[:required]).to be(false) }
       specify { expect(subject.to_h[:caseExact]).to be(false) }
       specify { expect(subject.to_h[:mutability]).to eql('readWrite') }

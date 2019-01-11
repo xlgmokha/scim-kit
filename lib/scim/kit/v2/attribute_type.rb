@@ -20,7 +20,7 @@ module Scim
         def initialize(name:, type: :string)
           @name = name.to_s.underscore
           @type = type.to_sym
-          @description = ''
+          @description = name
           @multi_valued = false
           @required = false
           @case_exact = false
