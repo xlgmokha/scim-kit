@@ -9,15 +9,19 @@ RSpec.describe Scim::Kit::V2::Schema do
   let(:description) { FFaker::Name.name }
   let(:result) { JSON.parse(subject.to_json, symbolize_names: true) }
 
-  before do
-    subject.description = description
-  end
-
   specify { expect(result[:id]).to eql(id) }
   specify { expect(result[:name]).to eql(name) }
-  specify { expect(result[:description]).to eql(description) }
+  specify { expect(result[:description]).to eql('') }
   specify { expect(result[:meta][:resourceType]).to eql('Schema') }
   specify { expect(result[:meta][:location]).to eql(location) }
+
+  context "with a description" do
+    before do
+      subject.description = description
+    end
+
+    specify { expect(result[:description]).to eql(description) }
+  end
 
   context 'with a single simple attribute' do
     before do

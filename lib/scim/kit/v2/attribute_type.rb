@@ -108,7 +108,6 @@ module Scim
 
         def valid?(value)
           if complex?
-
             if multi_valued
               return false unless value.respond_to?(:each)
 
