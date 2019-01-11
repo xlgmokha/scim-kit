@@ -36,11 +36,17 @@ module Scim
         complex: 'complex'
       }.freeze
       COERCION = {
-        string: ->(x) { x.to_s },
+        binary: ->(x) { Base64.strict_encode64(x) },
+        boolean: lambda { |x|
+          return true if x == 'true'
+          return false if x == 'false'
+
+          x
+        },
+        datetime: ->(x) { x.is_a?(::String) ? DateTime.parse(x) : x },
         decimal: ->(x) { x.to_f },
         integer: ->(x) { x.to_i },
-        datetime: ->(x) { x.is_a?(::String) ? DateTime.parse(x) : x },
-        binary: ->(x) { Base64.strict_encode64(x) }
+        string: ->(x) { x.to_s }
       }.freeze
       VALIDATIONS = {
         binary: ->(x) { x.is_a?(String) && x.match?(BASE64) },

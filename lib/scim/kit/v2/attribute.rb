@@ -21,8 +21,12 @@ module Scim
           define_attributes_for(type.attributes)
         end
 
+        def _assign(new_value, coerce: true)
+          @_value = coerce ? type.coerce(new_value) : new_value
+        end
+
         def _value=(new_value)
-          @_value = type.coerce(new_value)
+          _assign(new_value, coerce: true)
         end
 
         private

@@ -63,13 +63,17 @@ module Scim
         end
 
         def coerce(value)
-          if type_is?(:boolean) && !BOOLEAN_VALUES.include?(value)
-            raise ArgumentError, value
-          end
-          return value if multi_valued
+          return value if complex?
 
-          coercion = COERCION[type]
-          coercion ? coercion.call(value) : value
+          if multi_valued
+            return value unless value.respond_to?(:to_a)
+
+            value.to_a.map do |x|
+              COERCION.fetch(type, ->(y) { y }).call(x)
+            end
+          else
+            COERCION.fetch(type, ->(x) { x }).call(value)
+          end
         end
 
         def valid?(value)

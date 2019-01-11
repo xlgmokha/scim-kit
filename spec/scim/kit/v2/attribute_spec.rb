@@ -39,7 +39,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
     context 'when the wrong type is used' do
       before do
         type.multi_valued = true
-        subject._value = [1.0, 2.0]
+        subject._assign([1.0, 2.0], coerce: false)
         subject.valid?
       end
 
@@ -101,8 +101,11 @@ RSpec.describe Scim::Kit::V2::Attribute do
       specify { expect(subject.as_json[:hungry]).to be(false) }
     end
 
-    context 'when string' do
-      specify { expect { subject._value = 'hello' }.to raise_error(ArgumentError) }
+    context 'when invalid string' do
+      before { subject._value = 'hello' }
+
+      specify { expect(subject._value).to eql('hello') }
+      specify { expect(subject).not_to be_valid }
     end
   end
 

@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::V2::AttributeType do
+  let(:image) { Base64.strict_encode64(raw_image) }
+  let(:raw_image) { IO.read('./spec/fixtures/avatar.png', mode: 'rb') }
+
   specify { expect { described_class.new(name: 'displayName', type: :string) }.not_to raise_error }
   specify { expect { described_class.new(name: 'primary', type: :boolean) }.not_to raise_error }
   specify { expect { described_class.new(name: 'salary', type: :decimal) }.not_to raise_error }
@@ -65,8 +68,6 @@ RSpec.describe Scim::Kit::V2::AttributeType do
   end
 
   describe '#valid?' do
-    let(:image) { Base64.strict_encode64(IO.read('./spec/fixtures/avatar.png', mode: 'rb')) }
-
     specify { expect(described_class.new(name: :x, type: :binary)).to be_valid(image) }
     specify { expect(described_class.new(name: :x, type: :binary)).not_to be_valid('hello') }
     specify { expect(described_class.new(name: :x, type: :binary)).not_to be_valid(1) }
@@ -148,6 +149,78 @@ RSpec.describe Scim::Kit::V2::AttributeType do
       specify { expect(subject).not_to be_valid([email]) }
       specify { expect(subject).not_to be_valid([value: 1, primary: true]) }
       specify { expect(subject).not_to be_valid([value: email, primary: 'true']) }
+    end
+  end
+
+  describe '#coerce' do
+    let(:now) { DateTime.now }
+    let(:uri) { FFaker::Internet.uri('https') }
+
+    specify { expect(described_class.new(name: :x, type: :binary).coerce(raw_image)).to eql(image) }
+
+    specify { expect(described_class.new(name: :x, type: :boolean).coerce(true)).to be(true) }
+    specify { expect(described_class.new(name: :x, type: :boolean).coerce('true')).to be(true) }
+    specify { expect(described_class.new(name: :x, type: :boolean).coerce(false)).to be(false) }
+    specify { expect(described_class.new(name: :x, type: :boolean).coerce('false')).to be(false) }
+    specify { expect(described_class.new(name: :x, type: :boolean).coerce('invalid')).to eql('invalid') }
+
+    specify { expect(described_class.new(name: :x, type: :datetime).coerce(now)).to eql(now) }
+    specify { expect(described_class.new(name: :x, type: :datetime).coerce(now.iso8601)).to be_within(1).of(now) }
+
+    specify { expect(described_class.new(name: :x, type: :decimal).coerce(1.0)).to be(1.0) }
+    specify { expect(described_class.new(name: :x, type: :decimal).coerce(1)).to be(1.0) }
+    specify { expect(described_class.new(name: :x, type: :decimal).coerce('1.0')).to be(1.0) }
+    specify { expect(described_class.new(name: :x, type: :decimal).coerce('1')).to be(1.0) }
+
+    specify { expect(described_class.new(name: :x, type: :integer).coerce(1)).to be(1) }
+    specify { expect(described_class.new(name: :x, type: :integer).coerce(1.0)).to be(1) }
+    specify { expect(described_class.new(name: :x, type: :integer).coerce('1.0')).to be(1) }
+    specify { expect(described_class.new(name: :x, type: :integer).coerce('1')).to be(1) }
+
+    specify { expect(described_class.new(name: :x, type: :reference).coerce(uri)).to eql(uri) }
+    specify { expect(described_class.new(name: :x, type: :reference).coerce('hello')).to eql('hello') }
+
+    specify { expect(described_class.new(name: :x, type: :string).coerce('name')).to eql('name') }
+    specify { expect(described_class.new(name: :x, type: :string).coerce(1)).to eql('1') }
+
+    context 'when multi valued string type' do
+      subject do
+        x = described_class.new(name: :x, type: :string)
+        x.multi_valued = true
+        x
+      end
+
+      specify { expect(subject.coerce(['1'])).to match_array(['1']) }
+      specify { expect(subject.coerce([1])).to match_array(['1']) }
+    end
+
+    context 'when single valued complex type' do
+      subject { described_class.new(name: :location, type: :complex) }
+
+      before do
+        subject.multi_valued = false
+        subject.add_attribute(name: :name, type: :string)
+        subject.add_attribute(name: :latitude, type: :integer)
+        subject.add_attribute(name: :longitude, type: :integer)
+      end
+
+      specify { expect(subject.coerce(name: 'work', latitude: 100, longitude: 100)).to eql(name: 'work', latitude: 100, longitude: 100) }
+    end
+
+    context 'when multi valued complex type' do
+      subject { described_class.new(name: :emails, type: :complex) }
+
+      let(:email) { FFaker::Internet.email }
+      let(:other_email) { FFaker::Internet.email }
+
+      before do
+        subject.multi_valued = true
+        subject.add_attribute(name: 'value', type: :string)
+        subject.add_attribute(name: 'primary', type: :boolean)
+      end
+
+      specify { expect(subject.coerce([value: email, primary: true])).to match_array([value: email, primary: true]) }
+      specify { expect(subject.coerce([{ value: email, primary: true }, { value: other_email, primary: false }])).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
     end
   end
 end
