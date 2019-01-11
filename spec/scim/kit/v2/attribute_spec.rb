@@ -200,6 +200,25 @@ RSpec.describe Scim::Kit::V2::Attribute do
     specify { expect(subject.as_json[:name][:givenName]).to eql('Tsuyoshi') }
   end
 
+  context 'with single valued complex type' do
+    let(:type) do
+      x = Scim::Kit::V2::AttributeType.new(name: :person, type: :complex)
+      x.add_attribute(name: :name)
+      x.add_attribute(name: :age, type: :integer)
+      x
+    end
+
+    before { subject._value = { name: 'mo', age: 34 } }
+
+    specify { expect(subject).to be_valid }
+
+    context 'when invalid sub attribute' do
+      before { subject._value = { name: 34, age: 'wrong' } }
+
+      specify { expect(subject).not_to be_valid }
+    end
+  end
+
   context 'with multi valued complex type' do
     let(:type) do
       x = Scim::Kit::V2::AttributeType.new(name: 'emails', type: :complex)

@@ -30,7 +30,13 @@ module Scim
           boolean: ->(x) { BOOLEAN_VALUES.include?(x) },
           datetime: ->(x) { x.is_a?(DateTime) },
           decimal: ->(x) { x.is_a?(Float) },
-          integer: ->(x) { x&.integer? rescue false },
+          integer: lambda { |x|
+            begin
+              x&.integer?
+            rescue StandardError
+              false
+            end
+          },
           reference: ->(x) { x =~ /\A#{URI.regexp(%w[http https])}\z/ },
           string: ->(x) { x.is_a?(String) }
         }.freeze
@@ -111,6 +117,7 @@ module Scim
 
                 item.keys.each do |key|
                   attribute = attributes.find { |x| x.name.to_s.underscore == key.to_s.underscore }
+                  return false unless attribute
                   return false unless attribute.valid?(item[key])
                 end
               end

@@ -103,6 +103,7 @@ RSpec.describe Scim::Kit::V2::AttributeType do
 
     context 'when multi valued string type' do
       subject { described_class.new(name: :emails, type: :string) }
+
       let(:email) { FFaker::Internet.email }
 
       before do
@@ -131,6 +132,7 @@ RSpec.describe Scim::Kit::V2::AttributeType do
 
     context 'when multi valued complex type' do
       subject { described_class.new(name: :emails, type: :complex) }
+
       let(:email) { FFaker::Internet.email }
 
       before do
