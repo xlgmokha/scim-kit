@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'A SCIM library.'
   spec.description   = 'A SCIM library.'
-  spec.homepage      = 'https://www.mokhan.ca/'
+  spec.homepage      = 'https://www.github.com/mokhan/scim-kit'
   spec.license       = 'MIT'
 
   # Specify which files should be added to the gem when it is released.
