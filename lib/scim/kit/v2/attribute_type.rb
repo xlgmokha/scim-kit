@@ -102,12 +102,27 @@ module Scim
 
         def valid?(value)
           if complex?
-            return false unless value.is_a?(Hash)
-            value.keys.each do |key|
-              attribute = attributes.find { |x| x.name.to_s.underscore == key.to_s.underscore }
-              return false unless attribute.valid?(value[key])
+
+            if multi_valued
+              return false unless value.respond_to?(:each)
+
+              value.each do |item|
+                return false unless item.is_a?(Hash)
+
+                item.keys.each do |key|
+                  attribute = attributes.find { |x| x.name.to_s.underscore == key.to_s.underscore }
+                  return false unless attribute.valid?(item[key])
+                end
+              end
+            else
+              return false unless value.is_a?(Hash)
+
+              value.keys.each do |key|
+                attribute = attributes.find { |x| x.name.to_s.underscore == key.to_s.underscore }
+                return false unless attribute.valid?(value[key])
+              end
+              true
             end
-            true
           else
             if multi_valued
               return false unless value.respond_to?(:each)

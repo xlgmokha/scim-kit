@@ -140,6 +140,7 @@ RSpec.describe Scim::Kit::V2::AttributeType do
       end
 
       specify { expect(subject).to be_valid([value: email, primary: true]) }
+      specify { expect(subject).not_to be_valid(email) }
       specify { expect(subject).not_to be_valid([email]) }
       specify { expect(subject).not_to be_valid([value: 1, primary: true]) }
       specify { expect(subject).not_to be_valid([value: email, primary: 'true']) }
