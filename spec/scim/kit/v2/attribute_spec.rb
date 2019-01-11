@@ -224,10 +224,11 @@ RSpec.describe Scim::Kit::V2::Attribute do
     context 'when the hash is invalid' do
       before do
         subject._value = [{ blah: 'blah' }]
+        subject.valid?
       end
 
       specify { expect(subject).not_to be_valid }
-      xspecify { expect(subject.errors[:emails]).to be_present }
+      specify { expect(subject.errors[:emails]).to be_present }
     end
   end
 end
