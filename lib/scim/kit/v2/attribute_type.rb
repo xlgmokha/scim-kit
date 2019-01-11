@@ -6,40 +6,6 @@ module Scim
       # Represents a scim Attribute type
       class AttributeType
         include Templatable
-        B64 = %r(\A([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z).freeze
-        BOOLEAN_VALUES = [true, false].freeze
-        DATATYPES = {
-          string: 'string',
-          boolean: 'boolean',
-          decimal: 'decimal',
-          integer: 'integer',
-          datetime: 'dateTime',
-          binary: 'binary',
-          reference: 'reference',
-          complex: 'complex'
-        }.freeze
-        COERCION = {
-          string: ->(x) { x.to_s },
-          decimal: ->(x) { x.to_f },
-          integer: ->(x) { x.to_i },
-          datetime: ->(x) { x.is_a?(::String) ? DateTime.parse(x) : x },
-          binary: ->(x) { Base64.strict_encode64(x) }
-        }.freeze
-        VALIDATIONS = {
-          binary: ->(x) { x.is_a?(String) && x.match?(B64) },
-          boolean: ->(x) { BOOLEAN_VALUES.include?(x) },
-          datetime: ->(x) { x.is_a?(DateTime) },
-          decimal: ->(x) { x.is_a?(Float) },
-          integer: lambda { |x|
-            begin
-              x&.integer?
-            rescue StandardError
-              false
-            end
-          },
-          reference: ->(x) { x =~ /\A#{URI.regexp(%w[http https])}\z/ },
-          string: ->(x) { x.is_a?(String) }
-        }.freeze
         attr_accessor :canonical_values
         attr_accessor :case_exact
         attr_accessor :description
