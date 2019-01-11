@@ -157,6 +157,7 @@ RSpec.describe Scim::Kit::V2::AttributeType do
     let(:uri) { FFaker::Internet.uri('https') }
 
     specify { expect(described_class.new(name: :x, type: :binary).coerce(raw_image)).to eql(image) }
+    specify { expect(described_class.new(name: :x, type: :binary).coerce(image)).to eql(image) }
 
     specify { expect(described_class.new(name: :x, type: :boolean).coerce(true)).to be(true) }
     specify { expect(described_class.new(name: :x, type: :boolean).coerce('true')).to be(true) }

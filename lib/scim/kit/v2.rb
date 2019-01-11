@@ -36,7 +36,9 @@ module Scim
         complex: 'complex'
       }.freeze
       COERCION = {
-        binary: ->(x) { Base64.strict_encode64(x) },
+        binary: lambda { |x|
+          VALIDATIONS[:binary].call(x) ? x : Base64.strict_encode64(x)
+        },
         boolean: lambda { |x|
           return true if x == 'true'
           return false if x == 'false'
