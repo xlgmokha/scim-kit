@@ -134,6 +134,7 @@ RSpec.describe Scim::Kit::V2::AttributeType do
       subject { described_class.new(name: :emails, type: :complex) }
 
       let(:email) { FFaker::Internet.email }
+      let(:other_email) { FFaker::Internet.email }
 
       before do
         subject.multi_valued = true
@@ -142,6 +143,7 @@ RSpec.describe Scim::Kit::V2::AttributeType do
       end
 
       specify { expect(subject).to be_valid([value: email, primary: true]) }
+      specify { expect(subject).to be_valid([{ value: email, primary: true, }, { value: other_email, primary: false }]) }
       specify { expect(subject).not_to be_valid(email) }
       specify { expect(subject).not_to be_valid([email]) }
       specify { expect(subject).not_to be_valid([value: 1, primary: true]) }

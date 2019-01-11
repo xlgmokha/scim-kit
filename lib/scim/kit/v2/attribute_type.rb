@@ -107,44 +107,36 @@ module Scim
         end
 
         def valid?(value)
-          if complex?
-            if multi_valued
-              return false unless value.respond_to?(:each)
+          return false if multi_valued && !value.respond_to?(:each)
 
-              value.each do |item|
-                return false unless item.is_a?(Hash)
-
-                item.keys.each do |key|
-                  attribute = attributes.find { |x| x.name.to_s.underscore == key.to_s.underscore }
-                  return false unless attribute
-                  return false unless attribute.valid?(item[key])
-                end
-              end
-            else
-              return false unless value.is_a?(Hash)
-
-              value.keys.each do |key|
-                attribute = attributes.find { |x| x.name.to_s.underscore == key.to_s.underscore }
-                return false unless attribute.valid?(value[key])
-              end
-              true
+          if multi_valued
+            value.each do |x|
+              return false unless (complex? ? valid_complex?(x) : valid_simple?(x))
             end
+            true
           else
-            if multi_valued
-              return false unless value.respond_to?(:each)
-
-              validation = VALIDATIONS[type]
-              value.each do |x|
-                return false unless validation&.call(x)
-              end
-              true
-            else
-              VALIDATIONS[type]&.call(value)
-            end
+            complex? ? valid_complex?(value) : valid_simple?(value)
           end
         end
 
         private
+
+        def valid_simple?(value)
+          VALIDATIONS[type]&.call(value)
+        end
+
+        def valid_complex?(item)
+          return false unless item.is_a?(Hash)
+
+          item.keys.each do |key|
+            return false unless type_for(key)&.valid?(item[key])
+          end
+        end
+
+        def type_for(name)
+          name = name.to_s.underscore
+          attributes.find { |x| x.name.to_s.underscore == name }
+        end
 
         def string?
           type_is?(:string)
