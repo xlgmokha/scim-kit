@@ -13,7 +13,7 @@ module Scim
         def initialize(id:, name:, location:)
           @id = id
           @name = name
-          @description = ''
+          @description = name
           @meta = Meta.new('Schema', location)
           @meta.created = @meta.last_modified = @meta.version = nil
           @attributes = []

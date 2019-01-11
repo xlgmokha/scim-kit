@@ -11,7 +11,7 @@ RSpec.describe Scim::Kit::V2::Schema do
 
   specify { expect(result[:id]).to eql(id) }
   specify { expect(result[:name]).to eql(name) }
-  specify { expect(result[:description]).to eql('') }
+  specify { expect(result[:description]).to eql(name) }
   specify { expect(result[:meta][:resourceType]).to eql('Schema') }
   specify { expect(result[:meta][:location]).to eql(location) }
 
