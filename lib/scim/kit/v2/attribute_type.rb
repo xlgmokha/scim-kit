@@ -28,7 +28,6 @@ module Scim
         VALIDATIONS = {
           binary: ->(x) { x.is_a?(String) && x.match?(B64) },
           boolean: ->(x) { BOOLEAN_VALUES.include?(x) },
-          # complex: ->(x) { },
           datetime: ->(x) { x.is_a?(DateTime) },
           decimal: ->(x) { x.is_a?(Float) },
           integer: ->(x) { x&.integer? },
@@ -102,7 +101,22 @@ module Scim
         end
 
         def valid?(value)
-          VALIDATIONS[type]&.call(value)
+          if complex?
+            return false unless value.is_a?(Hash)
+            true
+          else
+            if multi_valued
+              return false unless value.respond_to?(:each)
+
+              validation = VALIDATIONS[type]
+              value.each do |x|
+                return false unless validation&.call(x)
+              end
+              true
+            else
+              VALIDATIONS[type]&.call(value)
+            end
+          end
         end
 
         private

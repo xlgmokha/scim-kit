@@ -95,8 +95,37 @@ RSpec.describe Scim::Kit::V2::AttributeType do
     specify { expect(described_class.new(name: :x, type: :reference)).not_to be_valid(1) }
     specify { expect(described_class.new(name: :x, type: :reference)).not_to be_valid(['hello']) }
 
-    specify { expect(described_class.new(name: :x)).to be_valid('name') }
-    specify { expect(described_class.new(name: :x)).not_to be_valid(1) }
-    specify { expect(described_class.new(name: :x)).not_to be_valid(['string']) }
+    specify { expect(described_class.new(name: :x, type: :string)).to be_valid('name') }
+    specify { expect(described_class.new(name: :x, type: :string)).not_to be_valid(1) }
+    specify { expect(described_class.new(name: :x, type: :string)).not_to be_valid(['string']) }
+
+    context 'when multi valued string type' do
+      subject { described_class.new(name: :emails, type: :string) }
+      let(:email) { FFaker::Internet.email }
+
+      before do
+        subject.multi_valued = true
+      end
+
+      specify { expect(subject).to be_valid([email]) }
+      specify { expect(subject).not_to be_valid([1]) }
+      specify { expect(subject).not_to be_valid(email) }
+    end
+
+    context 'when multi valued complex type' do
+      subject { described_class.new(name: :emails, type: :complex) }
+      let(:email) { FFaker::Internet.email }
+
+      before do
+        subject.multi_valued = true
+        subject.add_attribute(name: 'value', type: :string)
+        subject.add_attribute(name: 'primary', type: :boolean)
+      end
+
+      specify { expect(subject).to be_valid([value: email, primary: true]) }
+      specify { expect(subject).not_to be_valid([email]) }
+      specify { expect(subject).not_to be_valid([value: 1, primary: true]) }
+      specify { expect(subject).not_to be_valid([value: email, primary: 'true']) }
+    end
   end
 end
