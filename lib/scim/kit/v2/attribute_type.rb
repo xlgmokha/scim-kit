@@ -32,7 +32,7 @@ module Scim
           datetime: ->(x) { x.is_a?(DateTime) },
           decimal: ->(x) { x.is_a?(Float) },
           integer: ->(x) { x&.integer? },
-          reference: ->(x) { URI.parse(x) },
+          reference: ->(x) { x =~ /\A#{URI.regexp(%w[http https])}\z/ },
           string: ->(x) { x.is_a?(String) }
         }.freeze
         attr_accessor :canonical_values

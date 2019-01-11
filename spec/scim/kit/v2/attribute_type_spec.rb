@@ -63,4 +63,40 @@ RSpec.describe Scim::Kit::V2::AttributeType do
       specify { expect(build(canonical_values: %w[User Group]).to_h[:canonicalValues]).to match_array(%w[User Group]) }
     end
   end
+
+  describe '#valid?' do
+    let(:image) { Base64.strict_encode64(IO.read('./spec/fixtures/avatar.png', mode: 'rb')) }
+
+    specify { expect(described_class.new(name: :x, type: :binary)).to be_valid(image) }
+    specify { expect(described_class.new(name: :x, type: :binary)).not_to be_valid('hello') }
+    specify { expect(described_class.new(name: :x, type: :binary)).not_to be_valid(1) }
+    specify { expect(described_class.new(name: :x, type: :binary)).not_to be_valid([1]) }
+
+    specify { expect(described_class.new(name: :x, type: :boolean)).to be_valid(true) }
+    specify { expect(described_class.new(name: :x, type: :boolean)).to be_valid(false) }
+    specify { expect(described_class.new(name: :x, type: :boolean)).not_to be_valid('false') }
+    specify { expect(described_class.new(name: :x, type: :boolean)).not_to be_valid(1) }
+
+    specify { expect(described_class.new(name: :x, type: :datetime)).to be_valid(DateTime.now) }
+    specify { expect(described_class.new(name: :x, type: :datetime)).not_to be_valid(DateTime.now.iso8601) }
+    specify { expect(described_class.new(name: :x, type: :datetime)).not_to be_valid(Time.now.to_i) }
+    specify { expect(described_class.new(name: :x, type: :datetime)).not_to be_valid(Time.now) }
+
+    specify { expect(described_class.new(name: :x, type: :decimal)).to be_valid(1.0) }
+    specify { expect(described_class.new(name: :x, type: :decimal)).not_to be_valid(1) }
+    specify { expect(described_class.new(name: :x, type: :decimal)).not_to be_valid('1.0') }
+
+    specify { expect(described_class.new(name: :x, type: :integer)).to be_valid(1) }
+    specify { expect(described_class.new(name: :x, type: :integer)).to be_valid(1_000) }
+    specify { expect(described_class.new(name: :x, type: :integer)).not_to be_valid(10.0) }
+
+    specify { expect(described_class.new(name: :x, type: :reference)).to be_valid(FFaker::Internet.uri('https')) }
+    specify { expect(described_class.new(name: :x, type: :reference)).not_to be_valid('hello') }
+    specify { expect(described_class.new(name: :x, type: :reference)).not_to be_valid(1) }
+    specify { expect(described_class.new(name: :x, type: :reference)).not_to be_valid(['hello']) }
+
+    specify { expect(described_class.new(name: :x)).to be_valid('name') }
+    specify { expect(described_class.new(name: :x)).not_to be_valid(1) }
+    specify { expect(described_class.new(name: :x)).not_to be_valid(['string']) }
+  end
 end
