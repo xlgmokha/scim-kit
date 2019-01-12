@@ -162,6 +162,49 @@ RSpec.describe Scim::Kit::V2::Resource do
   context 'when building a new resource' do
     subject { described_class.new(schemas: schemas) }
 
+    before do
+      schema.add_attribute(name: 'userName') do |attribute|
+        attribute.required = true
+        attribute.uniqueness = :server
+      end
+      schema.add_attribute(name: 'name') do | attribute|
+        attribute.add_attribute(name: 'formatted') do |x|
+          x.mutability = :read_only
+        end
+        attribute.add_attribute(name: 'familyName')
+        attribute.add_attribute(name: 'givenName')
+      end
+      schema.add_attribute(name: 'displayName') do |attribute|
+        attribute.mutability = :read_only
+      end
+      schema.add_attribute(name: 'locale')
+      schema.add_attribute(name: 'timezone')
+      schema.add_attribute(name: 'active', type: :boolean)
+      schema.add_attribute(name: 'password') do |attribute|
+        attribute.mutability = :write_only
+        attribute.returned  = :never
+      end
+      schema.add_attribute(name: 'emails') do |attribute|
+        attribute.multi_valued = true
+        attribute.add_attribute(name: 'value')
+        attribute.add_attribute(name: 'primary', type: :boolean)
+      end
+      schema.add_attribute(name: 'groups') do |attribute|
+        attribute.multi_valued = true
+        attribute.mutability = :read_only
+        attribute.add_attribute(name: 'value') do |x|
+          x.mutability = :read_only
+        end
+        attribute.add_attribute(name: '$ref') do |x|
+          x.reference_types = ['User', 'Group']
+          x.mutability = :read_only
+        end
+        attribute.add_attribute(name: 'display') do |x|
+          x.mutability = :read_only
+        end
+      end
+    end
+
     specify { expect(subject.as_json.key?(:meta)).to be(false) }
     specify { expect(subject.as_json.key?(:id)).to be(false) }
     specify { expect(subject.as_json.key?(:externalId)).to be(false) }
@@ -179,24 +222,6 @@ RSpec.describe Scim::Kit::V2::Resource do
           ]
           x.locale = 'en'
           x.timezone = 'Etc/UTC'
-        end
-      end
-
-      before do
-        schema.add_attribute(name: 'userName') do |attribute|
-          attribute.required = true
-          attribute.uniqueness = :server
-        end
-        schema.add_attribute(name: 'name') do |attribute|
-          attribute.add_attribute(name: 'familyName')
-          attribute.add_attribute(name: 'givenName')
-        end
-        schema.add_attribute(name: 'locale')
-        schema.add_attribute(name: 'timezone')
-        schema.add_attribute(name: 'emails') do |attribute|
-          attribute.multi_valued = true
-          attribute.add_attribute(name: 'value')
-          attribute.add_attribute(name: 'primary', type: :boolean)
         end
       end
 
@@ -222,66 +247,40 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(resource.to_h.key?(:meta)).to be(false) }
       specify { expect(resource.to_h.key?(:id)).to be(false) }
       specify { expect(resource.to_h.key?(:external_id)).to be(false) }
-      specify { puts resource.to_h }
     end
 
     context "when building in client mode" do
       subject { described_class.new(schemas: schemas) }
 
-      before do
-        schema.add_attribute(name: 'userName') do |attribute|
-          attribute.required = true
-          attribute.uniqueness = :server
-        end
-        schema.add_attribute(name: 'name') do | attribute|
-          attribute.add_attribute(name: 'formatted') do |x|
-            x.mutability = :read_only
-          end
-          attribute.add_attribute(name: 'familyName')
-          attribute.add_attribute(name: 'givenName')
-        end
-        schema.add_attribute(name: 'displayName') do |attribute|
-          attribute.mutability = :read_only
-        end
-        schema.add_attribute(name: 'locale')
-        schema.add_attribute(name: 'timezone')
-        schema.add_attribute(name: 'active', type: :boolean)
-        schema.add_attribute(name: 'password') do |attribute|
-          attribute.mutability = :write_only
-          attribute.returned  = :never
-        end
-        schema.add_attribute(name: 'emails') do |attribute|
-          attribute.multi_valued = true
-          attribute.add_attribute(name: 'value')
-          attribute.add_attribute(name: 'primary', type: :boolean)
-        end
-        schema.add_attribute(name: 'groups') do |attribute|
-          attribute.multi_valued = true
-          attribute.mutability = :read_only
-          attribute.add_attribute(name: 'value') do |x|
-            x.mutability = :read_only
-          end
-          attribute.add_attribute(name: '$ref') do |x|
-            x.reference_types = ['User', 'Group']
-            x.mutability = :read_only
-          end
-          attribute.add_attribute(name: 'display') do |x|
-            x.mutability = :read_only
-          end
-        end
-      end
-
+      specify { expect(subject.to_h.key?(:meta)).to be(false) }
       specify { expect(subject.to_h.key?(:userName)).to be(true) }
       specify { expect(subject.to_h[:name].key?(:formatted)).to be(false) }
       specify { expect(subject.to_h[:name].key?(:familyName)).to be(true) }
       specify { expect(subject.to_h[:name].key?(:givenName)).to be(true) }
-      specify { expect(subject.to_h[:name].key?(:displayName)).to be(false) }
+      specify { expect(subject.to_h.key?(:displayName)).to be(false) }
       specify { expect(subject.to_h.key?(:locale)).to be(true) }
       specify { expect(subject.to_h.key?(:timezone)).to be(true) }
       specify { expect(subject.to_h.key?(:active)).to be(true) }
       specify { expect(subject.to_h.key?(:password)).to be(false) }
       specify { expect(subject.to_h.key?(:emails)).to be(true) }
       specify { expect(subject.to_h.key?(:groups)).to be(false) }
+    end
+
+    context "when building in server mode" do
+      subject { described_class.new(schemas: schemas, location: resource_location) }
+
+      specify { expect(subject.to_h.key?(:meta)).to be(true) }
+      specify { expect(subject.to_h.key?(:userName)).to be(true) }
+      specify { expect(subject.to_h[:name].key?(:formatted)).to be(true) }
+      specify { expect(subject.to_h[:name].key?(:familyName)).to be(true) }
+      specify { expect(subject.to_h[:name].key?(:givenName)).to be(true) }
+      specify { expect(subject.to_h.key?(:displayName)).to be(true) }
+      specify { expect(subject.to_h.key?(:locale)).to be(true) }
+      specify { expect(subject.to_h.key?(:timezone)).to be(true) }
+      specify { expect(subject.to_h.key?(:active)).to be(true) }
+      specify { expect(subject.to_h.key?(:password)).to be(true) }
+      specify { expect(subject.to_h.key?(:emails)).to be(true) }
+      specify { expect(subject.to_h.key?(:groups)).to be(true) }
     end
   end
 
