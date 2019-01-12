@@ -158,4 +158,12 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.errors[:hero]).to be_present }
     end
   end
+
+  context 'when submitting new record' do
+    subject { described_class.new(schemas: schemas, location: nil) }
+
+    specify { expect(subject.as_json.key?(:meta)).to be(false) }
+    specify { expect(subject.as_json.key?(:id)).to be(false) }
+    specify { expect(subject.as_json.key?(:externalId)).to be(false) }
+  end
 end

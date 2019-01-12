@@ -17,6 +17,10 @@ module Scim
           @created = @last_modified = Time.now
           @version = @created.to_i
         end
+
+        def disable_timestamps
+          @version = @created = @last_modified = nil
+        end
       end
     end
   end

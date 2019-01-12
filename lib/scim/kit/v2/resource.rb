@@ -18,6 +18,7 @@ module Scim
 
         def initialize(schemas:, location:)
           @meta = Meta.new(schemas[0].name, location)
+          @meta.disable_timestamps
           @schemas = schemas
           schemas.each do |schema|
             define_attributes_for(schema.attributes)
