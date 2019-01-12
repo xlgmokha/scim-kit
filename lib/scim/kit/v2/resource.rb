@@ -16,7 +16,7 @@ module Scim
         validates_presence_of :id
         validate :schema_validations
 
-        def initialize(schemas:, location:)
+        def initialize(schemas:, location: nil)
           @meta = Meta.new(schemas[0].name, location)
           @meta.disable_timestamps
           @schemas = schemas

@@ -160,7 +160,7 @@ RSpec.describe Scim::Kit::V2::Resource do
   end
 
   context 'when submitting new record' do
-    subject { described_class.new(schemas: schemas, location: nil) }
+    subject { described_class.new(schemas: schemas) }
 
     specify { expect(subject.as_json.key?(:meta)).to be(false) }
     specify { expect(subject.as_json.key?(:id)).to be(false) }
