@@ -23,6 +23,7 @@ module Scim
           schemas.each do |schema|
             define_attributes_for(schema.attributes)
           end
+          yield self if block_given?
         end
 
         private

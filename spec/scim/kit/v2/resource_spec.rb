@@ -159,11 +159,62 @@ RSpec.describe Scim::Kit::V2::Resource do
     end
   end
 
-  context 'when submitting new record' do
+  context 'when building a new resource' do
     subject { described_class.new(schemas: schemas) }
 
     specify { expect(subject.as_json.key?(:meta)).to be(false) }
     specify { expect(subject.as_json.key?(:id)).to be(false) }
     specify { expect(subject.as_json.key?(:externalId)).to be(false) }
+
+    context "using a simplified API" do
+      let(:user_name) { FFaker::Internet.user_name }
+
+      before do
+        schema.add_attribute(name: 'userName') do |attribute|
+          attribute.required = true
+          attribute.uniqueness = :server
+        end
+        schema.add_attribute(name: 'name') do | attribute|
+          attribute.add_attribute(name: 'formatted') do |x|
+            x.mutability = :read_only
+          end
+          attribute.add_attribute(name: 'familyName')
+          attribute.add_attribute(name: 'givenName')
+        end
+        schema.add_attribute(name: 'locale')
+        schema.add_attribute(name: 'timezone')
+        schema.add_attribute(name: 'emails') do |attribute|
+          attribute.multi_valued = true
+          attribute.add_attribute(name: 'value')
+          attribute.add_attribute(name: 'primary', type: :boolean)
+        end
+      end
+
+      let(:resource) do
+        Scim::Kit::V2::Resource.new(schemas: schemas) do |x|
+          x.user_name = user_name
+          x.name.given_name = 'Barbara'
+          x.name.family_name = 'Jensen'
+          x.emails = [
+            { value: FFaker::Internet.email, primary: true },
+            { value: FFaker::Internet.email, primary: false }
+          ]
+          x.locale = 'en'
+          x.timezone = 'Etc/UTC'
+        end
+      end
+
+      specify { expect(resource.user_name).to eql(user_name) }
+      specify { expect(resource.name.given_name).to eql('Barbara') }
+      specify { expect(resource.name.family_name).to eql('Jensen') }
+      specify { expect(resource.emails[0][:value]).to be_present }
+      specify { expect(resource.emails[0][:primary]).to be(true) }
+      specify { expect(resource.emails[1][:value]).to be_present }
+      specify { expect(resource.emails[1][:primary]).to be(false) }
+      specify { expect(resource.locale).to eql('en') }
+      specify { expect(resource.timezone).to eql('Etc/UTC') }
+
+      specify { expect(resource.to_h[:userName]).to eql(user_name) }
+    end
   end
 end
