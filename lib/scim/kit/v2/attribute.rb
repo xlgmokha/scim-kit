@@ -32,6 +32,8 @@ module Scim
         end
 
         def renderable?
+          return false if type.mutability == Mutability::READ_ONLY && _resource.mode?(:client)
+          return false if type.mutability == Mutability::WRITE_ONLY && _resource.mode?(:server)
           true
         end
 

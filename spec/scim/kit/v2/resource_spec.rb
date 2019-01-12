@@ -33,7 +33,7 @@ RSpec.describe Scim::Kit::V2::Resource do
     describe '#as_json' do
       specify { expect(subject.as_json[:schemas]).to match_array([schema.id]) }
       specify { expect(subject.as_json[:id]).to eql(id) }
-      specify { expect(subject.as_json[:externalId]).to eql(external_id) }
+      specify { expect(subject.as_json[:externalId]).to be_nil } # only render in client mode
       specify { expect(subject.as_json[:meta][:resourceType]).to eql('User') }
       specify { expect(subject.as_json[:meta][:location]).to eql(resource_location) }
       specify { expect(subject.as_json[:meta][:created]).to eql(created_at.iso8601) }
@@ -251,13 +251,13 @@ RSpec.describe Scim::Kit::V2::Resource do
 
     context "when building in client mode" do
       subject { described_class.new(schemas: schemas) }
+      let(:external_id) { SecureRandom.uuid }
 
-      before do
-        subject.external_id = SecureRandom.uuid
-      end
+      before { subject.external_id = external_id }
 
       specify { expect(subject.to_h.key?(:id)).to be(false) }
       specify { expect(subject.to_h.key?(:externalId)).to be(true) }
+      specify { expect(subject.to_h[:externalId]).to eql(external_id) }
       specify { expect(subject.to_h.key?(:meta)).to be(false) }
       specify { expect(subject.to_h.key?(:userName)).to be(true) }
       specify { expect(subject.to_h[:name].key?(:formatted)).to be(false) }
@@ -267,7 +267,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.to_h.key?(:locale)).to be(true) }
       specify { expect(subject.to_h.key?(:timezone)).to be(true) }
       specify { expect(subject.to_h.key?(:active)).to be(true) }
-      specify { expect(subject.to_h.key?(:password)).to be(false) }
+      specify { expect(subject.to_h.key?(:password)).to be(true) }
       specify { expect(subject.to_h.key?(:emails)).to be(true) }
       specify { expect(subject.to_h.key?(:groups)).to be(false) }
     end
@@ -290,7 +290,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.to_h.key?(:locale)).to be(true) }
       specify { expect(subject.to_h.key?(:timezone)).to be(true) }
       specify { expect(subject.to_h.key?(:active)).to be(true) }
-      specify { expect(subject.to_h.key?(:password)).to be(true) }
+      specify { expect(subject.to_h.key?(:password)).to be(false) }
       specify { expect(subject.to_h.key?(:emails)).to be(true) }
       specify { expect(subject.to_h.key?(:groups)).to be(true) }
     end
