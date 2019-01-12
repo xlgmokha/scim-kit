@@ -2,6 +2,7 @@
 
 RSpec.describe Scim::Kit::V2::Attribute do
   subject { described_class.new(type: type, resource: resource) }
+
   let(:resource) { Scim::Kit::V2::Resource.new(schemas: [schema], location: FFaker::Internet.uri('https')) }
   let(:schema) { Scim::Kit::V2::Schema.new(id: Scim::Kit::V2::Schemas::USER, name: 'User', location: FFaker::Internet.uri('https')) }
 
@@ -256,46 +257,47 @@ RSpec.describe Scim::Kit::V2::Attribute do
     end
   end
 
-  describe "#renderable?" do
+  context 'when the resource is in server mode' do
     let(:type) { Scim::Kit::V2::AttributeType.new(name: 'userName', type: :string) }
     let(:resource) { instance_double(Scim::Kit::V2::Resource) }
 
-    context "when the resource is in server mode" do
-      before do
-        allow(resource).to receive(:mode?).with(:server).and_return(true)
-        allow(resource).to receive(:mode?).with(:client).and_return(false)
-      end
-
-      context "when the type is read only" do
-        before { type.mutability = :read_only }
-
-        specify { expect(subject).to be_renderable }
-      end
-
-      context "when the type is write only" do
-        before { type.mutability = :write_only }
-
-        specify { expect(subject).not_to be_renderable }
-      end
+    before do
+      allow(resource).to receive(:mode?).with(:server).and_return(true)
+      allow(resource).to receive(:mode?).with(:client).and_return(false)
     end
 
-    context "when the resource is in client mode" do
-      before do
-        allow(resource).to receive(:mode?).with(:server).and_return(false)
-        allow(resource).to receive(:mode?).with(:client).and_return(true)
-      end
+    context 'when the type is read only' do
+      before { type.mutability = :read_only }
 
-      context "when the type is read only" do
-        before { type.mutability = :read_only }
+      specify { expect(subject).to be_renderable }
+    end
 
-        specify { expect(subject).not_to be_renderable }
-      end
+    context 'when the type is write only' do
+      before { type.mutability = :write_only }
 
-      context "when the type is write only" do
-        before { type.mutability = :write_only }
+      specify { expect(subject).not_to be_renderable }
+    end
+  end
 
-        specify { expect(subject).to be_renderable }
-      end
+  context 'when the resource is in client mode' do
+    let(:type) { Scim::Kit::V2::AttributeType.new(name: 'userName', type: :string) }
+    let(:resource) { instance_double(Scim::Kit::V2::Resource) }
+
+    before do
+      allow(resource).to receive(:mode?).with(:server).and_return(false)
+      allow(resource).to receive(:mode?).with(:client).and_return(true)
+    end
+
+    context 'when the type is read only' do
+      before { type.mutability = :read_only }
+
+      specify { expect(subject).not_to be_renderable }
+    end
+
+    context 'when the type is write only' do
+      before { type.mutability = :write_only }
+
+      specify { expect(subject).to be_renderable }
     end
   end
 end

@@ -7,6 +7,6 @@ if type.complex? && !type.multi_valued
       render attribute, json: json
     end
   end
-else
-  json.set! type.name, _value if renderable?
+elsif renderable?
+  json.set! type.name, _value
 end

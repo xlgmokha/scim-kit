@@ -16,7 +16,7 @@ module Scim
           readonly: READ_ONLY,
           readwrite: READ_WRITE,
           write_only: WRITE_ONLY,
-          writeonly: WRITE_ONLY,
+          writeonly: WRITE_ONLY
         }.freeze
 
         def self.find(value)

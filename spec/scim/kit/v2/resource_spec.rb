@@ -167,7 +167,7 @@ RSpec.describe Scim::Kit::V2::Resource do
         attribute.required = true
         attribute.uniqueness = :server
       end
-      schema.add_attribute(name: 'name') do | attribute|
+      schema.add_attribute(name: 'name') do |attribute|
         attribute.add_attribute(name: 'formatted') do |x|
           x.mutability = :read_only
         end
@@ -182,7 +182,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       schema.add_attribute(name: 'active', type: :boolean)
       schema.add_attribute(name: 'password') do |attribute|
         attribute.mutability = :write_only
-        attribute.returned  = :never
+        attribute.returned = :never
       end
       schema.add_attribute(name: 'emails') do |attribute|
         attribute.multi_valued = true
@@ -196,7 +196,7 @@ RSpec.describe Scim::Kit::V2::Resource do
           x.mutability = :read_only
         end
         attribute.add_attribute(name: '$ref') do |x|
-          x.reference_types = ['User', 'Group']
+          x.reference_types = %w[User Group]
           x.mutability = :read_only
         end
         attribute.add_attribute(name: 'display') do |x|
@@ -249,8 +249,9 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(resource.to_h.key?(:external_id)).to be(false) }
     end
 
-    context "when building in client mode" do
+    context 'when building in client mode' do
       subject { described_class.new(schemas: schemas) }
+
       let(:external_id) { SecureRandom.uuid }
 
       before { subject.external_id = external_id }
@@ -272,7 +273,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.to_h.key?(:groups)).to be(false) }
     end
 
-    context "when building in server mode" do
+    context 'when building in server mode' do
       subject { described_class.new(schemas: schemas, location: resource_location) }
 
       before do
@@ -296,15 +297,15 @@ RSpec.describe Scim::Kit::V2::Resource do
     end
   end
 
-  describe "#mode?" do
-    context "when server mode" do
+  describe '#mode?' do
+    context 'when server mode' do
       subject { described_class.new(schemas: schemas, location: resource_location) }
 
       specify { expect(subject).to be_mode(:server) }
       specify { expect(subject).not_to be_mode(:client) }
     end
 
-    context "when client mode" do
+    context 'when client mode' do
       subject { described_class.new(schemas: schemas) }
 
       specify { expect(subject).not_to be_mode(:server) }

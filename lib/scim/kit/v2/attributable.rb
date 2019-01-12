@@ -43,7 +43,10 @@ module Scim
         end
 
         def attribute(type, resource)
-          dynamic_attributes[type.name] = Attribute.new(type: type, resource: resource)
+          dynamic_attributes[type.name] = Attribute.new(
+            type: type,
+            resource: resource
+          )
           extend(create_module_for(type))
         end
       end
