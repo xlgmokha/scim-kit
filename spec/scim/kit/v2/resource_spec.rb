@@ -254,7 +254,10 @@ RSpec.describe Scim::Kit::V2::Resource do
 
       let(:external_id) { SecureRandom.uuid }
 
-      before { subject.external_id = external_id }
+      before do
+        subject.password = FFaker::Internet.password
+        subject.external_id = external_id
+      end
 
       specify { expect(subject.to_h.key?(:id)).to be(false) }
       specify { expect(subject.to_h.key?(:externalId)).to be(true) }

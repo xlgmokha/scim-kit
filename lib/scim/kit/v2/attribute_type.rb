@@ -63,6 +63,7 @@ module Scim
         end
 
         def coerce(value)
+          return value if value.nil?
           return value if complex?
 
           if multi_valued

@@ -297,7 +297,15 @@ RSpec.describe Scim::Kit::V2::Attribute do
     context 'when the type is write only' do
       before { type.mutability = :write_only }
 
-      specify { expect(subject).to be_renderable }
+      specify do
+        subject._value = 'hello'
+        expect(subject).to be_renderable
+      end
+
+      specify do
+        subject._value = nil
+        expect(subject).not_to be_renderable
+      end
     end
   end
 end
