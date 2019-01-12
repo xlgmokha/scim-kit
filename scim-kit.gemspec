@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
     File.basename(file)
   end
   spec.require_paths = ['lib']
+  spec.required_ruby_version = '>= 2.5.0'
 
   spec.add_dependency 'activemodel', '>= 5.2.0'
   spec.add_dependency 'tilt', '~> 2.0'
