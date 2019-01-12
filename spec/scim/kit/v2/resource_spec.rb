@@ -252,6 +252,12 @@ RSpec.describe Scim::Kit::V2::Resource do
     context "when building in client mode" do
       subject { described_class.new(schemas: schemas) }
 
+      before do
+        subject.external_id = SecureRandom.uuid
+      end
+
+      specify { expect(subject.to_h.key?(:id)).to be(false) }
+      specify { expect(subject.to_h.key?(:externalId)).to be(true) }
       specify { expect(subject.to_h.key?(:meta)).to be(false) }
       specify { expect(subject.to_h.key?(:userName)).to be(true) }
       specify { expect(subject.to_h[:name].key?(:formatted)).to be(false) }
@@ -269,6 +275,12 @@ RSpec.describe Scim::Kit::V2::Resource do
     context "when building in server mode" do
       subject { described_class.new(schemas: schemas, location: resource_location) }
 
+      before do
+        subject.external_id = SecureRandom.uuid
+      end
+
+      specify { expect(subject.to_h.key?(:id)).to be(true) }
+      specify { expect(subject.to_h.key?(:externalId)).to be(false) }
       specify { expect(subject.to_h.key?(:meta)).to be(true) }
       specify { expect(subject.to_h.key?(:userName)).to be(true) }
       specify { expect(subject.to_h[:name].key?(:formatted)).to be(true) }
