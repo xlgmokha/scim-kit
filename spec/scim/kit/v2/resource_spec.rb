@@ -166,32 +166,10 @@ RSpec.describe Scim::Kit::V2::Resource do
     specify { expect(subject.as_json.key?(:id)).to be(false) }
     specify { expect(subject.as_json.key?(:externalId)).to be(false) }
 
-    context "using a simplified API" do
+    context 'when using a simplified API' do
       let(:user_name) { FFaker::Internet.user_name }
-
-      before do
-        schema.add_attribute(name: 'userName') do |attribute|
-          attribute.required = true
-          attribute.uniqueness = :server
-        end
-        schema.add_attribute(name: 'name') do | attribute|
-          attribute.add_attribute(name: 'formatted') do |x|
-            x.mutability = :read_only
-          end
-          attribute.add_attribute(name: 'familyName')
-          attribute.add_attribute(name: 'givenName')
-        end
-        schema.add_attribute(name: 'locale')
-        schema.add_attribute(name: 'timezone')
-        schema.add_attribute(name: 'emails') do |attribute|
-          attribute.multi_valued = true
-          attribute.add_attribute(name: 'value')
-          attribute.add_attribute(name: 'primary', type: :boolean)
-        end
-      end
-
       let(:resource) do
-        Scim::Kit::V2::Resource.new(schemas: schemas) do |x|
+        described_class.new(schemas: schemas) do |x|
           x.user_name = user_name
           x.name.given_name = 'Barbara'
           x.name.family_name = 'Jensen'
@@ -201,6 +179,24 @@ RSpec.describe Scim::Kit::V2::Resource do
           ]
           x.locale = 'en'
           x.timezone = 'Etc/UTC'
+        end
+      end
+
+      before do
+        schema.add_attribute(name: 'userName') do |attribute|
+          attribute.required = true
+          attribute.uniqueness = :server
+        end
+        schema.add_attribute(name: 'name') do |attribute|
+          attribute.add_attribute(name: 'familyName')
+          attribute.add_attribute(name: 'givenName')
+        end
+        schema.add_attribute(name: 'locale')
+        schema.add_attribute(name: 'timezone')
+        schema.add_attribute(name: 'emails') do |attribute|
+          attribute.multi_valued = true
+          attribute.add_attribute(name: 'value')
+          attribute.add_attribute(name: 'primary', type: :boolean)
         end
       end
 
@@ -215,6 +211,18 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(resource.timezone).to eql('Etc/UTC') }
 
       specify { expect(resource.to_h[:userName]).to eql(user_name) }
+      specify { expect(resource.to_h[:name][:givenName]).to eql('Barbara') }
+      specify { expect(resource.to_h[:name][:familyName]).to eql('Jensen') }
+      specify { expect(resource.to_h[:emails][0][:value]).to be_present }
+      specify { expect(resource.to_h[:emails][0][:primary]).to be(true) }
+      specify { expect(resource.to_h[:emails][1][:value]).to be_present }
+      specify { expect(resource.to_h[:emails][1][:primary]).to be(false) }
+      specify { expect(resource.to_h[:locale]).to eql('en') }
+      specify { expect(resource.to_h[:timezone]).to eql('Etc/UTC') }
+      specify { expect(resource.to_h.key?(:meta)).to be(false) }
+      specify { expect(resource.to_h.key?(:id)).to be(false) }
+      specify { expect(resource.to_h.key?(:external_id)).to be(false) }
+      specify { puts resource.to_h }
     end
   end
 end
