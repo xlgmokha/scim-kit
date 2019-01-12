@@ -26,6 +26,15 @@ module Scim
           yield self if block_given?
         end
 
+        def mode?(type)
+          case type.to_sym
+          when :server
+            meta&.location
+          else
+            meta&.location.nil?
+          end
+        end
+
         private
 
         def schema_validations
