@@ -20,12 +20,13 @@ RSpec.describe Scim::Kit::V2::Attribute do
     end
 
     context 'when multiple values are allowed' do
-      before do
-        type.multi_valued = true
-        subject._value = %w[superman batman]
-      end
+      before { type.multi_valued = true }
 
-      specify { expect(subject._value).to match_array(%w[superman batman]) }
+      specify { expect(subject._value).to match_array([]) }
+      specify do
+        subject._value = %w[superman batman]
+        expect(subject._value).to match_array(%w[superman batman])
+      end
     end
 
     context 'when a single value is provided' do

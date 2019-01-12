@@ -18,7 +18,7 @@ module Scim
 
         def initialize(resource:, type:, value: nil)
           @type = type
-          @_value = value
+          @_value = value || type.multi_valued ? [] : nil
           @_resource = resource
           define_attributes_for(resource, type.attributes)
         end
