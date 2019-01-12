@@ -34,7 +34,7 @@ module Scim
         def renderable?
           return false if read_only? && _resource.mode?(:client)
           return false if write_only? &&
-                          (_resource.mode?(:server) || _value.nil?)
+                          (_resource.mode?(:server) || _value.blank?)
 
           true
         end
