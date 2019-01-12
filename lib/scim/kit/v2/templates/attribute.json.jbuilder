@@ -8,5 +8,5 @@ if type.complex? && !type.multi_valued
     end
   end
 else
-  json.set! type.name, _value
+  json.set! type.name, _value if renderable?
 end

@@ -21,7 +21,7 @@ module Scim
           @meta.disable_timestamps
           @schemas = schemas
           schemas.each do |schema|
-            define_attributes_for(schema.attributes)
+            define_attributes_for(self, schema.attributes)
           end
           yield self if block_given?
         end

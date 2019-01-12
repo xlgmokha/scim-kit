@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::V2::Attribute do
-  subject { described_class.new(type: type) }
+  subject { described_class.new(type: type, resource: resource) }
+  let(:resource) { Scim::Kit::V2::Resource.new(schemas: [schema], location: FFaker::Internet.uri('https')) }
+  let(:schema) { Scim::Kit::V2::Schema.new(id: Scim::Kit::V2::Schemas::USER, name: 'User', location: FFaker::Internet.uri('https')) }
 
   context 'with strings' do
     let(:type) { Scim::Kit::V2::AttributeType.new(name: 'userName', type: :string) }

@@ -9,16 +9,18 @@ module Scim
         include Attributable
         include Templatable
         attr_reader :type
+        attr_reader :_resource
         attr_reader :_value
 
         validate :presence_of_value, if: proc { |x| x.type.required }
         validate :inclusion_of_value, if: proc { |x| x.type.canonical_values }
         validate :validate_type
 
-        def initialize(type:, value: nil)
+        def initialize(resource:, type:, value: nil)
           @type = type
           @_value = value
-          define_attributes_for(type.attributes)
+          @_resource = resource
+          define_attributes_for(resource, type.attributes)
         end
 
         def _assign(new_value, coerce: true)
@@ -27,6 +29,10 @@ module Scim
 
         def _value=(new_value)
           _assign(new_value, coerce: true)
+        end
+
+        def renderable?
+          true
         end
 
         private
