@@ -278,6 +278,12 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
       specify { expect(subject).not_to be_renderable }
     end
+
+    context 'when returned type is `never`' do
+      before { type.returned = :never }
+
+      xspecify { expect(subject).not_to be_renderable }
+    end
   end
 
   context 'when the resource is in client mode' do

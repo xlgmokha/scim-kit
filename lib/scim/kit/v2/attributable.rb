@@ -8,7 +8,7 @@ module Scim
         attr_reader :dynamic_attributes
 
         def define_attributes_for(resource, types)
-          @dynamic_attributes = {}.with_indifferent_access
+          @dynamic_attributes ||= {}.with_indifferent_access
           types.each { |x| attribute(x, resource) }
         end
 
@@ -26,7 +26,8 @@ module Scim
         end
 
         def write_attribute(name, value)
-          attribute_for(name)._value = value
+          attribute = attribute_for(name)
+          attribute._value = value
         end
 
         def create_module_for(type)

@@ -109,12 +109,16 @@ RSpec.describe Scim::Kit::V2::Resource do
     let(:extension_id) { 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User' }
 
     before do
-      extension.add_attribute(name: :department)
-      subject.department = 'voltron'
+      schema.add_attribute(name: :country)
+      extension.add_attribute(name: :province)
+      subject.country = 'canada'
+      subject.province = 'alberta'
     end
 
-    specify { expect(subject.department).to eql('voltron') }
-    specify { expect(subject.as_json[extension_id][:department]).to eql('voltron') }
+    specify { expect(subject.country).to eql('canada') }
+    specify { expect(subject.province).to eql('alberta') }
+    specify { expect(subject.as_json[:country]).to eql('canada') }
+    specify { expect(subject.as_json[extension_id][:province]).to eql('alberta') }
   end
 
   describe '#valid?' do
