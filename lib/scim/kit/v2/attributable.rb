@@ -20,9 +20,9 @@ module Scim
 
         def read_attribute(name)
           attribute = attribute_for(name)
-          return attribute._value if attribute.type.multi_valued
+          return attribute._value if attribute._type.multi_valued
 
-          attribute.type.complex? ? attribute : attribute._value
+          attribute._type.complex? ? attribute : attribute._value
         end
 
         def write_attribute(name, value)

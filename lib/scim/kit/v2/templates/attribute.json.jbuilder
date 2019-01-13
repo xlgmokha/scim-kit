@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 json.key_format! camelize: :lower
-if type.complex? && !type.multi_valued
-  json.set! type.name do
+if _type.complex? && !_type.multi_valued
+  json.set! _type.name do
     dynamic_attributes.values.each do |attribute|
       render attribute, json: json
     end
   end
 elsif renderable?
-  json.set! type.name, _value
+  json.set! _type.name, _value
 end

@@ -8,23 +8,23 @@ module Scim
         include ::ActiveModel::Validations
         include Attributable
         include Templatable
-        attr_reader :type
+        attr_reader :_type
         attr_reader :_resource
         attr_reader :_value
 
-        validate :presence_of_value, if: proc { |x| x.type.required }
-        validate :inclusion_of_value, if: proc { |x| x.type.canonical_values }
+        validate :presence_of_value, if: proc { |x| x._type.required }
+        validate :inclusion_of_value, if: proc { |x| x._type.canonical_values }
         validate :validate_type
 
         def initialize(resource:, type:, value: nil)
-          @type = type
+          @_type = type
           @_value = value || type.multi_valued ? [] : nil
           @_resource = resource
           define_attributes_for(resource, type.attributes)
         end
 
         def _assign(new_value, coerce: true)
-          @_value = coerce ? type.coerce(new_value) : new_value
+          @_value = coerce ? _type.coerce(new_value) : new_value
         end
 
         def _value=(new_value)
@@ -50,33 +50,33 @@ module Scim
         end
 
         def restricted?
-          _resource.mode?(:server) && type.returned == Returned::NEVER
+          _resource.mode?(:server) && _type.returned == Returned::NEVER
         end
 
         def presence_of_value
-          return unless type.required && _value.blank?
+          return unless _type.required && _value.blank?
 
-          errors.add(type.name, I18n.t('errors.messages.blank'))
+          errors.add(_type.name, I18n.t('errors.messages.blank'))
         end
 
         def inclusion_of_value
-          return if type.canonical_values.include?(_value)
+          return if _type.canonical_values.include?(_value)
 
-          errors.add(type.name, I18n.t('errors.messages.inclusion'))
+          errors.add(_type.name, I18n.t('errors.messages.inclusion'))
         end
 
         def validate_type
-          return if type.valid?(_value)
+          return if _type.valid?(_value)
 
-          errors.add(type.name, I18n.t('errors.messages.invalid'))
+          errors.add(_type.name, I18n.t('errors.messages.invalid'))
         end
 
         def read_only?
-          type.mutability == Mutability::READ_ONLY
+          _type.mutability == Mutability::READ_ONLY
         end
 
         def write_only?
-          type.mutability == Mutability::WRITE_ONLY
+          _type.mutability == Mutability::WRITE_ONLY
         end
       end
     end

@@ -42,6 +42,31 @@ RSpec.describe Scim::Kit::V2::Resource do
     end
   end
 
+  context 'with attribute named "type"' do
+    before do
+      schema.add_attribute(name: 'members') do |attribute|
+        attribute.mutability = :read_only
+        attribute.multi_valued = true
+        attribute.add_attribute(name: 'value') do |z|
+          z.mutability = :immutable
+        end
+        attribute.add_attribute(name: '$ref') do |z|
+          z.reference_types = %w[User Group]
+          z.mutability = :immutable
+        end
+        attribute.add_attribute(name: 'type') do |z|
+          z.canonical_values = %w[User Group]
+          z.mutability = :immutable
+        end
+      end
+      subject.members << { value: SecureRandom.uuid, '$ref' => FFaker::Internet.uri('https'), type: 'User' }
+    end
+
+    specify { expect(subject.members[0][:type]).to eql('User') }
+    specify { expect(subject.as_json[:members][0][:type]).to eql('User') }
+    specify { expect(subject.to_h[:members][0][:type]).to eql('User') }
+  end
+
   context 'with custom string attribute' do
     let(:user_name) { FFaker::Internet.user_name }
 
@@ -61,7 +86,7 @@ RSpec.describe Scim::Kit::V2::Resource do
 
     specify { expect(subject.type).to eql('User') }
     specify { expect(subject.as_json[:type]).to eql('User') }
-    specify { expect(subject.send(:attribute_for, :type).type).to be_instance_of(Scim::Kit::V2::AttributeType) }
+    specify { expect(subject.send(:attribute_for, :type)._type).to be_instance_of(Scim::Kit::V2::AttributeType) }
   end
 
   context 'with a complex attribute' do
