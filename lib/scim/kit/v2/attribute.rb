@@ -32,14 +32,26 @@ module Scim
         end
 
         def renderable?
-          return false if read_only? && _resource.mode?(:client)
-          return false if write_only? &&
-                          (_resource.mode?(:server) || _value.blank?)
+          return false if server_only?
+          return false if client_only?
+          return false if restricted?
 
           true
         end
 
         private
+
+        def server_only?
+          read_only? && _resource.mode?(:client)
+        end
+
+        def client_only?
+          write_only? && (_resource.mode?(:server) || _value.blank?)
+        end
+
+        def restricted?
+          _resource.mode?(:server) && type.returned == Returned::NEVER
+        end
 
         def presence_of_value
           return unless type.required && _value.blank?
