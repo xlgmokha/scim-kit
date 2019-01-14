@@ -351,7 +351,7 @@ RSpec.describe Scim::Kit::V2::Resource do
 
       before do
         schema.add_attribute(name: 'userName')
-        subject.assign_attributes(userName: user_name)
+        subject.assign_attributes(schemas: schemas.map(&:id), userName: user_name)
       end
 
       specify { expect(subject.user_name).to eql(user_name) }
@@ -360,7 +360,7 @@ RSpec.describe Scim::Kit::V2::Resource do
     context 'with a simple integer attribute' do
       before do
         schema.add_attribute(name: 'age', type: :integer)
-        subject.assign_attributes(age: 34)
+        subject.assign_attributes(schemas: schemas.map(&:id), age: 34)
       end
 
       specify { expect(subject.age).to be(34) }
@@ -371,7 +371,7 @@ RSpec.describe Scim::Kit::V2::Resource do
         schema.add_attribute(name: 'colours', type: :string) do |x|
           x.multi_valued = true
         end
-        subject.assign_attributes(colours: ['red', 'green', :blue])
+        subject.assign_attributes(schemas: schemas.map(&:id), colours: ['red', 'green', :blue])
       end
 
       specify { expect(subject.colours).to match_array(%w[red green blue]) }
@@ -383,7 +383,7 @@ RSpec.describe Scim::Kit::V2::Resource do
           x.add_attribute(name: :given_name)
           x.add_attribute(name: :family_name)
         end
-        subject.assign_attributes(name: { givenName: 'Tsuyoshi', familyName: 'Garrett' })
+        subject.assign_attributes(schemas: schemas.map(&:id), name: { givenName: 'Tsuyoshi', familyName: 'Garrett' })
       end
 
       specify { expect(subject.name.given_name).to eql('Tsuyoshi') }
@@ -400,7 +400,7 @@ RSpec.describe Scim::Kit::V2::Resource do
           x.add_attribute(name: :value)
           x.add_attribute(name: :primary, type: :boolean)
         end
-        subject.assign_attributes(emails: [
+        subject.assign_attributes(schemas: schemas.map(&:id), emails: [
                                     { value: email, primary: true },
                                     { value: other_email, primary: false }
                                   ])
@@ -427,6 +427,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       before do
         extension.add_attribute(name: :preferred_name)
         subject.assign_attributes(
+          schemas: schemas.map(&:id),
           extension_id => { preferredName: 'hunk' }
         )
       end
