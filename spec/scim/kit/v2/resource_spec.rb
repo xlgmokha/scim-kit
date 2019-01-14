@@ -365,5 +365,16 @@ RSpec.describe Scim::Kit::V2::Resource do
 
       specify { expect(subject.age).to be(34) }
     end
+
+    context "with a multi-valued simple string attribute" do
+      before do
+        schema.add_attribute(name: 'colours', type: :string) do |x|
+          x.multi_valued = true
+        end
+        subject.assign_attributes(colours: ['red', 'green', :blue])
+      end
+
+      specify { expect(subject.colours).to match_array(['red', 'green', 'blue']) }
+    end
   end
 end
