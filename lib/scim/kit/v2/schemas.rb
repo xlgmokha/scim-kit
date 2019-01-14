@@ -4,7 +4,11 @@ module Scim
   module Kit
     module V2
       module Schemas
-        CORE = 'urn:ietf:params:scim:schemas:core:2.0'
+        ROOT = 'urn:ietf:params:scim:schemas'
+
+        CORE = "#{ROOT}:core:2.0"
+        EXTENSION = "#{ROOT}:extension"
+        ENTERPRISE_USER = "#{EXTENSION}:enterprise:2.0:User"
         GROUP = "#{CORE}:Group"
         RESOURCE_TYPE = "#{CORE}:ResourceType"
         SERVICE_PROVIDER_CONFIGURATION = "#{CORE}:ServiceProviderConfig"

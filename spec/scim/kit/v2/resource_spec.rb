@@ -357,7 +357,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.user_name).to eql(user_name) }
     end
 
-    context "with a simple integer attribute" do
+    context 'with a simple integer attribute' do
       before do
         schema.add_attribute(name: 'age', type: :integer)
         subject.assign_attributes(age: 34)
@@ -366,7 +366,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.age).to be(34) }
     end
 
-    context "with a multi-valued simple string attribute" do
+    context 'with a multi-valued simple string attribute' do
       before do
         schema.add_attribute(name: 'colours', type: :string) do |x|
           x.multi_valued = true
@@ -374,10 +374,10 @@ RSpec.describe Scim::Kit::V2::Resource do
         subject.assign_attributes(colours: ['red', 'green', :blue])
       end
 
-      specify { expect(subject.colours).to match_array(['red', 'green', 'blue']) }
+      specify { expect(subject.colours).to match_array(%w[red green blue]) }
     end
 
-    context "with a single complex attribute" do
+    context 'with a single complex attribute' do
       before do
         schema.add_attribute(name: :name) do |x|
           x.add_attribute(name: :given_name)
@@ -390,7 +390,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.name.family_name).to eql('Garrett') }
     end
 
-    context "with a multi-valued complex attribute" do
+    context 'with a multi-valued complex attribute' do
       let(:email) { FFaker::Internet.email }
       let(:other_email) { FFaker::Internet.email }
 
@@ -401,22 +401,37 @@ RSpec.describe Scim::Kit::V2::Resource do
           x.add_attribute(name: :primary, type: :boolean)
         end
         subject.assign_attributes(emails: [
-          { value: email, primary: true },
-          { value: other_email, primary: false }
-        ])
+                                    { value: email, primary: true },
+                                    { value: other_email, primary: false }
+                                  ])
       end
 
       specify do
         expect(subject.emails).to match_array([
-          { value: email, primary: true },
-          { value: other_email, primary: false }
-        ])
+                                                { value: email, primary: true },
+                                                { value: other_email, primary: false }
+                                              ])
       end
 
       specify { expect(subject.emails[0][:value]).to eql(email) }
       specify { expect(subject.emails[0][:primary]).to be(true) }
       specify { expect(subject.emails[1][:value]).to eql(other_email) }
       specify { expect(subject.emails[1][:primary]).to be(false) }
+    end
+
+    context 'with an extension schema' do
+      let(:schemas) { [schema, extension] }
+      let(:extension) { Scim::Kit::V2::Schema.new(id: extension_id, name: 'Extension', location: FFaker::Internet.uri('https')) }
+      let(:extension_id) { Scim::Kit::V2::Schemas::ENTERPRISE_USER }
+
+      before do
+        extension.add_attribute(name: :preferred_name)
+        subject.assign_attributes(
+          extension_id => { preferredName: 'hunk' }
+        )
+      end
+
+      specify { expect(subject.preferred_name).to eql('hunk') }
     end
   end
 end

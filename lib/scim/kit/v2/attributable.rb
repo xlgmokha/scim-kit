@@ -14,7 +14,10 @@ module Scim
 
         def assign_attributes(attributes = {})
           attributes.each do |key, value|
-            if value.is_a?(Hash)
+            if key.is_a?(String) &&
+               key.start_with?('urn:ietf:params:scim:schemas:extension:')
+              assign_attributes(value)
+            elsif value.is_a?(Hash)
               public_send(key.to_s.underscore.to_sym).assign_attributes(value)
             else
               public_send(:"#{key.to_s.underscore}=", value)
