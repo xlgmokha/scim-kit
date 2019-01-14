@@ -12,6 +12,16 @@ module Scim
           types.each { |x| attribute(x, resource) }
         end
 
+        def assign_attributes(attributes = {})
+          attributes.each do |key, value|
+            if value.is_a?(Hash)
+              public_send(key.to_s.underscore.to_sym).assign_attributes(value)
+            else
+              public_send(:"#{key.to_s.underscore}=", value)
+            end
+          end
+        end
+
         private
 
         def attribute_for(name)

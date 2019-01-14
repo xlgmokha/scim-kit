@@ -376,5 +376,18 @@ RSpec.describe Scim::Kit::V2::Resource do
 
       specify { expect(subject.colours).to match_array(['red', 'green', 'blue']) }
     end
+
+    context "with a single complex attribute" do
+      before do
+        schema.add_attribute(name: :name) do |x|
+          x.add_attribute(name: :given_name)
+          x.add_attribute(name: :family_name)
+        end
+        subject.assign_attributes(name: { givenName: 'Tsuyoshi', familyName: 'Garrett' })
+      end
+
+      specify { expect(subject.name.given_name).to eql('Tsuyoshi') }
+      specify { expect(subject.name.family_name).to eql('Garrett') }
+    end
   end
 end
