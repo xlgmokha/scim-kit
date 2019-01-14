@@ -389,5 +389,34 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.name.given_name).to eql('Tsuyoshi') }
       specify { expect(subject.name.family_name).to eql('Garrett') }
     end
+
+    context "with a multi-valued complex attribute" do
+      let(:email) { FFaker::Internet.email }
+      let(:other_email) { FFaker::Internet.email }
+
+      before do
+        schema.add_attribute(name: :emails) do |x|
+          x.multi_valued = true
+          x.add_attribute(name: :value)
+          x.add_attribute(name: :primary, type: :boolean)
+        end
+        subject.assign_attributes(emails: [
+          { value: email, primary: true },
+          { value: other_email, primary: false }
+        ])
+      end
+
+      specify do
+        expect(subject.emails).to match_array([
+          { value: email, primary: true },
+          { value: other_email, primary: false }
+        ])
+      end
+
+      specify { expect(subject.emails[0][:value]).to eql(email) }
+      specify { expect(subject.emails[0][:primary]).to be(true) }
+      specify { expect(subject.emails[1][:value]).to eql(other_email) }
+      specify { expect(subject.emails[1][:primary]).to be(false) }
+    end
   end
 end
