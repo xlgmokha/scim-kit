@@ -356,5 +356,14 @@ RSpec.describe Scim::Kit::V2::Resource do
 
       specify { expect(subject.user_name).to eql(user_name) }
     end
+
+    context "with a simple integer attribute" do
+      before do
+        schema.add_attribute(name: 'age', type: :integer)
+        subject.assign_attributes(age: 34)
+      end
+
+      specify { expect(subject.age).to be(34) }
+    end
   end
 end
