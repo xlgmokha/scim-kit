@@ -344,4 +344,17 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject).to be_mode(:client) }
     end
   end
+
+  describe '#assign_attributes' do
+    context 'with a simple string attribute' do
+      let(:user_name) { FFaker::Internet.user_name }
+
+      before do
+        schema.add_attribute(name: 'userName')
+        subject.assign_attributes(userName: user_name)
+      end
+
+      specify { expect(subject.user_name).to eql(user_name) }
+    end
+  end
 end

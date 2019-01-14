@@ -35,6 +35,12 @@ module Scim
           end
         end
 
+        def assign_attributes(attributes = {})
+          attributes.each do |key, value|
+            public_send(:"#{key.to_s.underscore}=", value)
+          end
+        end
+
         private
 
         def schema_validations
