@@ -147,13 +147,6 @@ RSpec.describe Scim::Kit::V2::Resource do
   end
 
   describe '#valid?' do
-    context 'when invalid' do
-      before { subject.valid? }
-
-      specify { expect(subject).not_to be_valid }
-      specify { expect(subject.errors[:id]).to be_present }
-    end
-
     context 'when valid' do
       before { subject.id = SecureRandom.uuid }
 
@@ -351,7 +344,7 @@ RSpec.describe Scim::Kit::V2::Resource do
 
       before do
         schema.add_attribute(name: 'userName')
-        subject.assign_attributes(schemas: schemas.map(&:id), userName: user_name)
+        subject.assign_attributes('schemas' => schemas.map(&:id), userName: user_name)
       end
 
       specify { expect(subject.user_name).to eql(user_name) }

@@ -14,14 +14,12 @@ module Scim
 
         def assign_attributes(attributes = {})
           attributes.each do |key, value|
-            next if key == :schemas
+            next if key.to_sym == :schemas
 
-            if key.to_s.start_with?('urn:ietf:params:scim:schemas:extension:')
+            if key.to_s.start_with?(Schemas::EXTENSION)
               assign_attributes(value)
-            elsif value.is_a?(Hash)
-              public_send(key.to_s.underscore.to_sym).assign_attributes(value)
             else
-              public_send(:"#{key.to_s.underscore}=", value)
+              write_attribute(key, value)
             end
           end
         end
@@ -29,7 +27,7 @@ module Scim
         private
 
         def attribute_for(name)
-          dynamic_attributes[name]
+          dynamic_attributes[name.to_s.underscore]
         end
 
         def read_attribute(name)
@@ -40,8 +38,11 @@ module Scim
         end
 
         def write_attribute(name, value)
-          attribute = attribute_for(name)
-          attribute._value = value
+          if value.is_a?(Hash)
+            attribute_for(name)&.assign_attributes(value)
+          else
+            attribute_for(name)&._value = value
+          end
         end
 
         def create_module_for(type)

@@ -13,7 +13,6 @@ module Scim
         attr_reader :meta
         attr_reader :schemas
 
-        validates_presence_of :id
         validate :schema_validations
 
         def initialize(schemas:, location: nil)
