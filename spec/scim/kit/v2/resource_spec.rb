@@ -461,6 +461,7 @@ RSpec.describe Scim::Kit::V2::Resource do
         end
       end
 
+      specify { expect(subject.raw_attributes).to eql(attributes) }
       specify { expect(subject.user_name).to eql(user_name) }
       specify { expect(subject.age).to be(34) }
       specify { expect(subject.colours).to match_array(%w[red green blue]) }

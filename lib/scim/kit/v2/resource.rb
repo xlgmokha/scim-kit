@@ -12,6 +12,7 @@ module Scim
         attr_accessor :id, :external_id
         attr_reader :meta
         attr_reader :schemas
+        attr_reader :raw_attributes
 
         validate :schema_validations
 
@@ -19,6 +20,7 @@ module Scim
           @meta = Meta.new(schemas[0].name, location)
           @meta.disable_timestamps
           @schemas = schemas
+          @raw_attributes = attributes
           schemas.each do |schema|
             define_attributes_for(self, schema.attributes)
           end
