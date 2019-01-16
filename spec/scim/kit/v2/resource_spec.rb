@@ -427,5 +427,47 @@ RSpec.describe Scim::Kit::V2::Resource do
 
       specify { expect(subject.preferred_name).to eql('hunk') }
     end
+
+    context 'when initializing the resource with attributes' do
+      subject { described_class.new(schemas: schemas, attributes: attributes) }
+
+      let(:user_name) { FFaker::Internet.user_name }
+      let(:email) { FFaker::Internet.email }
+      let(:attributes) do
+        {
+          schemas: schemas.map(&:id),
+          userName: user_name,
+          age: 34,
+          colours: %w[red green blue],
+          name: { given_name: 'Tsuyoshi', family_name: 'Garrett' },
+          emails: [{ value: email, primary: true }]
+        }
+      end
+
+      before do
+        schema.add_attribute(name: :user_name)
+        schema.add_attribute(name: :age, type: :integer)
+        schema.add_attribute(name: :colours, type: :string) do |x|
+          x.multi_valued = true
+        end
+        schema.add_attribute(name: :name) do |x|
+          x.add_attribute(name: :given_name)
+          x.add_attribute(name: :family_name)
+        end
+        schema.add_attribute(name: :emails) do |x|
+          x.multi_valued = true
+          x.add_attribute(name: :value)
+          x.add_attribute(name: :primary, type: :boolean)
+        end
+      end
+
+      specify { expect(subject.user_name).to eql(user_name) }
+      specify { expect(subject.age).to be(34) }
+      specify { expect(subject.colours).to match_array(%w[red green blue]) }
+      specify { expect(subject.name.given_name).to eql('Tsuyoshi') }
+      specify { expect(subject.name.family_name).to eql('Garrett') }
+      specify { expect(subject.emails[0][:value]).to eql(email) }
+      specify { expect(subject.emails[0][:primary]).to be(true) }
+    end
   end
 end

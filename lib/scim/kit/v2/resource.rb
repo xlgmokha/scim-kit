@@ -15,13 +15,14 @@ module Scim
 
         validate :schema_validations
 
-        def initialize(schemas:, location: nil)
+        def initialize(schemas:, location: nil, attributes: {})
           @meta = Meta.new(schemas[0].name, location)
           @meta.disable_timestamps
           @schemas = schemas
           schemas.each do |schema|
             define_attributes_for(self, schema.attributes)
           end
+          assign_attributes(attributes)
           yield self if block_given?
         end
 
