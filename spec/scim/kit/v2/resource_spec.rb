@@ -472,13 +472,14 @@ RSpec.describe Scim::Kit::V2::Resource do
     end
   end
 
-  describe "Errors" do
+  describe 'Errors' do
     subject { described_class.new(schemas: schemas) }
-    let(:schemas) { [Scim::Kit::V2::Schemas.error] }
+
+    let(:schemas) { [Scim::Kit::V2::Error.default_schema] }
 
     before do
       subject.scim_type = :invalidSyntax
-      subject.detail = "error"
+      subject.detail = 'error'
       subject.status = 400
     end
 

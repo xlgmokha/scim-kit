@@ -19,11 +19,7 @@ module Scim
       private
 
       def template_path
-        TEMPLATES_DIR.join(template_name)
-      end
-
-      def template_name
-        "#{target.class.name.split('::').last.underscore}.json.jbuilder"
+        TEMPLATES_DIR.join(target.template_name)
       end
 
       def template

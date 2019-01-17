@@ -19,6 +19,10 @@ module Scim
       def render(model, options)
         Template.new(model).to_json(options)
       end
+
+      def template_name
+        "#{self.class.name.split('::').last.underscore}.json.jbuilder"
+      end
     end
   end
 end
