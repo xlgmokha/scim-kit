@@ -471,4 +471,20 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.emails[0][:primary]).to be(true) }
     end
   end
+
+  describe "Errors" do
+    subject { described_class.new(schemas: schemas) }
+    let(:schemas) { [Scim::Kit::V2::Schemas.error] }
+
+    before do
+      subject.scim_type = :invalidSyntax
+      subject.detail = "error"
+      subject.status = 400
+    end
+
+    specify { expect(subject.to_h[:schemas]).to match_array([Scim::Kit::V2::Messages::ERROR]) }
+    specify { expect(subject.to_h[:scimType]).to eql('invalidSyntax') }
+    specify { expect(subject.to_h[:detail]).to eql('error') }
+    specify { expect(subject.to_h[:status]).to be(400) }
+  end
 end

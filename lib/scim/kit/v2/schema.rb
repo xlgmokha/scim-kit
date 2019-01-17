@@ -17,6 +17,7 @@ module Scim
           @meta = Meta.new('Schema', location)
           @meta.created = @meta.last_modified = @meta.version = nil
           @attributes = []
+          yield self if block_given?
         end
 
         def add_attribute(name:, type: :string)
@@ -26,7 +27,7 @@ module Scim
         end
 
         def core?
-          id.include?(Schemas::CORE)
+          id.include?(Schemas::CORE) || id.include?(Messages::CORE)
         end
 
         def self.build(*args)
