@@ -36,6 +36,10 @@ module Scim
           end
         end
 
+        def template_name
+          'resource.json.jbuilder'
+        end
+
         private
 
         def schema_validations
