@@ -14,5 +14,6 @@ require 'scim/kit/version'
 module Scim
   module Kit
     class Error < StandardError; end
+    class UnknownAttributeError < Error; end
   end
 end

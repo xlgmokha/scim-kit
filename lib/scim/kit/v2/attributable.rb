@@ -41,7 +41,10 @@ module Scim
           if value.is_a?(Hash)
             attribute_for(name)&.assign_attributes(value)
           else
-            attribute_for(name)&._value = value
+            attribute = attribute_for(name)
+            raise Scim::Kit::UnknownAttributeError, name unless attribute
+
+            attribute._value = value
           end
         end
 
