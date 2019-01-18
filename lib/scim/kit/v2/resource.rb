@@ -16,7 +16,7 @@ module Scim
         validate :schema_validations
 
         def initialize(schemas:, location: nil, attributes: {})
-          @meta = Meta.new(schemas[0].name, location)
+          @meta = Meta.new(schemas[0]&.name, location)
           @meta.disable_timestamps
           @schemas = schemas
           @raw_attributes = attributes

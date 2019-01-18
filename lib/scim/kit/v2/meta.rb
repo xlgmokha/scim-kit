@@ -12,7 +12,7 @@ module Scim
         attr_reader :resource_type
 
         def initialize(resource_type, location)
-          @resource_type = resource_type
+          @resource_type = resource_type || 'Unknown'
           @location = location
           @created = @last_modified = Time.now
           @version = @created.to_i

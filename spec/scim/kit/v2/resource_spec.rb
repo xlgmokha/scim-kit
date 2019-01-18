@@ -7,6 +7,13 @@ RSpec.describe Scim::Kit::V2::Resource do
   let(:schema) { Scim::Kit::V2::Schema.new(id: Scim::Kit::V2::Schemas::USER, name: 'User', location: FFaker::Internet.uri('https')) }
   let(:resource_location) { FFaker::Internet.uri('https') }
 
+  context 'when the schemas is empty' do
+    let(:schemas) { [] }
+
+    specify { expect { subject }.not_to raise_error }
+    specify { expect(subject.meta.resource_type).to eql('Unknown') }
+  end
+
   context 'with common attributes' do
     let(:id) { SecureRandom.uuid }
     let(:external_id) { SecureRandom.uuid }
