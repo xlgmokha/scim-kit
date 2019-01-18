@@ -9,7 +9,6 @@ module Scim
         include Attributable
         include Templatable
 
-        attr_accessor :id, :external_id
         attr_reader :meta
         attr_reader :schemas
         attr_reader :raw_attributes
@@ -21,9 +20,9 @@ module Scim
           @meta.disable_timestamps
           @schemas = schemas
           @raw_attributes = attributes
-          schemas.each do |schema|
-            define_attributes_for(self, schema.attributes)
-          end
+          schemas.each { |x| define_attributes_for(self, x.attributes) }
+          attribute(AttributeType.new(name: :id), self)
+          attribute(AttributeType.new(name: :external_id), self)
           assign_attributes(attributes)
           yield self if block_given?
         end

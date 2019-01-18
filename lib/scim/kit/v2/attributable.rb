@@ -5,10 +5,11 @@ module Scim
     module V2
       # Represents a dynamic attribute that corresponds to a SCIM type
       module Attributable
-        attr_reader :dynamic_attributes
+        def dynamic_attributes
+          @dynamic_attributes ||= {}.with_indifferent_access
+        end
 
         def define_attributes_for(resource, types)
-          @dynamic_attributes ||= {}.with_indifferent_access
           types.each { |x| attribute(x, resource) }
         end
 
