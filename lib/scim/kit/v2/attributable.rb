@@ -25,12 +25,6 @@ module Scim
           end
         end
 
-        private
-
-        def attribute_for(name)
-          dynamic_attributes[name.to_s.underscore]
-        end
-
         def read_attribute(name)
           attribute = attribute_for(name)
           return attribute._value if attribute._type.multi_valued
@@ -47,6 +41,12 @@ module Scim
 
             attribute._value = value
           end
+        end
+
+        private
+
+        def attribute_for(name)
+          dynamic_attributes[name.to_s.underscore]
         end
 
         def create_module_for(type)

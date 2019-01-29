@@ -96,6 +96,17 @@ RSpec.describe Scim::Kit::V2::Resource do
     specify { expect(subject.send(:attribute_for, :type)._type).to be_instance_of(Scim::Kit::V2::AttributeType) }
   end
 
+  context 'with attribute named $ref' do
+    before do
+      schema.add_attribute(name: '$ref')
+      subject.write_attribute('$ref', 'User')
+    end
+
+    specify { expect(subject.read_attribute('$ref')).to eql('User') }
+    specify { expect(subject.as_json['$ref']).to eql('User') }
+    specify { expect(subject.send(:attribute_for, '$ref')._type).to be_instance_of(Scim::Kit::V2::AttributeType) }
+  end
+
   context 'with a complex attribute' do
     before do
       schema.add_attribute(name: 'name') do |x|
