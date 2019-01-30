@@ -23,9 +23,22 @@ RSpec.describe Scim::Kit::V2::Attribute do
       before { type.multi_valued = true }
 
       specify { expect(subject._value).to match_array([]) }
-      specify do
-        subject._value = %w[superman batman]
-        expect(subject._value).to match_array(%w[superman batman])
+
+      context "when multiple valid values are added" do
+        before do
+          subject._value = %w[superman batman]
+        end
+
+        specify { expect(subject._value).to match_array(%w[superman batman]) }
+        specify { expect(subject).to be_valid }
+      end
+
+      context "when multiple invalid values are added" do
+        before do
+          subject._value = ["superman", {}]
+        end
+
+        specify { expect(subject).not_to be_valid }
       end
     end
 
