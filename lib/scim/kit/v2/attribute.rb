@@ -14,7 +14,8 @@ module Scim
 
         validate :presence_of_value, if: proc { |x| x._type.required }
         validate :inclusion_of_value, if: proc { |x| x._type.canonical_values }
-        validate :validate_type
+        validate :validate_type, unless: proc { |x| x._type.complex? }
+        validate :validate_complex, if: proc { |x| x._type.complex? }
 
         def initialize(resource:, type:, value: nil)
           @_type = type
@@ -69,6 +70,12 @@ module Scim
           return if _type.valid?(_value)
 
           errors.add(_type.name, I18n.t('errors.messages.invalid'))
+        end
+
+        def validate_complex
+          dynamic_attributes.each do |key, attribute|
+            errors.copy!(attribute.errors) unless attribute.valid?
+          end
         end
 
         def read_only?

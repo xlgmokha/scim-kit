@@ -215,14 +215,16 @@ RSpec.describe Scim::Kit::V2::Attribute do
       x
     end
 
-    before { subject._value = { name: 'mo', age: 34 } }
+    specify do
+      subject.name = 'mo'
+      subject.age = 34
+      expect(subject).to be_valid
+    end
 
-    specify { expect(subject).to be_valid }
-
-    context 'when invalid sub attribute' do
-      before { subject._value = { name: 34, age: 'wrong' } }
-
-      specify { expect(subject).not_to be_valid }
+    specify do
+      subject.name = 'mo'
+      subject.age = { }
+      expect(subject).not_to be_valid
     end
   end
 

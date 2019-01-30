@@ -197,6 +197,63 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject).not_to be_valid }
       specify { expect(subject.errors[:hero]).to be_present }
     end
+
+    context "when validating a complex type" do
+      before do
+        schema.add_attribute(name: :manager, type: :complex) do |x|
+          x.multi_valued = false
+          x.required = false
+          x.mutability = :read_write
+          x.returned = :default
+          x.add_attribute(name: :value, type: :string) do |y|
+            y.multi_valued = false
+            y.required = false
+            y.case_exact = false
+            y.mutability = :read_write
+            y.returned = :default
+            y.uniqueness = :none
+          end
+          x.add_attribute(name: '$ref', type: :reference) do |y|
+            y.multi_valued = false
+            y.required = false
+            y.case_exact = false
+            y.mutability = :read_write
+            y.returned = :default
+            y.uniqueness = :none
+          end
+          x.add_attribute(name: :display_name, type: :string) do |y|
+            y.multi_valued = false
+            y.required = true
+            y.case_exact = false
+            y.mutability = :read_only
+            y.returned = :default
+            y.uniqueness = :none
+          end
+        end
+      end
+
+      context "when valid" do
+        before do
+          subject.manager.value = SecureRandom.uuid
+          subject.manager.write_attribute('$ref', FFaker::Internet.uri('https'))
+          subject.manager.display_name = SecureRandom.uuid
+        end
+
+        specify { expect(subject).to be_valid }
+      end
+
+      context "when invalid" do
+        before do
+          subject.manager.value = SecureRandom.uuid
+          subject.manager.write_attribute('$ref', SecureRandom.uuid)
+          subject.manager.display_name = nil
+          subject.valid?
+        end
+
+        specify { expect(subject).not_to be_valid }
+        specify { expect(subject.errors[:display_name]).to be_present }
+      end
+    end
   end
 
   context 'when building a new resource' do
