@@ -43,6 +43,12 @@ module Scim
           end
         end
 
+        def each
+          dynamic_attributes.each do |_name, attribute|
+            yield attribute
+          end
+        end
+
         private
 
         def attribute_for(name)

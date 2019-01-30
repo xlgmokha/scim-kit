@@ -73,7 +73,7 @@ module Scim
         end
 
         def validate_complex
-          dynamic_attributes.each do |key, attribute|
+          each do |attribute|
             errors.copy!(attribute.errors) unless attribute.valid?
           end
         end
