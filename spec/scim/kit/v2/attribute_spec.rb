@@ -35,7 +35,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
       context "when multiple invalid values are added" do
         before do
-          subject._value = ["superman", {}]
+          subject._assign(["superman", {}], coerce: false)
         end
 
         specify { expect(subject).not_to be_valid }

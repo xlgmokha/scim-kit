@@ -16,15 +16,17 @@ module Scim
         validate :inclusion_of_value, if: proc { |x| x._type.canonical_values }
         validate :validate_type, unless: proc { |x| x._type.complex? }
         validate :validate_complex, if: proc { |x| x._type.complex? }
+        validate :validate_multiple, if: proc { |x| x._type.multi_valued && !x._type.complex? }
 
         def initialize(resource:, type:, value: nil)
           @_type = type
           @_value = value || type.multi_valued ? [] : nil
           @_resource = resource
+
           define_attributes_for(resource, type.attributes)
         end
 
-        def _assign(new_value, coerce: true)
+        def _assign(new_value, coerce: false)
           @_value = coerce ? _type.coerce(new_value) : new_value
         end
 
@@ -75,6 +77,16 @@ module Scim
         def validate_complex
           each do |attribute|
             errors.copy!(attribute.errors) unless attribute.valid?
+          end
+        end
+
+        def validate_multiple
+          return unless _value.respond_to?(:to_a)
+
+          duped_type = _type.dup
+          duped_type.multi_valued = false
+          _value.to_a.each do |x|
+            errors.add(duped_type.name, I18n.t('errors.messages.invalid')) unless duped_type.valid?(x)
           end
         end
 
