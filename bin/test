@@ -14,4 +14,8 @@ echo [$(date "+%H:%M:%S")] "==> Running setup…"
 bin/setup
 
 echo [$(date "+%H:%M:%S")] "==> Running tests…"
-bundle exec rake spec
+if [[ $# -eq 0 ]]; then
+  bundle exec rake spec
+else
+  bundle exec rspec "$1"
+fi
