@@ -270,6 +270,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
       end
 
       specify { expect(subject).not_to be_valid }
+      specify { expect(subject.errors[:blah]).to be_present }
       specify { expect(subject.errors[:emails]).to be_present }
     end
   end

@@ -3,6 +3,24 @@
 module Scim
   module Kit
     module V2
+      class UnknownAttribute
+        include ::ActiveModel::Validations
+        validate :unknown
+        attr_reader :name
+
+        def initialize(name)
+          @name = name
+        end
+
+        def _assign(*args)
+          valid?
+        end
+
+        def unknown
+          errors.add(name, I18n.t('errors.messages.invalid'))
+        end
+      end
+
       # Represents a SCIM Attribute
       class Attribute
         include ::ActiveModel::Validations
@@ -75,9 +93,25 @@ module Scim
         end
 
         def validate_complex
-          each do |attribute|
-            errors.copy!(attribute.errors) unless attribute.valid?
+          if _type.multi_valued
+            each_value do |hash|
+              hash.each do |key, value|
+                attribute = attribute_for(key) || UnknownAttribute.new(key)
+                attribute._assign(value)
+                errors.copy!(attribute.errors) unless attribute.valid?
+              end
+            end
+          else
+            each do |attribute|
+              errors.copy!(attribute.errors) unless attribute.valid?
+            end
           end
+        end
+
+        def each_value(&block)
+          return unless _type.multi_valued
+
+          _value.each(&block)
         end
 
         def validate_multiple
