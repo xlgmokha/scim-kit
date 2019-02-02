@@ -17,6 +17,7 @@ require 'scim/kit/v2/schemas'
 require 'scim/kit/v2/service_provider_configuration'
 require 'scim/kit/v2/supportable'
 require 'scim/kit/v2/uniqueness'
+require 'scim/kit/v2/unknown_attribute'
 
 module Scim
   module Kit
