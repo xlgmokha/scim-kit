@@ -91,9 +91,7 @@ module Scim
         end
 
         def each_value(&block)
-          return unless _type.multi_valued
-
-          _value.each(&block)
+          Array(_value).each(&block)
         end
 
         def validate_multiple

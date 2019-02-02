@@ -24,7 +24,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
       specify { expect(subject._value).to match_array([]) }
 
-      context "when multiple valid values are added" do
+      context 'when multiple valid values are added' do
         before do
           subject._value = %w[superman batman]
         end
@@ -33,9 +33,9 @@ RSpec.describe Scim::Kit::V2::Attribute do
         specify { expect(subject).to be_valid }
       end
 
-      context "when multiple invalid values are added" do
+      context 'when multiple invalid values are added' do
         before do
-          subject._assign(["superman", {}], coerce: false)
+          subject._assign(['superman', {}], coerce: false)
         end
 
         specify { expect(subject).not_to be_valid }
@@ -236,7 +236,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
     specify do
       subject.name = 'mo'
-      subject.age = { }
+      subject.age = {}
       expect(subject).not_to be_valid
     end
   end
@@ -271,7 +271,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
       specify { expect(subject).not_to be_valid }
       specify { expect(subject.errors[:blah]).to be_present }
-      specify { expect(subject.errors[:emails]).to be_present }
+      specify { expect(subject.errors[:value]).to be_present }
     end
   end
 

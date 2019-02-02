@@ -133,7 +133,9 @@ RSpec.describe Scim::Kit::V2::Resource do
     before do
       schema.add_attribute(name: 'emails', type: :complex) do |x|
         x.multi_valued = true
-        x.add_attribute(name: 'value')
+        x.add_attribute(name: 'value') do |y|
+          y.required = true
+        end
         x.add_attribute(name: 'primary', type: :boolean)
       end
       subject.emails = [
@@ -144,6 +146,18 @@ RSpec.describe Scim::Kit::V2::Resource do
 
     specify { expect(subject.emails).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
     specify { expect(subject.as_json[:emails]).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
+
+    specify do
+      subject.emails = [{ value: email, primary: 'q' }]
+      expect(subject).not_to be_valid
+      expect(subject.errors[:primary]).to be_present
+    end
+
+    specify do
+      subject.emails = [{ primary: true }]
+      expect(subject).not_to be_valid
+      expect(subject.errors[:value]).to be_present
+    end
   end
 
   context 'with multiple schemas' do
@@ -198,7 +212,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.errors[:hero]).to be_present }
     end
 
-    context "when validating a complex type" do
+    context 'when validating a complex type' do
       before do
         schema.add_attribute(name: :manager, type: :complex) do |x|
           x.multi_valued = false
@@ -232,7 +246,7 @@ RSpec.describe Scim::Kit::V2::Resource do
         end
       end
 
-      context "when valid" do
+      context 'when valid' do
         before do
           subject.manager.value = SecureRandom.uuid
           subject.manager.write_attribute('$ref', FFaker::Internet.uri('https'))
@@ -242,7 +256,7 @@ RSpec.describe Scim::Kit::V2::Resource do
         specify { expect(subject).to be_valid }
       end
 
-      context "when invalid" do
+      context 'when invalid' do
         before do
           subject.manager.value = SecureRandom.uuid
           subject.manager.write_attribute('$ref', SecureRandom.uuid)
@@ -475,10 +489,12 @@ RSpec.describe Scim::Kit::V2::Resource do
       end
 
       specify do
-        expect(subject.emails).to match_array([
-                                                { value: email, primary: true },
-                                                { value: other_email, primary: false }
-                                              ])
+        expect(subject.emails).to match_array(
+          [
+            { value: email, primary: true },
+            { value: other_email, primary: false }
+          ]
+        )
       end
 
       specify { expect(subject.emails[0][:value]).to eql(email) }

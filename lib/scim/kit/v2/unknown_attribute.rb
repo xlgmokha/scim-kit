@@ -12,11 +12,11 @@ module Scim
           @name = name
         end
 
-        def _assign(*args)
+        def _assign(*_args)
           valid?
         end
 
-        def _value=(*args)
+        def _value=(*_args)
           raise Scim::Kit::UnknownAttributeError, name
         end
 
