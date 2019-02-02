@@ -36,10 +36,7 @@ module Scim
           if value.is_a?(Hash)
             attribute_for(name)&.assign_attributes(value)
           else
-            attribute = attribute_for(name)
-            raise Scim::Kit::UnknownAttributeError, name unless attribute
-
-            attribute._value = value
+            attribute_for(name)._value = value
           end
         end
 
@@ -52,7 +49,7 @@ module Scim
         private
 
         def attribute_for(name)
-          dynamic_attributes[name.to_s.underscore]
+          dynamic_attributes[name.to_s.underscore] || UnknownAttribute.new(name)
         end
 
         def create_module_for(type)

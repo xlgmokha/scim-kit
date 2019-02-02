@@ -16,6 +16,10 @@ module Scim
           valid?
         end
 
+        def _value=(*args)
+          raise Scim::Kit::UnknownAttributeError, name
+        end
+
         def unknown
           errors.add(name, I18n.t('errors.messages.invalid'))
         end

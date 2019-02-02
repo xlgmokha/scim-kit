@@ -78,7 +78,7 @@ module Scim
           if _type.multi_valued
             each_value do |hash|
               hash.each do |key, value|
-                attribute = attribute_for(key) || UnknownAttribute.new(key)
+                attribute = attribute_for(key)
                 attribute._assign(value)
                 errors.copy!(attribute.errors) unless attribute.valid?
               end
