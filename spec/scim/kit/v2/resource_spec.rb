@@ -147,16 +147,24 @@ RSpec.describe Scim::Kit::V2::Resource do
     specify { expect(subject.emails).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
     specify { expect(subject.as_json[:emails]).to match_array([{ value: email, primary: true }, { value: other_email, primary: false }]) }
 
-    specify do
-      subject.emails = [{ value: email, primary: 'q' }]
-      expect(subject).not_to be_valid
-      expect(subject.errors[:primary]).to be_present
+    context 'when one attribute has an invalid type' do
+      before do
+        subject.emails = [{ value: email, primary: 'q' }]
+        subject.valid?
+      end
+
+      specify { expect(subject).not_to be_valid }
+      specify { expect(subject.errors[:primary]).to be_present }
     end
 
-    specify do
-      subject.emails = [{ primary: true }]
-      expect(subject).not_to be_valid
-      expect(subject.errors[:value]).to be_present
+    context 'when a required attribute is missing' do
+      before do
+        subject.emails = [{ primary: true }]
+        subject.valid?
+      end
+
+      specify { expect(subject).not_to be_valid }
+      specify { expect(subject.errors[:value]).to be_present }
     end
   end
 
@@ -483,18 +491,16 @@ RSpec.describe Scim::Kit::V2::Resource do
           x.add_attribute(name: :primary, type: :boolean)
         end
         subject.assign_attributes(schemas: schemas.map(&:id), emails: [
-                                    { value: email, primary: true },
-                                    { value: other_email, primary: false }
-                                  ])
+          { value: email, primary: true },
+          { value: other_email, primary: false }
+        ])
       end
 
       specify do
-        expect(subject.emails).to match_array(
-          [
-            { value: email, primary: true },
-            { value: other_email, primary: false }
-          ]
-        )
+        expect(subject.emails).to match_array([
+          { value: email, primary: true },
+          { value: other_email, primary: false }
+        ])
       end
 
       specify { expect(subject.emails[0][:value]).to eql(email) }

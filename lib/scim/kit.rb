@@ -15,6 +15,7 @@ require 'scim/kit/v2'
 require 'scim/kit/version'
 
 module Scim
+  # @api
   module Kit
     class Error < StandardError; end
     class UnknownAttributeError < Error; end

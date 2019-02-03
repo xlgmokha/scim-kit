@@ -3,6 +3,7 @@
 module Scim
   module Kit
     module V2
+      # Represents an Unknown/Unrecognized Attribute
       class UnknownAttribute
         include ::ActiveModel::Validations
         validate :unknown

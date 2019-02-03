@@ -14,9 +14,11 @@ module Scim
 
         validate :presence_of_value, if: proc { |x| x._type.required }
         validate :inclusion_of_value, if: proc { |x| x._type.canonical_values }
-        validate :validate_type, unless: proc { |x| x._type.complex? }
-        validate :validate_complex, if: proc { |x| x._type.complex? }
-        validate :validate_multiple, if: proc { |x| x._type.multi_valued && !x._type.complex? }
+        validate :validate_type, unless: proc { |x| x.complex? }
+        validate :validate_complex, if: proc { |x| x.complex? }
+        validate :multiple, if: proc { |x| x.multi_valued && !x.complex? }
+
+        delegate :complex?, :multi_valued, to: :_type
 
         def initialize(resource:, type:, value: nil)
           @_type = type
@@ -78,14 +80,15 @@ module Scim
         def validate_complex
           if _type.multi_valued
             each_value do |hash|
-              validated_attributes = hash.map do |key, value|
+              validated = hash.map do |key, value|
                 attribute = attribute_for(key)
                 attribute._assign(value)
                 errors.merge!(attribute.errors) unless attribute.valid?
 
                 key.to_sym
               end
-              (map { |x| x._type.name.to_sym } - validated_attributes).each do |key|
+              not_validated = map { |x| x._type.name.to_sym } - validated
+              not_validated.each do |key|
                 attribute = attribute_for(key)
                 attribute._assign(hash[key])
                 errors.merge!(attribute.errors) unless attribute.valid?
@@ -102,7 +105,7 @@ module Scim
           Array(_value).each(&block)
         end
 
-        def validate_multiple
+        def multiple
           return unless _value.respond_to?(:to_a)
 
           duped_type = _type.dup
