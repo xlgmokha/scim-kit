@@ -27,6 +27,10 @@ module Scim
           end
         end
 
+        def attribute_for(name)
+          dynamic_attributes[name.to_s.underscore] || UnknownAttribute.new(name)
+        end
+
         def read_attribute(name)
           attribute = attribute_for(name)
           return attribute._value if attribute._type.multi_valued
@@ -49,10 +53,6 @@ module Scim
         end
 
         private
-
-        def attribute_for(name)
-          dynamic_attributes[name.to_s.underscore] || UnknownAttribute.new(name)
-        end
 
         def create_module_for(type)
           name = type.name.to_sym

@@ -44,6 +44,10 @@ module Scim
           true
         end
 
+        def each_value(&block)
+          Array(_value).each(&block)
+        end
+
         private
 
         def server_only?
@@ -78,31 +82,7 @@ module Scim
         end
 
         def validate_complex
-          if _type.multi_valued
-            each_value do |hash|
-              validated = hash.map do |key, value|
-                attribute = attribute_for(key)
-                attribute._assign(value)
-                errors.merge!(attribute.errors) unless attribute.valid?
-
-                key.to_sym
-              end
-              not_validated = map { |x| x._type.name.to_sym } - validated
-              not_validated.each do |key|
-                attribute = attribute_for(key)
-                attribute._assign(hash[key])
-                errors.merge!(attribute.errors) unless attribute.valid?
-              end
-            end
-          else
-            each do |attribute|
-              errors.merge!(attribute.errors) unless attribute.valid?
-            end
-          end
-        end
-
-        def each_value(&block)
-          Array(_value).each(&block)
+          validates_with ComplexAttributeValidator
         end
 
         def multiple
