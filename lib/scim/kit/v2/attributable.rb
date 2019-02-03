@@ -5,6 +5,8 @@ module Scim
     module V2
       # Represents a dynamic attribute that corresponds to a SCIM type
       module Attributable
+        include Enumerable
+
         def dynamic_attributes
           @dynamic_attributes ||= {}.with_indifferent_access
         end
