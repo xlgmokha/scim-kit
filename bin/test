@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # script/test: Run test suite for application. Optionally pass in a path to an
 #              individual test file to run a single test.
@@ -10,10 +10,10 @@ cd "$(dirname "$0")/.."
 
 [ -z "$DEBUG" ] || set -x
 
-echo [$(date "+%H:%M:%S")] "==> Running setup…"
+echo ["$(date "+%H:%M:%S")"] "==> Running setup…"
 bin/setup
 
-echo [$(date "+%H:%M:%S")] "==> Running tests…"
+echo ["$(date "+%H:%M:%S")"] "==> Running tests…"
 if [[ $# -eq 0 ]]; then
   bundle exec rake spec
 else
