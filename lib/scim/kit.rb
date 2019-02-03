@@ -3,6 +3,7 @@
 require 'active_model'
 require 'active_support/core_ext/hash/indifferent_access'
 require 'json'
+require 'logger'
 require 'pathname'
 require 'tilt'
 require 'tilt/jbuilder'
@@ -17,5 +18,13 @@ module Scim
   module Kit
     class Error < StandardError; end
     class UnknownAttributeError < Error; end
+
+    def self.logger
+      @logger ||= Logger.new(STDOUT)
+    end
+
+    def self.logger=(logger)
+      @logger = logger
+    end
   end
 end
