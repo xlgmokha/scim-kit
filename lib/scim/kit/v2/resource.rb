@@ -52,7 +52,7 @@ module Scim
 
         def validate_attribute(type)
           attribute = attribute_for(type.name)
-          errors.copy!(attribute.errors) unless attribute.valid?
+          errors.merge!(attribute.errors) unless attribute.valid?
         end
       end
     end
