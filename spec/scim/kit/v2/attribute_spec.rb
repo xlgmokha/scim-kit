@@ -236,7 +236,7 @@ RSpec.describe Scim::Kit::V2::Attribute do
 
     specify do
       subject.name = 'mo'
-      subject.age = {}
+      subject.age = []
       expect(subject).not_to be_valid
     end
   end
@@ -245,7 +245,9 @@ RSpec.describe Scim::Kit::V2::Attribute do
     let(:type) do
       x = Scim::Kit::V2::AttributeType.new(name: 'emails', type: :complex)
       x.multi_valued = true
-      x.add_attribute(name: 'value')
+      x.add_attribute(name: 'value') do |y|
+        y.required = true
+      end
       x.add_attribute(name: 'primary', type: :boolean)
       x
     end

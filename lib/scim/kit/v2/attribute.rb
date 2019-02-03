@@ -69,6 +69,7 @@ module Scim
         end
 
         def validate_type
+          return if _value.nil?
           return if _type.valid?(_value)
 
           errors.add(_type.name, I18n.t('errors.messages.invalid'))
@@ -77,15 +78,22 @@ module Scim
         def validate_complex
           if _type.multi_valued
             each_value do |hash|
-              hash.each do |key, value|
+              validated_attributes = hash.map do |key, value|
                 attribute = attribute_for(key)
                 attribute._assign(value)
-                errors.copy!(attribute.errors) unless attribute.valid?
+                errors.merge!(attribute.errors) unless attribute.valid?
+
+                key.to_sym
+              end
+              (map { |x| x._type.name.to_sym } - validated_attributes).each do |key|
+                attribute = attribute_for(key)
+                attribute._assign(hash[key])
+                errors.merge!(attribute.errors) unless attribute.valid?
               end
             end
           else
             each do |attribute|
-              errors.copy!(attribute.errors) unless attribute.valid?
+              errors.merge!(attribute.errors) unless attribute.valid?
             end
           end
         end
@@ -100,7 +108,9 @@ module Scim
           duped_type = _type.dup
           duped_type.multi_valued = false
           _value.to_a.each do |x|
-            errors.add(duped_type.name, I18n.t('errors.messages.invalid')) unless duped_type.valid?(x)
+            unless duped_type.valid?(x)
+              errors.add(duped_type.name, I18n.t('errors.messages.invalid'))
+            end
           end
         end
 
