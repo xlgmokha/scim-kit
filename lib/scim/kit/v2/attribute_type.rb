@@ -69,11 +69,9 @@ module Scim
           if multi_valued
             return value unless value.respond_to?(:to_a)
 
-            value.to_a.map do |x|
-              COERCION.fetch(type, ->(y) { y }).call(x)
-            end
+            value.to_a.map { |x| coerce_single(x) }
           else
-            COERCION.fetch(type, ->(x) { x }).call(value)
+            coerce_single(value)
           end
         end
 
@@ -88,6 +86,13 @@ module Scim
         end
 
         private
+
+        def coerce_single(value)
+          COERCION.fetch(type, ->(x) { x }).call(value)
+        rescue StandardError => error
+          Scim::Kit.logger.error(error)
+          value
+        end
 
         def validate(value)
           complex? ? valid_complex?(value) : valid_simple?(value)
