@@ -38,19 +38,23 @@ module Scim
 
         def self.parse(json)
           hash = JSON.parse(json, symbolize_names: true)
-          Schema.new(id: hash[:id], name: hash[:name], location: hash[:location]) do |x|
+          Schema.new(
+            id: hash[:id],
+            name: hash[:name],
+            location: hash[:location]
+          ) do |x|
             x.meta = Meta.from(hash[:meta])
-            hash[:attributes].each do |attribute|
-              x.add_attribute(name: attribute[:name], type: attribute[:type]) do |y|
-                y.description = attribute[:description]
-                y.multi_valued = attribute[:multiValued]
-                y.required = attribute[:required]
-                y.case_exact = attribute[:caseExact]
-                y.mutability = attribute[:mutability]
-                y.returned = attribute[:returned]
-                y.uniqueness = attribute[:uniqueness]
-                y.canonical_values = attribute[:canonicalValues]
-                y.reference_types = attribute[:referenceTypes]
+            hash[:attributes].each do |attr|
+              x.add_attribute(name: attr[:name], type: attr[:type]) do |y|
+                y.description = attr[:description]
+                y.multi_valued = attr[:multiValued]
+                y.required = attr[:required]
+                y.case_exact = attr[:caseExact]
+                y.mutability = attr[:mutability]
+                y.returned = attr[:returned]
+                y.uniqueness = attr[:uniqueness]
+                y.canonical_values = attr[:canonicalValues]
+                y.reference_types = attr[:referenceTypes]
               end
             end
           end
