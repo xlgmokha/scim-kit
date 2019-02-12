@@ -44,12 +44,7 @@ module Scim
             x.sort.supported = hash[:sort][:supported]
             x.etag.supported = hash[:etag][:supported]
             hash[:authenticationSchemes]&.each do |auth|
-              x.add_authentication(auth[:type], primary: auth[:primary]) do |y|
-                y.description = auth[:description]
-                y.documentation_uri = auth[:documentationUri]
-                y.name = auth[:name]
-                y.spec_uri = auth[:specUri]
-              end
+              x.authentication_schemes << AuthenticationScheme.from(auth)
             end
             x
           end

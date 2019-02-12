@@ -32,15 +32,26 @@ module Scim
           yield self if block_given?
         end
 
-        def self.build_for(type, primary: nil)
-          defaults = DEFAULTS[type.to_sym] || {}
-          new do |x|
-            x.type = type
-            x.primary = primary
-            x.description = defaults[:description]
-            x.documentation_uri = defaults[:documentation_uri]
-            x.name = defaults[:name]
-            x.spec_uri = defaults[:spec_uri]
+        class << self
+          def build_for(type, primary: nil)
+            defaults = DEFAULTS[type.to_sym] || {}
+            new do |x|
+              x.type = type
+              x.primary = primary
+              x.description = defaults[:description]
+              x.documentation_uri = defaults[:documentation_uri]
+              x.name = defaults[:name]
+              x.spec_uri = defaults[:spec_uri]
+            end
+          end
+
+          def from(hash)
+            x = build_for(hash[:type], primary: hash[:primary])
+            x.description = hash[:description]
+            x.documentation_uri = hash[:documentationUri]
+            x.name = hash[:name]
+            x.spec_uri = hash[:specUri]
+            x
           end
         end
       end
