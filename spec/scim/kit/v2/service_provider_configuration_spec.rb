@@ -136,11 +136,11 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
     end
   end
 
-  describe ".parse" do
+  describe '.parse' do
     let(:result) { described_class.parse(subject.to_json) }
 
     before do
-      #subject.add_authentication(:oauthbearertoken)
+      subject.add_authentication(:oauthbearertoken)
       subject.bulk.max_operations = 1000
       subject.bulk.max_payload_size = 1_048_576
       subject.bulk.supported = true

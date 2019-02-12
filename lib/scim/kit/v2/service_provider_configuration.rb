@@ -8,7 +8,7 @@ module Scim
         include Templatable
         attr_accessor :meta, :documentation_uri
         attr_reader :authentication_schemes
-        attr_reader :bulk, :filter#, :location
+        attr_reader :bulk, :filter
         attr_reader :etag, :sort, :change_password, :patch
 
         def initialize(location:)
@@ -43,6 +43,14 @@ module Scim
             x.change_password.supported = hash[:changePassword][:supported]
             x.sort.supported = hash[:sort][:supported]
             x.etag.supported = hash[:etag][:supported]
+            hash[:authenticationSchemes]&.each do |auth|
+              x.add_authentication(auth[:type], primary: auth[:primary]) do |y|
+                y.description = auth[:description]
+                y.documentation_uri = auth[:documentationUri]
+                y.name = auth[:name]
+                y.spec_uri = auth[:specUri]
+              end
+            end
             x
           end
         end
