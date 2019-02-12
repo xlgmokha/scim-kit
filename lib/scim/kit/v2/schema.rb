@@ -7,8 +7,8 @@ module Scim
       class Schema
         include Templatable
 
-        attr_reader :id, :name, :attributes, :meta
-        attr_accessor :description
+        attr_reader :id, :name, :attributes
+        attr_accessor :meta, :description
 
         def initialize(id:, name:, location:)
           @id = id
@@ -34,6 +34,13 @@ module Scim
           item = new(*args)
           yield item
           item
+        end
+
+        def self.parse(json)
+          hash = JSON.parse(json, symbolize_names: true)
+          Schema.new(id: hash[:id], name: hash[:name], location: hash[:location]) do |x|
+            x.meta = Meta.from(hash[:meta])
+          end
         end
       end
     end

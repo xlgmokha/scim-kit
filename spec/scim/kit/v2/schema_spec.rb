@@ -122,4 +122,17 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:meta][:resourceType]).to eql('Schema') }
     specify { expect(result[:meta][:location]).to eql(location) }
   end
+
+  describe ".parse" do
+    let(:result) { described_class.parse(subject.to_json) }
+
+    specify { expect(result.id).to eql(subject.id) }
+    specify { expect(result.name).to eql(subject.name) }
+    specify { expect(result.description).to eql(subject.description) }
+    specify { expect(result.meta.created).to eql(subject.meta.created) }
+    specify { expect(result.meta.last_modified).to eql(subject.meta.last_modified) }
+    specify { expect(result.meta.version).to eql(subject.meta.version) }
+    specify { expect(result.meta.location).to eql(subject.meta.location) }
+    specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
+  end
 end

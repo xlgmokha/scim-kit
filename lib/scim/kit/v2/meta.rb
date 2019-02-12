@@ -21,6 +21,14 @@ module Scim
         def disable_timestamps
           @version = @created = @last_modified = nil
         end
+
+        def self.from(hash)
+          meta = Meta.new(hash[:resourceType], hash[:location])
+          meta.created = hash[:created] ? DateTime.parse(hash[:created]) : nil
+          meta.last_modified = hash[:lastModified] ? DateTime.parse(hash[:lastModified]) : nil
+          meta.version = hash[:version]
+          meta
+        end
       end
     end
   end
