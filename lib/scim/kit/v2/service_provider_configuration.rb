@@ -9,10 +9,13 @@ module Scim
         attr_accessor :bulk, :filter
         attr_accessor :etag, :sort, :change_password, :patch
         attr_accessor :meta, :documentation_uri
-        attr_reader :authentication_schemes
+        attr_accessor :authentication_schemes
 
-        def initialize(location:)
-          @meta = Meta.new('ServiceProviderConfig', location)
+        def initialize(
+          location:,
+          meta: Meta.new('ServiceProviderConfig', location)
+        )
+          @meta = meta
           @authentication_schemes = []
           @etag = Supportable.new
           @sort = Supportable.new
@@ -29,16 +32,15 @@ module Scim
         end
 
         class << self
-          def parse(json)
-            hash = JSON.parse(json, symbolize_names: true)
-            x = new(location: hash[:location])
-            x.meta = Meta.from(hash[:meta])
+          def parse(json, hash = JSON.parse(json, symbolize_names: true))
+            x = new(location: hash[:location], meta: Meta.from(hash[:meta]))
             x.documentation_uri = hash[:documentationUri]
             %i[patch changePassword sort etag filter bulk].each do |key|
               x.send("#{key.to_s.underscore}=", Supportable.from(hash[key]))
             end
-            hash[:authenticationSchemes]&.each do |auth|
-              x.authentication_schemes << AuthenticationScheme.from(auth)
+            schemes = hash[:authenticationSchemes]
+            x.authentication_schemes = schemes&.map do |auth|
+              AuthenticationScheme.from(auth)
             end
             x
           end
