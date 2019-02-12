@@ -125,6 +125,9 @@ RSpec.describe Scim::Kit::V2::Schema do
 
   describe ".parse" do
     let(:result) { described_class.parse(subject.to_json) }
+    before do
+      subject.add_attribute(name: :display_name)
+    end
 
     specify { expect(result.id).to eql(subject.id) }
     specify { expect(result.name).to eql(subject.name) }
@@ -134,5 +137,6 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result.meta.version).to eql(subject.meta.version) }
     specify { expect(result.meta.location).to eql(subject.meta.location) }
     specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
+    pending { expect(result.to_json).to eql(subject.to_json) }
   end
 end
