@@ -44,9 +44,7 @@ module Scim
             location: hash[:location]
           ) do |x|
             x.meta = Meta.from(hash[:meta])
-            hash[:attributes].each do |attr|
-              x.attributes << AttributeType.from(attr)
-            end
+            hash[:attributes].each { |y| x.attributes << AttributeType.from(y) }
           end
         end
       end

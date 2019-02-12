@@ -6,20 +6,14 @@ module Scim
       # Represents a scim Attribute type
       class AttributeType
         include Templatable
-        attr_accessor :canonical_values
-        attr_accessor :case_exact
-        attr_accessor :description
-        attr_accessor :multi_valued
-        attr_accessor :required
-        attr_reader :mutability
-        attr_reader :name, :type
-        attr_reader :reference_types
-        attr_reader :returned
-        attr_reader :uniqueness
+        attr_accessor :canonical_values, :case_exact, :description
+        attr_accessor :multi_valued, :required
+        attr_reader :mutability, :name, :type, :attributes
+        attr_reader :reference_types, :returned, :uniqueness
 
         def initialize(name:, type: :string)
           @name = name.to_s.underscore
-          @type = type.to_sym
+          @type = DATATYPES[type.to_sym] ? type.to_sym : (raise TYPE_ERROR)
           @description = name
           @multi_valued = false
           @required = false
@@ -27,7 +21,7 @@ module Scim
           @mutability = Mutability::READ_WRITE
           @returned = Returned::DEFAULT
           @uniqueness = Uniqueness::NONE
-          raise ArgumentError, :type unless DATATYPES[@type]
+          @attributes = []
         end
 
         def mutability=(value)
@@ -52,10 +46,6 @@ module Scim
         def reference_types=(value)
           @type = :reference
           @reference_types = value
-        end
-
-        def attributes
-          @attributes ||= []
         end
 
         def complex?
@@ -85,17 +75,16 @@ module Scim
           complex? ? valid_complex?(value) : valid_simple?(value)
         end
 
-        def self.from(hash)
-          new(name: hash[:name], type: hash[:type]).tap do |x|
-            x.canonical_values = hash[:canonicalValues]
-            x.case_exact = hash[:caseExact]
-            x.description = hash[:description]
-            x.multi_valued = hash[:multiValued]
-            x.mutability = hash[:mutability]
-            x.reference_types = hash[:referenceTypes]
-            x.required = hash[:required]
-            x.returned = hash[:returned]
-            x.uniqueness = hash[:uniqueness]
+        class << self
+          def from(hash)
+            x = new(name: hash[:name], type: hash[:type])
+            %i[
+              canonicalValues caseExact description multiValued mutability
+              referenceTypes required returned uniqueness
+            ].each do |key|
+              x.public_send("#{key.to_s.underscore}=", hash[key])
+            end
+            x
           end
         end
 

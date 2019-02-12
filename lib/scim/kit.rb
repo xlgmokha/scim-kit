@@ -19,6 +19,7 @@ module Scim
   module Kit
     class Error < StandardError; end
     class UnknownAttributeError < Error; end
+    TYPE_ERROR = ArgumentError.new(:type)
 
     def self.logger
       @logger ||= Logger.new(STDOUT)
