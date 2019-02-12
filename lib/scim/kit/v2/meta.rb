@@ -24,18 +24,16 @@ module Scim
 
         def self.from(hash)
           meta = Meta.new(hash[:resourceType], hash[:location])
-          meta.created = begin
-                           DateTime.parse(hash[:created])
-                         rescue StandardError
-                           nil
-                         end
-          meta.last_modified = begin
-                                 DateTime.parse(hash[:lastModified])
-                               rescue StandardError
-                                 nil
-                               end
+          meta.created = parse_date(hash[:created])
+          meta.last_modified = parse_date(hash[:lastModified])
           meta.version = hash[:version]
           meta
+        end
+
+        def self.parse_date(date)
+          DateTime.parse(date)
+        rescue StandardError
+          nil
         end
       end
     end
