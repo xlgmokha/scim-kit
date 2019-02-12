@@ -35,16 +35,11 @@ module Scim
           def parse(json, hash = JSON.parse(json, symbolize_names: true))
             x = new(location: hash[:location])
             x.meta = Meta.from(hash[:meta])
-            x.id = hash[:id]
-            x.name = hash[:name]
-            x.description = hash[:description]
-            x.endpoint = hash[:endpoint]
-            x.schema = hash[:schema]
-            hash[:schemaExtensions].each do |ext|
-              x.add_schema_extension(
-                schema: ext[:schema],
-                required: ext[:required]
-              )
+            %i[id name description endpoint schema].each do |key|
+              x.public_send("#{key}=", hash[key])
+            end
+            hash[:schemaExtensions].each do |y|
+              x.add_schema_extension(schema: y[:schema], required: y[:required])
             end
             x
           end
