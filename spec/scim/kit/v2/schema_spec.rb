@@ -123,10 +123,20 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:meta][:location]).to eql(location) }
   end
 
-  describe ".parse" do
+  describe '.parse' do
     let(:result) { described_class.parse(subject.to_json) }
+
     before do
-      subject.add_attribute(name: :display_name)
+      subject.add_attribute(name: :display_name) do |x|
+        x.multi_valued = true
+        x.required = true
+        x.case_exact = true
+        x.mutability = :read_only
+        x.returned = :never
+        x.uniqueness = :server
+        x.canonical_values = ['honerva']
+        x.reference_types = %w[User Group]
+      end
     end
 
     specify { expect(result.id).to eql(subject.id) }
@@ -137,6 +147,7 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result.meta.version).to eql(subject.meta.version) }
     specify { expect(result.meta.location).to eql(subject.meta.location) }
     specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
-    pending { expect(result.to_json).to eql(subject.to_json) }
+    specify { expect(result.to_json).to eql(subject.to_json) }
+    specify { expect(result.to_h).to eql(subject.to_h) }
   end
 end

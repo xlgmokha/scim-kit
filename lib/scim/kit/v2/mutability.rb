@@ -11,10 +11,13 @@ module Scim
         WRITE_ONLY = 'writeOnly'
         VALID = {
           immutable: IMMUTABLE,
+          readOnly: READ_ONLY,
+          readWrite: READ_WRITE,
           read_only: READ_ONLY,
           read_write: READ_WRITE,
           readonly: READ_ONLY,
           readwrite: READ_WRITE,
+          writeOnly: WRITE_ONLY,
           write_only: WRITE_ONLY,
           writeonly: WRITE_ONLY
         }.freeze
