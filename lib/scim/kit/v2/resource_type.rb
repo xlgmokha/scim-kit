@@ -13,7 +13,7 @@ module Scim
         attr_accessor :endpoint
         attr_accessor :schema
         attr_reader :schema_extensions
-        attr_reader :meta
+        attr_accessor :meta
 
         def initialize(location:)
           @meta = Meta.new('ResourceType', location)
@@ -25,10 +25,29 @@ module Scim
           @schema_extensions.push(schema: schema, required: required)
         end
 
-        def self.build(*args)
-          item = new(*args)
-          yield item
-          item
+        class << self
+          def build(*args)
+            item = new(*args)
+            yield item
+            item
+          end
+
+          def parse(json, hash = JSON.parse(json, symbolize_names: true))
+            x = new(location: hash[:location])
+            x.meta = Meta.from(hash[:meta])
+            x.id = hash[:id]
+            x.name = hash[:name]
+            x.description = hash[:description]
+            x.endpoint = hash[:endpoint]
+            x.schema = hash[:schema]
+            hash[:schemaExtensions].each do |ext|
+              x.add_schema_extension(
+                schema: ext[:schema],
+                required: ext[:required]
+              )
+            end
+            x
+          end
         end
       end
     end

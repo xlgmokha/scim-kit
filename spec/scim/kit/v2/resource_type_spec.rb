@@ -30,4 +30,20 @@ RSpec.describe Scim::Kit::V2::ResourceType do
 
     specify { expect(subject.to_h[:schemaExtensions]).to match_array([{ schema: extension, required: false }]) }
   end
+
+  describe '.parse' do
+    let(:extension) { 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User' }
+    let(:result) { described_class.parse(subject.to_json) }
+
+    before { subject.add_schema_extension(schema: extension, required: false) }
+
+    specify { expect(result.id).to eql(subject.id) }
+    specify { expect(result.name).to eql(subject.name) }
+    specify { expect(result.description).to eql(subject.description) }
+    specify { expect(result.endpoint).to eql(subject.endpoint) }
+    specify { expect(result.schema).to eql(subject.schema) }
+    specify { expect(result.schema_extensions).to eql(subject.schema_extensions) }
+    specify { expect(result.to_h).to eql(subject.to_h) }
+    specify { expect(result.to_json).to eql(subject.to_json) }
+  end
 end
