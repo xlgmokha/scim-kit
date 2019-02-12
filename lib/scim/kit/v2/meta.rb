@@ -31,7 +31,7 @@ module Scim
         end
 
         def self.parse_date(date)
-          DateTime.parse(date)
+          DateTime.parse(date).to_time
         rescue StandardError
           nil
         end

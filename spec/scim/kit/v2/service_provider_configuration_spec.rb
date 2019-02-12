@@ -135,4 +135,30 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
       specify { expect(result[:filter][:maxResults]).to be(200) }
     end
   end
+
+  describe ".parse" do
+    let(:result) { described_class.parse(subject.to_json) }
+
+    before do
+      #subject.add_authentication(:oauthbearertoken)
+      subject.bulk.max_operations = 1000
+      subject.bulk.max_payload_size = 1_048_576
+      subject.bulk.supported = true
+      subject.change_password.supported = true
+      subject.documentation_uri = FFaker::Internet.uri('https')
+      subject.etag.supported = true
+      subject.filter.max_results = 200
+      subject.filter.supported = true
+      subject.patch.supported = true
+      subject.sort.supported = true
+    end
+
+    specify { expect(result.meta.created.to_i).to eql(subject.meta.created.to_i) }
+    specify { expect(result.meta.last_modified.to_i).to eql(subject.meta.last_modified.to_i) }
+    specify { expect(result.meta.version).to eql(subject.meta.version) }
+    specify { expect(result.meta.location).to eql(subject.meta.location) }
+    specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
+    specify { expect(result.to_json).to eql(subject.to_json) }
+    specify { expect(result.to_h).to eql(subject.to_h) }
+  end
 end
