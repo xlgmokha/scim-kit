@@ -6,10 +6,10 @@ module Scim
       # Represents a scim Service Provider Configuration
       class ServiceProviderConfiguration
         include Templatable
+        attr_accessor :bulk, :filter
+        attr_accessor :etag, :sort, :change_password, :patch
         attr_accessor :meta, :documentation_uri
         attr_reader :authentication_schemes
-        attr_reader :bulk, :filter
-        attr_reader :etag, :sort, :change_password, :patch
 
         def initialize(location:)
           @meta = Meta.new('ServiceProviderConfig', location)
@@ -34,15 +34,9 @@ module Scim
             x = new(location: hash[:location])
             x.meta = Meta.from(hash[:meta])
             x.documentation_uri = hash[:documentationUri]
-            x.bulk.supported = hash[:bulk][:supported]
-            x.bulk.max_operations = hash[:bulk][:maxOperations]
-            x.bulk.max_payload_size = hash[:bulk][:maxPayloadSize]
-            x.filter.supported = hash[:filter][:supported]
-            x.filter.max_results = hash[:filter][:maxResults]
-            x.patch.supported = hash[:patch][:supported]
-            x.change_password.supported = hash[:changePassword][:supported]
-            x.sort.supported = hash[:sort][:supported]
-            x.etag.supported = hash[:etag][:supported]
+            %i[patch changePassword sort etag filter bulk].each do |key|
+              x.send("#{key.to_s.underscore}=", Supportable.from(hash[key]))
+            end
             hash[:authenticationSchemes]&.each do |auth|
               x.authentication_schemes << AuthenticationScheme.from(auth)
             end
