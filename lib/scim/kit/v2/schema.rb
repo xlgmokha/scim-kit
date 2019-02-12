@@ -45,17 +45,7 @@ module Scim
           ) do |x|
             x.meta = Meta.from(hash[:meta])
             hash[:attributes].each do |attr|
-              x.add_attribute(name: attr[:name], type: attr[:type]) do |y|
-                y.description = attr[:description]
-                y.multi_valued = attr[:multiValued]
-                y.required = attr[:required]
-                y.case_exact = attr[:caseExact]
-                y.mutability = attr[:mutability]
-                y.returned = attr[:returned]
-                y.uniqueness = attr[:uniqueness]
-                y.canonical_values = attr[:canonicalValues]
-                y.reference_types = attr[:referenceTypes]
-              end
+              x.attributes << AttributeType.from(attr)
             end
           end
         end

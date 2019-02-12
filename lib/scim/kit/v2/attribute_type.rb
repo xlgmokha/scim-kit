@@ -85,6 +85,20 @@ module Scim
           complex? ? valid_complex?(value) : valid_simple?(value)
         end
 
+        def self.from(hash)
+          new(name: hash[:name], type: hash[:type]).tap do |x|
+            x.canonical_values = hash[:canonicalValues]
+            x.case_exact = hash[:caseExact]
+            x.description = hash[:description]
+            x.multi_valued = hash[:multiValued]
+            x.mutability = hash[:mutability]
+            x.reference_types = hash[:referenceTypes]
+            x.required = hash[:required]
+            x.returned = hash[:returned]
+            x.uniqueness = hash[:uniqueness]
+          end
+        end
+
         private
 
         def coerce_single(value)
