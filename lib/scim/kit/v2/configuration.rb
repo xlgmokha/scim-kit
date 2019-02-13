@@ -51,6 +51,13 @@ module Scim
           uri = URI.join(base_url, 'ServiceProviderConfig')
           self.service_provider_configuration =
             ServiceProviderConfiguration.parse(client.get(uri).body)
+
+          response = client.get(URI.join(base_url, 'Schemas'))
+          schema_hashes = JSON.parse(response.body, symbolize_names: true)
+          schema_hashes.each do |schema_hash|
+            schema = Schema.from(schema_hash)
+            schemas[schema.id] = schema
+          end
         end
 
         private

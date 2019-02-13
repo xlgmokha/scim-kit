@@ -30,21 +30,28 @@ module Scim
           id.include?(Schemas::CORE) || id.include?(Messages::CORE)
         end
 
-        def self.build(*args)
-          item = new(*args)
-          yield item
-          item
-        end
+        class << self
+          def build(*args)
+            item = new(*args)
+            yield item
+            item
+          end
 
-        def self.parse(json)
-          hash = JSON.parse(json, symbolize_names: true)
-          Schema.new(
-            id: hash[:id],
-            name: hash[:name],
-            location: hash[:location]
-          ) do |x|
-            x.meta = Meta.from(hash[:meta])
-            hash[:attributes].each { |y| x.attributes << AttributeType.from(y) }
+          def from(hash)
+            Schema.new(
+              id: hash[:id],
+              name: hash[:name],
+              location: hash[:location]
+            ) do |x|
+              x.meta = Meta.from(hash[:meta])
+              hash[:attributes].each do |y|
+                x.attributes << AttributeType.from(y)
+              end
+            end
+          end
+
+          def parse(json)
+            from(JSON.parse(json, symbolize_names: true))
           end
         end
       end

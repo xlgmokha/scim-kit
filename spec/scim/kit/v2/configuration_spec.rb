@@ -43,13 +43,21 @@ RSpec.describe Scim::Kit::V2::Configuration do
     let(:service_provider_configuration) do
       Scim::Kit::V2::ServiceProviderConfiguration.new(location: FFaker::Internet.uri('https'))
     end
+    let(:schema) do
+      Scim::Kit::V2::Schema.new(id: 'User', name: 'User', location: FFaker::Internet.uri('https'))
+    end
 
     before do
       stub_request(:get, "#{base_url}/ServiceProviderConfig")
         .to_return(status: 200, body: service_provider_configuration.to_json)
+
+      stub_request(:get, "#{base_url}/Schemas")
+        .to_return(status: 200, body: [schema.to_h].to_json)
+
       subject.load_from(base_url)
     end
 
     specify { expect(subject.service_provider_configuration.to_h).to eql(service_provider_configuration.to_h) }
+    specify { expect(subject.schemas[schema.id].to_h).to eql(schema.to_h) }
   end
 end
