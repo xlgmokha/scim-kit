@@ -52,21 +52,29 @@ module Scim
           self.service_provider_configuration =
             ServiceProviderConfiguration.parse(client.get(uri).body)
 
+          load_schemas_from(base_url)
+          load_resource_types_from(base_url)
+        end
+
+        private
+
+        def load_schemas_from(base_url)
           response = client.get(URI.join(base_url, 'Schemas'))
           schema_hashes = JSON.parse(response.body, symbolize_names: true)
           schema_hashes.each do |schema_hash|
             schema = Schema.from(schema_hash)
             schemas[schema.id] = schema
           end
+        end
+
+        def load_resource_types_from(base_url)
           response = client.get(URI.join(base_url, 'ResourceTypes'))
-          resource_types_hashes = JSON.parse(response.body, symbolize_names: true)
-          resource_types_hashes.each do |resource_type_hash|
-            resource_type = ResourceType.from(resource_type_hash)
+          types_hashes = JSON.parse(response.body, symbolize_names: true)
+          types_hashes.each do |type_hash|
+            resource_type = ResourceType.from(type_hash)
             resource_types[resource_type.id] = resource_type
           end
         end
-
-        private
 
         def client
           @client ||= Net::Hippie::Client.new
