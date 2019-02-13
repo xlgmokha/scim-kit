@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.5.0'
 
   spec.add_dependency 'activemodel', '>= 5.2.0'
+  spec.add_dependency 'net-hippie', '~> 0.2'
   spec.add_dependency 'tilt', '~> 2.0'
   spec.add_dependency 'tilt-jbuilder', '~> 0.7'
   spec.add_development_dependency 'bundler', '~> 1.17'
@@ -40,4 +41,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rubocop', '~> 0.52'
   spec.add_development_dependency 'rubocop-rspec', '~> 1.22'
+  spec.add_development_dependency 'webmock', '~> 3.5'
 end

@@ -46,6 +46,18 @@ module Scim
 
           yield Builder.new(self) if block_given?
         end
+
+        def load_from(base_url)
+          uri = URI.join(base_url, 'ServiceProviderConfig')
+          self.service_provider_configuration =
+            ServiceProviderConfiguration.parse(client.get(uri).body)
+        end
+
+        private
+
+        def client
+          @client ||= Net::Hippie::Client.new
+        end
       end
     end
   end
