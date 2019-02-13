@@ -58,6 +58,12 @@ module Scim
             schema = Schema.from(schema_hash)
             schemas[schema.id] = schema
           end
+          response = client.get(URI.join(base_url, 'ResourceTypes'))
+          resource_types_hashes = JSON.parse(response.body, symbolize_names: true)
+          resource_types_hashes.each do |resource_type_hash|
+            resource_type = ResourceType.from(resource_type_hash)
+            resource_types[resource_type.id] = resource_type
+          end
         end
 
         private

@@ -32,7 +32,7 @@ module Scim
             item
           end
 
-          def parse(json, hash = JSON.parse(json, symbolize_names: true))
+          def from(hash)
             x = new(location: hash[:location])
             x.meta = Meta.from(hash[:meta])
             %i[id name description endpoint schema].each do |key|
@@ -42,6 +42,10 @@ module Scim
               x.add_schema_extension(schema: y[:schema], required: y[:required])
             end
             x
+          end
+
+          def parse(json)
+            from(JSON.parse(json, symbolize_names: true))
           end
         end
       end
