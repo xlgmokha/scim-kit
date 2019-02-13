@@ -20,13 +20,18 @@ module Scim
           end
 
           def resource_type(id:, location:)
-            configuration.resource_types[id] ||= ResourceType.new(location: location)
+            configuration.resource_types[id] ||=
+              ResourceType.new(location: location)
             configuration.resource_types[id].id = id
             yield configuration.resource_types[id]
           end
 
           def schema(id:, name:, location:)
-            configuration.schemas[id] ||= Schema.new(id: id, name: name, location: location)
+            configuration.schemas[id] ||= Schema.new(
+              id: id,
+              name: name,
+              location: location
+            )
             yield configuration.schemas[id]
           end
         end
