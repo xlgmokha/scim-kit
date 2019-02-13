@@ -7,31 +7,27 @@ module Scim
       class Configuration
         # @private
         class Builder
-          def initialize
-            @resource_types = {}
-            @schemas = {}
+          attr_reader :configuration
+
+          def initialize(configuration)
+            @configuration = configuration
           end
 
           def service_provider_configuration(location:)
-            @sp_config = ServiceProviderConfiguration.new(location: location)
-            yield @sp_config
+            configuration.service_provider_configuration =
+              ServiceProviderConfiguration.new(location: location)
+            yield configuration.service_provider_configuration
           end
 
           def resource_type(id:, location:)
-            @resource_types[id] ||= ResourceType.new(location: location)
-            @resource_types[id].id = id
-            yield @resource_types[id]
+            configuration.resource_types[id] ||= ResourceType.new(location: location)
+            configuration.resource_types[id].id = id
+            yield configuration.resource_types[id]
           end
 
           def schema(id:, name:, location:)
-            @schemas[id] ||= Schema.new(id: id, name: name, location: location)
-            yield @schemas[id]
-          end
-
-          def apply_to(configuration)
-            configuration.service_provider_configuration = @sp_config
-            configuration.resource_types = @resource_types
-            configuration.schemas = @schemas
+            configuration.schemas[id] ||= Schema.new(id: id, name: name, location: location)
+            yield configuration.schemas[id]
           end
         end
 
@@ -40,9 +36,10 @@ module Scim
         attr_accessor :schemas
 
         def initialize
-          builder = Builder.new
-          yield builder if block_given?
-          builder.apply_to(self)
+          @resource_types = {}
+          @schemas = {}
+
+          yield Builder.new(self) if block_given?
         end
       end
     end
