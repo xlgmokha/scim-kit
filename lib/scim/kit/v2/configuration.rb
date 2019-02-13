@@ -52,27 +52,18 @@ module Scim
           self.service_provider_configuration =
             ServiceProviderConfiguration.parse(client.get(uri).body)
 
-          load_schemas_from(base_url)
-          load_resource_types_from(base_url)
+          load_items(base_url, 'Schemas', Schema, schemas)
+          load_items(base_url, 'ResourceTypes', ResourceType, resource_types)
         end
 
         private
 
-        def load_schemas_from(base_url)
-          response = client.get(URI.join(base_url, 'Schemas'))
-          schema_hashes = JSON.parse(response.body, symbolize_names: true)
-          schema_hashes.each do |schema_hash|
-            schema = Schema.from(schema_hash)
-            schemas[schema.id] = schema
-          end
-        end
-
-        def load_resource_types_from(base_url)
-          response = client.get(URI.join(base_url, 'ResourceTypes'))
-          types_hashes = JSON.parse(response.body, symbolize_names: true)
-          types_hashes.each do |type_hash|
-            resource_type = ResourceType.from(type_hash)
-            resource_types[resource_type.id] = resource_type
+        def load_items(base_url, path, type, items)
+          response = client.get(URI.join(base_url, path))
+          hashes = JSON.parse(response.body, symbolize_names: true)
+          hashes.each do |hash|
+            item = type.from(hash)
+            items[item.id] = item
           end
         end
 
