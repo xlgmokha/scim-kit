@@ -1,5 +1,9 @@
 # Scim::Kit
 
+[![Build Status](https://travis-ci.org/mokhan/scim-kit.svg?branch=master)](https://travis-ci.org/mokhan/scim-kit)
+[![Code Climate](https://codeclimate.com/github/mokhan/scim-kit.svg)](https://codeclimate.com/github/mokhan/scim-kit)
+[![Gem Version](https://badge.fury.io/rb/scim-kit.svg)](https://rubygems.org/gems/scim-kit)
+
 Scim::Kit is a library with the purpose of simplifying the generation
 and consumption of SCIM Schema. https://tools.ietf.org/html/rfc7643#section-2
 
