@@ -27,6 +27,10 @@ module Scim
           yield self if block_given?
         end
 
+        # Returns the current mode.
+        #
+        # @param type [Symbol] The mode `:server` or `:client`.
+        # @return [Boolean] Returns true if the resource matches the # type of mode
         def mode?(type)
           case type.to_sym
           when :server
@@ -36,6 +40,8 @@ module Scim
           end
         end
 
+        # Returns the name of the jbuilder template file.
+        # @return [String] the name of the jbuilder template.
         def template_name
           'resource.json.jbuilder'
         end

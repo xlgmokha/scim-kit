@@ -7,14 +7,21 @@ module Scim
       module Attributable
         include Enumerable
 
+        # Returns a hash of the generated dynamic attributes
+        # @return [Hash] the dynamic attributes keys by their name
         def dynamic_attributes
           @dynamic_attributes ||= {}.with_indifferent_access
         end
 
+        # Defines dynamic attributes on the resource for the types provided
+        # @param resource [Scim::Kit::V2::Resource] the resource to attach dynamic attributes to.
+        # @param types [Array<Scim::Kit::V2::AttributeType>] the array of types
         def define_attributes_for(resource, types)
           types.each { |x| attribute(x, resource) }
         end
 
+        # Assigns attribute values via the provided hash.
+        # @param attributes [Hash] The name/values to assign.
         def assign_attributes(attributes = {})
           attributes.each do |key, value|
             next if key.to_sym == :schemas
@@ -27,10 +34,16 @@ module Scim
           end
         end
 
+        # Returns the attribute identified by the name.
+        # @param name [String] the name of the attribute to return
+        # @return [Scim::Kit::V2::Attribute] the attribute or {Scim::Kit::V2::UnknownAttribute}
         def attribute_for(name)
           dynamic_attributes[name.to_s.underscore] || UnknownAttribute.new(name)
         end
 
+        # Returns the value associated with the attribute name
+        # @param name [String] the name of the attribute
+        # @return [Object] the value assigned to the attribute
         def read_attribute(name)
           attribute = attribute_for(name)
           return attribute._value if attribute._type.multi_valued
@@ -38,6 +51,9 @@ module Scim
           attribute._type.complex? ? attribute : attribute._value
         end
 
+        # Assigns the value to the attribute with the given name
+        # @param name [String] the name of the attribute
+        # @param value [Object] the value to assign to the attribute
         def write_attribute(name, value)
           if value.is_a?(Hash)
             attribute_for(name)&.assign_attributes(value)
@@ -46,6 +62,8 @@ module Scim
           end
         end
 
+        # yields each attribute to the provided block
+        # @param [Block] the block to yield each attribute to.
         def each
           dynamic_attributes.each do |_name, attribute|
             yield attribute
