@@ -59,7 +59,7 @@ module Scim
         private
 
         def load_items(base_url, path, type, items)
-          response = client.get(URI.join(base_url, path))
+          response = client.get(URI.join(base_url, path), headers: headers)
           hashes = JSON.parse(response.body, symbolize_names: true)
           hashes.each do |hash|
             item = type.from(hash)
@@ -69,6 +69,13 @@ module Scim
 
         def client
           @client ||= Net::Hippie::Client.new
+        end
+
+        def headers
+          {
+            'Accept' => 'application/scim+json',
+            'Content-Type' => 'application/scim+json',
+          }
         end
       end
     end
