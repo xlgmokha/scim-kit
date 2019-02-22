@@ -20,6 +20,8 @@ Metrics/BlockLength:
 Metrics/LineLength:
   Exclude:
     - 'spec/**/*.rb'
+  IgnoredPatterns:
+    - '^#*'
 
 Naming/FileName:
   Exclude:

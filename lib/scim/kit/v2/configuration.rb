@@ -74,7 +74,7 @@ module Scim
         def headers
           {
             'Accept' => 'application/scim+json',
-            'Content-Type' => 'application/scim+json',
+            'Content-Type' => 'application/scim+json'
           }
         end
       end

@@ -81,8 +81,8 @@ module Scim
             %i[
               canonicalValues caseExact description multiValued mutability
               referenceTypes required returned uniqueness
-            ].each do |key|
-              x.public_send("#{key.to_s.underscore}=", hash[key]) if hash.key?(key)
+            ].each do |y|
+              x.public_send("#{y.to_s.underscore}=", hash[y]) if hash.key?(y)
             end
             x
           end
