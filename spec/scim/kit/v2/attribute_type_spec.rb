@@ -14,6 +14,13 @@ RSpec.describe Scim::Kit::V2::AttributeType do
   specify { expect { described_class.new(name: 'photo', type: :binary) }.not_to raise_error }
   specify { expect { described_class.new(name: 'invalid', type: :invalid) }.to raise_error(ArgumentError) }
 
+  describe 'with a symbolic name' do
+    subject { described_class.new(name: :display_name) }
+
+    specify { expect(subject.to_h[:name]).to eql('displayName') }
+    specify { expect(subject.to_h[:description]).to eql('displayName') }
+  end
+
   describe 'String Attribute' do
     describe 'defaults' do
       subject { described_class.new(name: 'displayName') }

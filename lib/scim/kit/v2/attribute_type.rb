@@ -14,7 +14,7 @@ module Scim
         def initialize(name:, type: :string)
           @name = name.to_s.underscore
           @type = DATATYPES[type.to_sym] ? type.to_sym : (raise TYPE_ERROR)
-          @description = name
+          @description = name.to_s.camelize(:lower)
           @multi_valued = false
           @required = false
           @case_exact = false
