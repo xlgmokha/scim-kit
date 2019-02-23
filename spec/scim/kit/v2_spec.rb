@@ -3,14 +3,16 @@
 RSpec.describe Scim::Kit::V2 do
   subject { described_class }
 
-  describe ".configure" do
+  describe '.configure' do
     specify do
-      called = false
       subject.configure do |config|
-        called = true
         expect(config).to be_instance_of(Scim::Kit::V2::Configuration::Builder)
       end
+    end
 
+    specify do
+      called = false
+      subject.configure { |_config| called = true }
       expect(called).to be(true)
     end
   end
