@@ -1,4 +1,4 @@
-Version 0.3.0
+Version 0.3.1
 # Changelog
 All notable changes to this project will be documented in this file.
 
@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - NA
+
+## [0.3.1] - 2019-02-23
+### Changed
+- fix bug in `Scim::Kit::V2.configure`
 
 ## [0.3.0] - 2019-02-21
 ### Added
@@ -27,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - \_assign does not coerce values by default.
 - errors are merged together instead of overwritten during attribute validation.
 
-[Unreleased]: https://github.com/mokhan/scim-kit/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/mokhan/scim-kit/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/mokhan/scim-kit/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/mokhan/scim-kit/compare/v0.2.16...v0.3.0
 [0.2.16]: https://github.com/mokhan/scim-kit/compare/v0.2.15...v0.2.16
 [0.2.15]: https://github.com/mokhan/scim-kit/compare/v0.2.14...v0.2.15
