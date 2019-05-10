@@ -87,7 +87,7 @@ subAttr   = "." ATTRNAME
         rule(:less_than) { str("lt") }
         rule(:greater_than_equals) { str("ge") }
         rule(:less_than_equals) { str("le") }
-        rule(:string) { (alpha | single_quote).repeat(1) }
+        rule(:string) { (alpha | single_quote | str('@') | dot).repeat(1) }
         rule(:lparen) { str('(') >> space? }
         rule(:rparen) { str(')') >> space? }
         rule(:lbracket) { str('[') >> space? }
