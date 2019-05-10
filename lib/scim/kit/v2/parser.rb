@@ -37,25 +37,28 @@ subAttr   = "." ATTRNAME
            ; a sub-attribute of a complex attribute
 =end
       class Parser < Parslet::Parser
-        rule(:lparen) { str('(') >> space? }
-        rule(:rparen) { str(')') >> space? }
-        rule(:digit) { match(/\d/) }
-        rule(:quote) { str('"') }
-        rule(:single_quote) { str("'") }
-        rule(:space) { match('\s') }
-        rule(:space?) { space.maybe }
-        rule(:alpha) { match('[a-zA-Z]') }
-        rule(:dot) { str('.') }
-        rule(:colon) { str(':') }
-        rule(:hyphen) { str('-') }
-
-        rule(:attribute) { uri | attribute_name }
-        rule(:attribute_name) { alpha.repeat(1) | dot }
-        rule(:uri) { (alpha | digit | dot | colon).repeat(1) }
-        rule(:date) { (alpha | digit | dot | colon | hyphen).repeat(1) }
-        rule(:string) { (alpha | single_quote).repeat(1) }
-
-        rule(:operator) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
+        root :filter
+        rule(:filter) { (attrExp | logExp | valuePath) | (lparen >> filter >> rparen) }
+        rule(:valuePath) { attrPath >> lsquare_bracket >> valFilter >> rsquare_bracket }
+        rule(:valFilter) { logExp | attrExp | (not_op? >> lparen >> valFilter >> rparen) }
+        rule(:attrExp) { (attrPath >> space >> presence) | (attrPath >> space >> compareOp >> space >> quote >> compValue >> quote) }
+        rule(:logExp) { filter >> space >> (and_op | or_op) >> space >> filter }
+        rule(:compValue) { falsey | null | truthy | number | string }
+        rule(:compareOp) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
+        rule(:attrPath) { scim_schema_uri | attrname >> subAttr.maybe }
+        rule(:attrname) { nameChar.repeat(1) }
+        rule(:nameChar) { hyphen | underscore | digit | alpha }
+        rule(:subAttr) { dot >> attrname }
+        rule(:presence) { str('pr') }
+        rule(:and_op) { str('and') }
+        rule(:or_op) { str('or') }
+        rule(:not_op) { str('not') }
+        rule(:not_op?) { not_op.maybe }
+        rule(:falsey) { str('false') }
+        rule(:truthy) { str('true') }
+        rule(:null) { str('null') }
+        rule(:number) { digit.repeat(1) }
+        rule(:scim_schema_uri) { (alpha | digit | dot | colon).repeat(1) }
         rule(:equal) { str("eq") }
         rule(:not_equal) { str("ne") }
         rule(:contains) { str("co") }
@@ -65,19 +68,21 @@ subAttr   = "." ATTRNAME
         rule(:less_than) { str("lt") }
         rule(:greater_than_equals) { str("ge") }
         rule(:less_than_equals) { str("le") }
-
-        rule(:quoted_value) { quote >> value.as(:right) >> quote }
-        rule(:value) { (string | date | uri).repeat(1) }
-
-        rule(:filter) { attribute.as(:left) >> space >> operator.as(:operator) >> space >> quoted_value }
-        root :filter
-
-        def pretty_parse(*args)
-          puts *args.inspect
-          parse(*args)
-        rescue Parslet::ParseFailed => error
-          puts error.parse_failure_cause.ascii_tree
-        end
+        rule(:string) { (alpha | single_quote).repeat(1) }
+        rule(:lparen) { str('(') >> space? }
+        rule(:rparen) { str(')') >> space? }
+        rule(:lsquare_bracket) { str('[') >> space? }
+        rule(:rsquare_bracket) { str(']') >> space? }
+        rule(:digit) { match(/\d/) }
+        rule(:quote) { str('"') }
+        rule(:single_quote) { str("'") }
+        rule(:space) { match('\s') }
+        rule(:space?) { space.maybe }
+        rule(:alpha) { match('[a-zA-Z]') }
+        rule(:dot) { str('.') }
+        rule(:colon) { str(':') }
+        rule(:hyphen) { str('-') }
+        rule(:underscore) { str('_') }
       end
     end
   end

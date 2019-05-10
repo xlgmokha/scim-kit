@@ -5,6 +5,8 @@ require 'scim/kit'
 require 'ffaker'
 require 'json'
 require 'byebug'
+require 'parslet/convenience'
+require 'parslet/rig/rspec'
 require 'webmock/rspec'
 
 Scim::Kit.logger = Logger.new('/dev/null')
