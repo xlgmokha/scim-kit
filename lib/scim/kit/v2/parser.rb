@@ -38,17 +38,17 @@ subAttr   = "." ATTRNAME
 =end
       class Parser < Parslet::Parser
         root :filter
-        rule(:filter) { (attrExp | logExp | valuePath) | (not_op? >> lparen >> filter >> rparen) }
-        rule(:valuePath) { attrPath >> lsquare_bracket >> valFilter >> rsquare_bracket }
-        rule(:valFilter) { attrExp | logExp | (not_op? >> lparen >> valFilter >> rparen) }
-        rule(:attrExp) { (attrPath >> space >> presence) | (attrPath >> space >> compareOp >> space >> quote >> compValue >> quote) }
-        rule(:logExp) { filter >> space >> (and_op | or_op) >> space >> filter }
-        rule(:compValue) { (falsey | null | truthy | number | string | scim_schema_uri).repeat(1) }
-        rule(:compareOp) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
-        rule(:attrPath) { scim_schema_uri | attrname >> subAttr.maybe }
-        rule(:attrname) { alpha >> nameChar.repeat(1) }
-        rule(:nameChar) { hyphen | underscore | digit | alpha }
-        rule(:subAttr) { dot >> attrname }
+        rule(:filter) { (attribute_expression | logical_expression | value_path) | (not_op? >> lparen >> filter >> rparen) }
+        rule(:value_path) { attribute_path >> lbracket >> valFilter >> rbracket }
+        rule(:value_filter) { attribute_expression | logical_expression | (not_op? >> lparen >> value_filter >> rparen) }
+        rule(:attribute_expression) { (attribute_path >> space >> presence) | (attribute_path >> space >> comparison_operator >> space >> quote >> comparison_value >> quote) }
+        rule(:logical_expression) { filter >> space >> (and_op | or_op) >> space >> filter }
+        rule(:comparison_value) { (falsey | null | truthy | number | string | scim_schema_uri).repeat(1) }
+        rule(:comparison_operator) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
+        rule(:attribute_path) { scim_schema_uri | attribute_name >> sub_attribute.maybe }
+        rule(:attribute_name) { alpha >> name_character.repeat(1) }
+        rule(:name_character) { hyphen | underscore | digit | alpha }
+        rule(:sub_attribute) { dot >> attribute_name }
         rule(:presence) { str('pr') }
         rule(:and_op) { str('and') }
         rule(:or_op) { str('or') }
@@ -71,8 +71,8 @@ subAttr   = "." ATTRNAME
         rule(:string) { (alpha | single_quote).repeat(1) }
         rule(:lparen) { str('(') >> space? }
         rule(:rparen) { str(')') >> space? }
-        rule(:lsquare_bracket) { str('[') >> space? }
-        rule(:rsquare_bracket) { str(']') >> space? }
+        rule(:lbracket) { str('[') >> space? }
+        rule(:rbracket) { str(']') >> space? }
         rule(:digit) { match(/\d/) }
         rule(:quote) { str('"') }
         rule(:single_quote) { str("'") }
