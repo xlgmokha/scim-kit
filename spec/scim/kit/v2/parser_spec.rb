@@ -43,6 +43,15 @@ RSpec.describe Scim::Kit::V2::Parser do
   context "match uri" do
     specify { expect(subject.uri.parse("urn:ietf:params:scim:schemas:core:2.0:User:userName")).to be_present }
   end
+
+  context "title pr and userType eq \"Employee\"" do
+    let(:result) { subject.pretty_parse(%Q(title pr and userType eq "Employee")) }
+
+    specify { expect(result).to be_present }
+    specify { expect(result[:left].to_s).to eql(attribute) }
+    specify { expect(result[:operator].to_s).to eql(operator) }
+    specify { expect(result[:right].to_s).to eql(value) }
+  end
 end
 
 
