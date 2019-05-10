@@ -28,11 +28,7 @@ RSpec.describe Scim::Kit::V2::Parser do
         "2011-05-13T04:42:34Z",
         "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",
       ].each do |value|
-        let(:query) { %Q(#{attribute} #{operator} \"#{value}\") }
-        specify { expect(subject).to parse(query) }
-        specify do
-          expect(subject.parse_with_debug(query)).to be_truthy
-        end
+        specify { expect(subject.parse_with_debug(%Q(#{attribute} #{operator} \"#{value}\"))).to be_truthy }
       end
     end
   end
@@ -106,7 +102,7 @@ RSpec.describe Scim::Kit::V2::Parser do
   specify { expect(subject.presence).to parse('pr') }
   specify { expect(subject.and_op).to parse('and') }
   specify { expect(subject.or_op).to parse('or') }
-  specify { expect(subject.not_op).to parse('not') }
+  specify { expect(subject.not_op?).to parse('not') }
   specify { expect(subject.falsey).to parse('false') }
   specify { expect(subject.truthy).to parse('true') }
   specify { expect(subject.null).to parse('null') }
