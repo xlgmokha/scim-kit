@@ -3,35 +3,46 @@
 RSpec.describe Scim::Kit::V2::Parser do
   subject { described_class.new }
 
-  [ "eq", "ne", "co", "sw", "ew", "gt", "lt", "ge", "le" ].each do |operator|
-    context "simple expression #{operator}" do
-      let(:result) { subject.pretty_parse(%Q(userName #{operator} "bjensen")) }
+  [
+    'userName',
+    'name.familyName',
+    'urn:ietf:params:scim:schemas:core:2.0:User:userName'
+  ].each do |attribute|
+    [
+      "eq",
+      "ne",
+      "co",
+      "sw",
+      "ew",
+      "gt",
+      "lt",
+      "ge",
+      "le"
+    ].each do |operator|
+      [
+        "bjensen",
+        "O'Malley",
+        "J",
+      ].each do |value|
+        context "#{attribute} #{operator} #{value}" do
+          let(:result) { subject.pretty_parse(%Q(#{attribute} #{operator} \"#{value}\")) }
 
-      specify { expect(result).to be_present }
-      specify { expect(result[:left].to_s).to eql('userName') }
-      specify { expect(result[:operator].to_s).to eql(operator) }
-      specify { expect(result[:right].to_s).to eql('bjensen') }
+          specify { expect(result).to be_present }
+          specify { expect(result[:left].to_s).to eql(attribute) }
+          specify { expect(result[:operator].to_s).to eql(operator) }
+          specify { expect(result[:right].to_s).to eql(value) }
+        end
+      end
     end
+  end
 
-    context "nested attribute #{operator}" do
-      let(:result) { subject.pretty_parse(%Q(name.familyName #{operator} "O'Malley")) }
-
-      specify { expect(result).to be_present }
-      specify { expect(result[:left].to_s).to eql('name.familyName') }
-      specify { expect(result[:operator].to_s).to eql(operator) }
-      specify { expect(result[:right].to_s).to eql("O'Malley") }
-    end
+  context "match uri" do
+    specify { expect(subject.uri.parse("urn:ietf:params:scim:schemas:core:2.0:User:userName")).to be_present }
   end
 end
 
 
 =begin
-filter=userName eq "bjensen"
-
-filter=name.familyName co "O'Malley"
-
-filter=userName sw "J"
-
 filter=urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"
 
 filter=title pr

@@ -41,10 +41,15 @@ subAttr   = "." ATTRNAME
         rule(:rparen) { str(')') >> space? }
         rule(:digit) { match(/\d/) }
         rule(:quote) { str('"') }
-        rule(:space) { match('\s').repeat(1) }
+        rule(:space) { match('\s') }
         rule(:space?) { space.maybe }
+        rule(:alpha) { match('[a-zA-Z]') }
+        rule(:dot) { match('\.') }
+        rule(:colon) { match(':') }
 
-        rule(:attribute) { match['a-zA-Z\.'].repeat(1) }
+        rule(:attribute) { uri | attribute_name }
+        rule(:attribute_name) { alpha.repeat(1) | dot }
+        rule(:uri) { (alpha | digit | dot | colon).repeat(1) }
 
         rule(:operator) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
         rule(:equal) { str("eq") }
@@ -64,6 +69,7 @@ subAttr   = "." ATTRNAME
         root :filter
 
         def pretty_parse(*args)
+          puts *args.inspect
           parse(*args)
         rescue Parslet::ParseFailed => error
           puts error.parse_failure_cause.ascii_tree
