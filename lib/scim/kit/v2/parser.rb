@@ -38,15 +38,15 @@ subAttr   = "." ATTRNAME
 =end
       class Parser < Parslet::Parser
         root :filter
-        rule(:filter) { (attrExp | logExp | valuePath) | (lparen >> filter >> rparen) }
+        rule(:filter) { (attrExp | logExp | valuePath) | (not_op? >> lparen >> filter >> rparen) }
         rule(:valuePath) { attrPath >> lsquare_bracket >> valFilter >> rsquare_bracket }
-        rule(:valFilter) { logExp | attrExp | (not_op? >> lparen >> valFilter >> rparen) }
+        rule(:valFilter) { attrExp | logExp | (not_op? >> lparen >> valFilter >> rparen) }
         rule(:attrExp) { (attrPath >> space >> presence) | (attrPath >> space >> compareOp >> space >> quote >> compValue >> quote) }
         rule(:logExp) { filter >> space >> (and_op | or_op) >> space >> filter }
-        rule(:compValue) { falsey | null | truthy | number | string }
+        rule(:compValue) { falsey | null | truthy | number | string | scim_schema_uri }
         rule(:compareOp) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
         rule(:attrPath) { scim_schema_uri | attrname >> subAttr.maybe }
-        rule(:attrname) { nameChar.repeat(1) }
+        rule(:attrname) { alpha >> nameChar.repeat(1) }
         rule(:nameChar) { hyphen | underscore | digit | alpha }
         rule(:subAttr) { dot >> attrname }
         rule(:presence) { str('pr') }
