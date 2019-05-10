@@ -41,15 +41,19 @@ subAttr   = "." ATTRNAME
         rule(:rparen) { str(')') >> space? }
         rule(:digit) { match(/\d/) }
         rule(:quote) { str('"') }
+        rule(:single_quote) { str("'") }
         rule(:space) { match('\s') }
         rule(:space?) { space.maybe }
         rule(:alpha) { match('[a-zA-Z]') }
-        rule(:dot) { match('\.') }
-        rule(:colon) { match(':') }
+        rule(:dot) { str('.') }
+        rule(:colon) { str(':') }
+        rule(:hyphen) { str('-') }
 
         rule(:attribute) { uri | attribute_name }
         rule(:attribute_name) { alpha.repeat(1) | dot }
         rule(:uri) { (alpha | digit | dot | colon).repeat(1) }
+        rule(:date) { (alpha | digit | dot | colon | hyphen).repeat(1) }
+        rule(:string) { (alpha | single_quote).repeat(1) }
 
         rule(:operator) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
         rule(:equal) { str("eq") }
@@ -63,7 +67,7 @@ subAttr   = "." ATTRNAME
         rule(:less_than_equals) { str("le") }
 
         rule(:quoted_value) { quote >> value.as(:right) >> quote }
-        rule(:value) { match(/[a-zA-Z0-9:\-']/).repeat(1) }
+        rule(:value) { (string | date | uri).repeat(1) }
 
         rule(:filter) { attribute.as(:left) >> space >> operator.as(:operator) >> space >> quoted_value }
         root :filter
