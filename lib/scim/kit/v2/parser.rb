@@ -43,7 +43,7 @@ subAttr   = "." ATTRNAME
         rule(:valFilter) { attrExp | logExp | (not_op? >> lparen >> valFilter >> rparen) }
         rule(:attrExp) { (attrPath >> space >> presence) | (attrPath >> space >> compareOp >> space >> quote >> compValue >> quote) }
         rule(:logExp) { filter >> space >> (and_op | or_op) >> space >> filter }
-        rule(:compValue) { falsey | null | truthy | number | string | scim_schema_uri }
+        rule(:compValue) { (falsey | null | truthy | number | string | scim_schema_uri).repeat(1) }
         rule(:compareOp) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
         rule(:attrPath) { scim_schema_uri | attrname >> subAttr.maybe }
         rule(:attrname) { alpha >> nameChar.repeat(1) }

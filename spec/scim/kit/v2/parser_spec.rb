@@ -5,30 +5,34 @@ RSpec.describe Scim::Kit::V2::Parser do
 
   [
     'userName',
-    #'name.familyName',
-    #'urn:ietf:params:scim:schemas:core:2.0:User:userName',
-    #'meta.lastModified',
-    #'schemas',
+    'name.familyName',
+    'urn:ietf:params:scim:schemas:core:2.0:User:userName',
+    'meta.lastModified',
+    'schemas',
   ].each do |attribute|
     [
       "eq",
-      #"ne",
-      #"co",
-      #"sw",
-      #"ew",
-      #"gt",
-      #"lt",
-      #"ge",
-      #"le"
+      "ne",
+      "co",
+      "sw",
+      "ew",
+      "gt",
+      "lt",
+      "ge",
+      "le"
     ].each do |operator|
       [
-        #"bjensen",
-        #"O'Malley",
-        #"J",
-        #"2011-05-13T04:42:34Z",
+        "bjensen",
+        "O'Malley",
+        "J",
+        "2011-05-13T04:42:34Z",
         "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",
       ].each do |value|
-        specify { expect(subject).to parse(%Q(#{attribute} #{operator} \"#{value}\")) }
+        let(:query) { %Q(#{attribute} #{operator} \"#{value}\") }
+        specify { expect(subject).to parse(query) }
+        specify do
+          expect(subject.parse_with_debug(query)).to be_truthy
+        end
       end
     end
   end
