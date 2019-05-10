@@ -37,7 +37,7 @@ RSpec.describe Scim::Kit::V2::Parser do
     end
   end
 
-  specify { expect(subject).to parse(%Q(title pr and userType eq "Employee")) }
+  specify { expect(subject.parse_with_debug(%Q(title pr and userType eq "Employee"))).to be_truthy }
 
   [
     'emails[type eq "work" and value co "@example.com"]',
@@ -60,10 +60,9 @@ RSpec.describe Scim::Kit::V2::Parser do
     specify { expect(subject.attrExp).to parse(x) }
   end
 
-  specify { expect(subject.attrExp).not_to parse('firstName eq "Tsuyoshi" and lastName eq "Garret"') }
-
   [
-    'firstName eq "Tsuyoshi" and lastName eq "Garret"'
+    'firstName eq "Tsuyoshi" and lastName eq "Garret"',
+    %Q(title pr and userType eq "Employee"),
   ].each do |x|
     specify { expect(subject.logExp).to parse(x) }
   end
