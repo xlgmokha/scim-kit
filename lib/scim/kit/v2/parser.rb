@@ -58,7 +58,7 @@ subAttr   = "." ATTRNAME
         rule(:less_than_equals) { str("le") }
 
         rule(:quoted_value) { quote >> value.as(:right) >> quote }
-        rule(:value) { match(/[a-zA-Z0-9:\-]/).repeat(1) }
+        rule(:value) { match(/[a-zA-Z0-9:\-']/).repeat(1) }
 
         rule(:filter) { attribute.as(:left) >> space >> operator.as(:operator) >> space >> quoted_value }
         root :filter
