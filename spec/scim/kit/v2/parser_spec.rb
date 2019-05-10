@@ -6,7 +6,8 @@ RSpec.describe Scim::Kit::V2::Parser do
   [
     'userName',
     'name.familyName',
-    'urn:ietf:params:scim:schemas:core:2.0:User:userName'
+    'urn:ietf:params:scim:schemas:core:2.0:User:userName',
+    'meta.lastModified',
   ].each do |attribute|
     [
       "eq",
@@ -23,6 +24,7 @@ RSpec.describe Scim::Kit::V2::Parser do
         "bjensen",
         "O'Malley",
         "J",
+        "2011-05-13T04:42:34Z",
       ].each do |value|
         context "#{attribute} #{operator} #{value}" do
           let(:result) { subject.pretty_parse(%Q(#{attribute} #{operator} \"#{value}\")) }
@@ -43,17 +45,7 @@ end
 
 
 =begin
-filter=urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"
-
 filter=title pr
-
-filter=meta.lastModified gt "2011-05-13T04:42:34Z"
-
-filter=meta.lastModified ge "2011-05-13T04:42:34Z"
-
-filter=meta.lastModified lt "2011-05-13T04:42:34Z"
-
-filter=meta.lastModified le "2011-05-13T04:42:34Z"
 
 filter=title pr and userType eq "Employee"
 
