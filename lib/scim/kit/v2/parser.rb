@@ -38,13 +38,32 @@ subAttr   = "." ATTRNAME
 =end
       class Parser < Parslet::Parser
         root :filter
-        rule(:filter) { (attribute_expression | logical_expression | value_path) | (not_op? >> lparen >> filter >> rparen) }
-        rule(:value_path) { attribute_path >> lbracket >> valFilter >> rbracket }
-        rule(:value_filter) { attribute_expression | logical_expression | (not_op? >> lparen >> value_filter >> rparen) }
-        rule(:attribute_expression) { (attribute_path >> space >> presence) | (attribute_path >> space >> comparison_operator >> space >> quote >> comparison_value >> quote) }
-        rule(:logical_expression) { filter >> space >> (and_op | or_op) >> space >> filter }
-        rule(:comparison_value) { (falsey | null | truthy | number | string | scim_schema_uri).repeat(1) }
-        rule(:comparison_operator) { equal | not_equal | contains | starts_with | ends_with | greater_than | less_than | less_than_equals | greater_than_equals }
+        rule(:filter) do
+          (attribute_expression | logical_expression | value_path) |
+            (not_op? >> lparen >> filter >> rparen)
+        end
+        rule(:value_path) do
+          attribute_path >> lbracket >> value_filter >> rbracket
+        end
+        rule(:value_filter) do
+          attribute_expression |
+            logical_expression |
+            (not_op? >> lparen >> value_filter >> rparen)
+        end
+        rule(:attribute_expression) do
+          (attribute_path >> space >> presence) |
+            (attribute_path >> space >> comparison_operator >> space >> quote >> comparison_value >> quote)
+        end
+        rule(:logical_expression) do
+          filter >> space >> (and_op | or_op) >> space >> filter
+        end
+        rule(:comparison_value) do
+          (falsey | null | truthy | number | string | scim_schema_uri).repeat(1)
+        end
+        rule(:comparison_operator) do
+          equal | not_equal | contains | starts_with | ends_with |
+            greater_than | less_than | less_than_equals | greater_than_equals
+        end
         rule(:attribute_path) { scim_schema_uri | attribute_name >> sub_attribute.maybe }
         rule(:attribute_name) { alpha >> name_character.repeat(1) }
         rule(:name_character) { hyphen | underscore | digit | alpha }

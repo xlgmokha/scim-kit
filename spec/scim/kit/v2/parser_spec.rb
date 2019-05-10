@@ -38,6 +38,9 @@ RSpec.describe Scim::Kit::V2::Parser do
   end
 
   specify { expect(subject.parse_with_debug(%Q(title pr and userType eq "Employee"))).to be_truthy }
+  specify { expect(subject.attribute_expression.parse_with_debug(%Q(title pr and userType eq "Employee"))).not_to be_truthy }
+  specify { expect(subject.logical_expression.parse_with_debug(%Q(title pr and userType eq "Employee"))).to be_truthy }
+  specify { expect(subject.value_path.parse_with_debug(%Q(title pr and userType eq "Employee"))).not_to be_truthy }
 
   [
     'emails[type eq "work" and value co "@example.com"]',
