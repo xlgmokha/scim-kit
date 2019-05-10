@@ -29,6 +29,7 @@ RSpec.describe Scim::Kit::V2::Parser do
         "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User",
       ].each do |value|
         specify { expect(subject.parse_with_debug(%Q(#{attribute} #{operator} \"#{value}\"))).to be_truthy }
+        #specify { puts subject.parse(%Q(#{attribute} #{operator} \"#{value}\")).inspect }
       end
     end
   end
@@ -133,6 +134,7 @@ RSpec.describe Scim::Kit::V2::Parser do
   [
     'Tsuyoshi',
     'hello@example.org',
+    "2011-05-13T04:42:34Z",
   ].each do |x|
     specify { expect(subject.string).to parse(x) }
   end
