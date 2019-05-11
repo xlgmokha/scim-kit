@@ -50,7 +50,9 @@ module Scim
         end
 
         # attrPath = [URI ":"] ATTRNAME *1subAttr ; SCIM attribute name ; URI is SCIM "schema" URI
-        rule(:attribute_path) { scim_schema_uri | attribute_name >> sub_attribute.maybe }
+        rule(:attribute_path) do
+          (scim_schema_uri >> colon).repeat(0, 1) >> attribute_name >> sub_attribute.maybe
+        end
 
         # ATTRNAME  = ALPHA *(nameChar)
         rule(:attribute_name) { alpha >> name_character.repeat(0, nil) }
