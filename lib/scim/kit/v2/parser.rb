@@ -53,7 +53,7 @@ module Scim
         rule(:attribute_path) { scim_schema_uri | attribute_name >> sub_attribute.maybe }
 
         # ATTRNAME  = ALPHA *(nameChar)
-        rule(:attribute_name) { alpha >> name_character.repeat(1) }
+        rule(:attribute_name) { alpha >> name_character.repeat(0, nil) }
 
         # nameChar = "-" / "_" / DIGIT / ALPHA
         rule(:name_character) { hyphen | underscore | digit | alpha }

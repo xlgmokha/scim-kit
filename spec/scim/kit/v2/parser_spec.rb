@@ -101,6 +101,7 @@ RSpec.describe Scim::Kit::V2::Parser do
   ].each do |x|
     specify { expect(subject.attribute_name).to parse(x) }
   end
+
   ['-', '_', '0', 'a'].each { |x| specify { expect(subject.name_character).to parse(x) } }
   specify { expect(subject.sub_attribute).to parse('.name') }
   specify { expect(subject.presence).to parse('pr') }
