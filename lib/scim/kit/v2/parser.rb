@@ -74,12 +74,12 @@ module Scim
             str('core:2.0:Group') |
             (
               str('extension') >>
-              colon >>
-              alpha.repeat(1) >>
-              colon >>
-              version >>
-              colon >>
-              alpha.repeat(1)
+            colon >>
+            alpha.repeat(1) >>
+            colon >>
+            version >>
+            colon >>
+            alpha.repeat(1)
             )
           )
         end
@@ -90,7 +90,15 @@ module Scim
         rule(:falsey) { str('false') }
         rule(:truthy) { str('true') }
         rule(:null) { str('null') }
-        rule(:number) { digit.repeat(1) }
+        rule(:number) do
+          str('-').maybe >> (
+            str('0') | (match('[1-9]') >> digit.repeat)
+          ) >> (
+            str('.') >> digit.repeat(1)
+          ).maybe >> (
+            match('[eE]') >> (str('+') | str('-')).maybe >> digit.repeat(1)
+          ).maybe
+        end
         rule(:equal) { str('eq') }
         rule(:not_equal) { str('ne') }
         rule(:contains) { str('co') }
