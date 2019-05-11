@@ -6,7 +6,7 @@ RSpec.describe Scim::Kit::V2::Parser do
   [
     'userName',
     'name.familyName',
-    #'urn:ietf:params:scim:schemas:core:2.0:User:userName',
+    'urn:ietf:params:scim:schemas:core:2.0:User:userName',
     'meta.lastModified',
     'schemas'
   ].each do |attribute|
@@ -26,10 +26,9 @@ RSpec.describe Scim::Kit::V2::Parser do
         "O'Malley",
         'J',
         '2011-05-13T04:42:34Z',
-        #'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User'
+        'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User'
       ].each do |value|
         specify { expect(subject.parse_with_debug(%(#{attribute} #{operator} \"#{value}\"))).to be_truthy }
-        # specify { puts subject.parse(%Q(#{attribute} #{operator} \"#{value}\")).inspect }
       end
     end
   end
@@ -83,11 +82,11 @@ RSpec.describe Scim::Kit::V2::Parser do
     'user_name',
     'user-name',
     'username1',
-    'name.familyName',
-    #'urn:ietf:params:scim:schemas:core:2.0:User:userName',
-    #'urn:ietf:params:scim:schemas:core:2.0:User:name.familyName',
     'meta.lastModified',
-    'schemas'
+    'schemas',
+    'name.familyName',
+    'urn:ietf:params:scim:schemas:core:2.0:User:userName',
+    'urn:ietf:params:scim:schemas:core:2.0:User:name.familyName',
   ].each do |x|
     specify { expect(subject.attribute_path.parse_with_debug(x)).to be_truthy }
   end
@@ -116,10 +115,11 @@ RSpec.describe Scim::Kit::V2::Parser do
   1.upto(100).each { |n| specify { expect(subject.number).to parse(n.to_s) } }
 
   [
-    'urn:ietf:params:scim:schemas:core:2.0:User:userName',
-    'urn:ietf:params:scim:schemas:core:2.0:User:name.familyName'
+    'urn:ietf:params:scim:schemas:core:2.0:User',
+    'urn:ietf:params:scim:schemas:core:2.0:Group',
+    'urn:ietf:params:scim:schemas:extension:altean:2.0:User',
   ].each do |x|
-    specify { expect(subject.scim_schema_uri).to parse(x) }
+    specify { expect(subject.uri).to parse(x) }
   end
 
   [
@@ -143,4 +143,13 @@ RSpec.describe Scim::Kit::V2::Parser do
   ].each do |x|
     specify { expect(subject.string).to parse(x) }
   end
+
+  specify { expect(subject.hyphen).to parse("-") }
+  specify { expect(subject.underscore).to parse("_") }
+  (0..9).each { |x| specify { expect(subject.digit).to parse(x.to_s) } }
+  ('A'..'Z').each { |x| specify { expect(subject.alpha).to parse(x) } }
+  ('a'..'z').each { |x| specify { expect(subject.alpha).to parse(x) } }
+  specify { expect(subject.colon).to parse(":") }
+  specify { expect(subject.version).to parse("2.0") }
+  specify { expect(subject.version).to parse("1.0") }
 end

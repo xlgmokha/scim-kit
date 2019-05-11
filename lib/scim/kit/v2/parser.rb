@@ -51,11 +51,13 @@ module Scim
 
         # attrPath = [URI ":"] ATTRNAME *1subAttr ; SCIM attribute name ; URI is SCIM "schema" URI
         rule(:attribute_path) do
-          (scim_schema_uri >> colon).repeat(0, 1) >> attribute_name >> sub_attribute.repeat(0, 1)
+          (uri >> colon).repeat(0, 1) >> attribute_name >> sub_attribute.repeat(0, 1)
         end
 
         # ATTRNAME  = ALPHA *(nameChar)
-        rule(:attribute_name) { alpha >> name_character.repeat(0, nil) }
+        rule(:attribute_name) do
+          alpha >> name_character.repeat(0, nil)
+        end
 
         # nameChar = "-" / "_" / DIGIT / ALPHA
         rule(:name_character) { hyphen | underscore | digit | alpha }
@@ -63,6 +65,24 @@ module Scim
         # subAttr = "." ATTRNAME ; a sub-attribute of a complex attribute
         rule(:sub_attribute) { dot >> attribute_name }
 
+        # uri = 1*ALPHA 1*(":" 1*ALPHA)
+        rule(:uri) do
+          # alpha.repeat(1, nil) >> (colon >> (alpha.repeat(1, nil) | version)).repeat(1, nil)
+          str('urn:ietf:params:scim:schemas:') >>
+          (
+            str('core:2.0:User') |
+            str('core:2.0:Group') |
+            (
+              str('extension') >>
+              colon >>
+              alpha.repeat(1) >>
+              colon >>
+              version >>
+              colon >>
+              alpha.repeat(1)
+            )
+          )
+        end
         rule(:presence) { str('pr') }
         rule(:and_op) { str('and') }
         rule(:or_op) { str('or') }
@@ -71,7 +91,6 @@ module Scim
         rule(:truthy) { str('true') }
         rule(:null) { str('null') }
         rule(:number) { digit.repeat(1) }
-        rule(:scim_schema_uri) { (alpha | digit | dot | colon).repeat(1) }
         rule(:equal) { str('eq') }
         rule(:not_equal) { str('ne') }
         rule(:contains) { str('co') }
@@ -97,6 +116,7 @@ module Scim
         rule(:colon) { str(':') }
         rule(:hyphen) { str('-') }
         rule(:underscore) { str('_') }
+        rule(:version) { digit >> dot >> digit }
       end
     end
   end
