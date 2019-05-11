@@ -26,14 +26,11 @@ module Scim
             logical_expression |
             (not_op >> lparen >> value_filter >> rparen)
         end
-        rule(:tmp) do
-          attribute_expression | logical_expression
-        end
 
         # attrExp = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
         rule(:attribute_expression) do
           (attribute_path >> space >> presence) |
-            (attribute_path >> space >> comparison_operator >> space >> quote >> comparison_value >> quote)
+            (attribute_path >> space >> comparison_operator >> space >> comparison_value)
         end
 
         # logExp = FILTER SP ("and" / "or") SP FILTER
@@ -43,7 +40,7 @@ module Scim
 
         # compValue = false / null / true / number / string ; rules from JSON (RFC 7159)
         rule(:comparison_value) do
-          (falsey | null | truthy | number | string).repeat(1)
+          falsey | null | truthy | number | string
         end
 
         # compareOp = "eq" / "ne" / "co" / "sw" / "ew" / "gt" / "lt" / "ge" / "le"
@@ -103,13 +100,14 @@ module Scim
         rule(:less_than) { str('lt') }
         rule(:greater_than_equals) { str('ge') }
         rule(:less_than_equals) { str('le') }
-        rule(:string) { (alpha | single_quote | at | dot | hyphen | colon | digit).repeat(1) }
+        rule(:string) do
+          quote >> (str('\\') >> any | str('"').absent? >> any).repeat >> quote
+        end
         rule(:lparen) { str('(') }
         rule(:rparen) { str(')') }
         rule(:lbracket) { str('[') >> space? }
         rule(:rbracket) { str(']') >> space? }
         rule(:digit) { match('\d') }
-        rule(:at) { str('@') }
         rule(:quote) { str('"') }
         rule(:single_quote) { str("'") }
         rule(:space) { match('\s') }

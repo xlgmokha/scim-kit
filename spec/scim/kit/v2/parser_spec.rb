@@ -47,9 +47,9 @@ RSpec.describe Scim::Kit::V2::Parser do
 
   [
     #'firstName eq "Tsuyoshi" and lastName eq "Garret"',
-    #'type eq "work" and value co "@example.com"',
-    'firstName eq "Tsuyoshi"',
-    'firstName pr',
+    'type eq "work" and value co "@example.com"',
+    #'firstName eq "Tsuyoshi"',
+    #'firstName pr',
   ].each do |x|
     specify { expect(subject.value_filter).to parse(x) }
   end
@@ -70,7 +70,7 @@ RSpec.describe Scim::Kit::V2::Parser do
     specify { expect(subject.logical_expression).to parse(x) }
   end
 
-  ['false', 'null', 'true', '1', 'hello', 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User', 'Garrett'].each do |x|
+  ['false', 'null', 'true', '1', '"hello"', '"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"', '"Garrett"'].each do |x|
     specify { expect(subject.comparison_value).to parse(x) }
   end
 
@@ -138,9 +138,9 @@ RSpec.describe Scim::Kit::V2::Parser do
   end
 
   [
-    'Tsuyoshi',
-    'hello@example.org',
-    '2011-05-13T04:42:34Z'
+    '"Tsuyoshi"',
+    '"hello@example.org"',
+    '"2011-05-13T04:42:34Z"'
   ].each do |x|
     specify { expect(subject.string).to parse(x) }
   end
