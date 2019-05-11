@@ -69,19 +69,19 @@ module Scim
         rule(:uri) do
           # alpha.repeat(1, nil) >> (colon >> (alpha.repeat(1, nil) | version)).repeat(1, nil)
           str('urn:ietf:params:scim:schemas:') >>
-          (
-            str('core:2.0:User') |
-            str('core:2.0:Group') |
             (
-              str('extension') >>
-            colon >>
-            alpha.repeat(1) >>
-            colon >>
-            version >>
-            colon >>
-            alpha.repeat(1)
+              str('core:2.0:User') |
+              str('core:2.0:Group') |
+              (
+                str('extension') >>
+              colon >>
+              alpha.repeat(1) >>
+              colon >>
+              version >>
+              colon >>
+              alpha.repeat(1)
+              )
             )
-          )
         end
         rule(:presence) { str('pr') }
         rule(:and_op) { str('and') }
