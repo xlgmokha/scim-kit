@@ -26,6 +26,9 @@ module Scim
             logical_expression |
             (not_op >> lparen >> value_filter >> rparen)
         end
+        rule(:tmp) do
+          attribute_expression | logical_expression
+        end
 
         # attrExp = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
         rule(:attribute_expression) do

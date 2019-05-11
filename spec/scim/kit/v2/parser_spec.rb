@@ -40,15 +40,16 @@ RSpec.describe Scim::Kit::V2::Parser do
   specify { expect(subject.value_path.parse_with_debug(%(title pr and userType eq "Employee"))).not_to be_truthy }
 
   [
-    'emails[type eq "work" and value co "@example.com"]'
+    #'emails[type eq "work" and value co "@example.com"]'
   ].each do |x|
-    xspecify { expect(subject.value_path).to parse(x) }
+    specify { expect(subject.value_path.parse_with_debug(x)).to be_truthy }
   end
 
   [
+    #'firstName eq "Tsuyoshi" and lastName eq "Garret"',
+    #'type eq "work" and value co "@example.com"',
     'firstName eq "Tsuyoshi"',
-    'firstName pr'
-    # 'firstName eq "Tsuyoshi" and lastName eq "Garret"'
+    'firstName pr',
   ].each do |x|
     specify { expect(subject.value_filter).to parse(x) }
   end
