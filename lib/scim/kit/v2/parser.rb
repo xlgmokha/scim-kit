@@ -5,13 +5,14 @@ require 'parslet'
 module Scim
   module Kit
     module V2
+      # Parses SCIM filter queries
       class Parser < Parslet::Parser
         root :filter
 
         # FILTER = attrExp / logExp / valuePath / *1"not" "(" FILTER ")"
         rule(:filter) do
           (attribute_expression | logical_expression | value_path) |
-            (not_op? >> lparen >> filter >> rparen)
+            (not_op >> lparen >> filter >> rparen)
         end
 
         # valuePath = attrPath "[" valFilter "]" ; FILTER uses sub-attributes of a parent attrPath
@@ -23,7 +24,7 @@ module Scim
         rule(:value_filter) do
           attribute_expression |
             logical_expression |
-            (not_op? >> lparen >> value_filter >> rparen)
+            (not_op >> lparen >> value_filter >> rparen)
         end
 
         # attrExp = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
@@ -63,8 +64,7 @@ module Scim
         rule(:presence) { str('pr') }
         rule(:and_op) { str('and') }
         rule(:or_op) { str('or') }
-        rule(:not_op) { str('not') }
-        rule(:not_op?) { not_op.maybe }
+        rule(:not_op) { str('not').repeat(0, 1) }
         rule(:falsey) { str('false') }
         rule(:truthy) { str('true') }
         rule(:null) { str('null') }
@@ -84,13 +84,13 @@ module Scim
         rule(:rparen) { str(')') }
         rule(:lbracket) { str('[') >> space? }
         rule(:rbracket) { str(']') >> space? }
-        rule(:digit) { match(/\d/) }
+        rule(:digit) { match('\d') }
         rule(:at) { str('@') }
         rule(:quote) { str('"') }
         rule(:single_quote) { str("'") }
         rule(:space) { match('\s') }
         rule(:space?) { space.maybe }
-        rule(:alpha) { match('[a-zA-Z]') }
+        rule(:alpha) { match['a-zA-Z'] }
         rule(:dot) { str('.') }
         rule(:colon) { str(':') }
         rule(:hyphen) { str('-') }

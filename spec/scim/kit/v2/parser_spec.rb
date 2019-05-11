@@ -48,8 +48,8 @@ RSpec.describe Scim::Kit::V2::Parser do
 
   [
     'firstName eq "Tsuyoshi"',
-    'firstName pr',
-    #'firstName eq "Tsuyoshi" and lastName eq "Garret"'
+    'firstName pr'
+    # 'firstName eq "Tsuyoshi" and lastName eq "Garret"'
   ].each do |x|
     specify { expect(subject.value_filter).to parse(x) }
   end
@@ -65,7 +65,7 @@ RSpec.describe Scim::Kit::V2::Parser do
     'firstName eq "Tsuyoshi" and lastName eq "Garret"',
     'firstName eq "Tsuyoshi" or lastName eq "Garret"',
     'title pr and userType eq "Employee"',
-    'title pr or userType eq "Employee"',
+    'title pr or userType eq "Employee"'
   ].each do |x|
     specify { expect(subject.logical_expression).to parse(x) }
   end
@@ -106,7 +106,9 @@ RSpec.describe Scim::Kit::V2::Parser do
   specify { expect(subject.presence).to parse('pr') }
   specify { expect(subject.and_op).to parse('and') }
   specify { expect(subject.or_op).to parse('or') }
-  specify { expect(subject.not_op?).to parse('not') }
+  specify { expect(subject.not_op).to parse('not') }
+  specify { expect(subject.not_op).to parse('') }
+  specify { expect(subject.not_op).not_to parse('not not') }
   specify { expect(subject.falsey).to parse('false') }
   specify { expect(subject.truthy).to parse('true') }
   specify { expect(subject.null).to parse('null') }
@@ -120,15 +122,15 @@ RSpec.describe Scim::Kit::V2::Parser do
   end
 
   [
-    'title pr',
-    #'title pr and userType eq "Employee"',
-    #'title pr or userType eq "Intern"',
-    #'',
-    #'userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")',
-    #'userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")',
-    #'userType eq "Employee" and (emails.type eq "work") ',
-    #'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
-    #'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]'
+    'title pr'
+    # 'title pr and userType eq "Employee"',
+    # 'title pr or userType eq "Intern"',
+    # '',
+    # 'userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")',
+    # 'userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")',
+    # 'userType eq "Employee" and (emails.type eq "work") ',
+    # 'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
+    # 'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]'
   ].each do |x|
     specify { expect(subject).to parse(x) }
   end
