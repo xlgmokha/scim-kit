@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Scim::Kit::V2::Parser do
+RSpec.describe Scim::Kit::V2::Filter do
   subject { described_class.new }
 
   [

@@ -6,7 +6,7 @@ module Scim
   module Kit
     module V2
       # Parses SCIM filter queries
-      class Parser < Parslet::Parser
+      class Filter < Parslet::Parser
         root :filter
 
         # FILTER = attrExp / logExp / valuePath / *1"not" "(" FILTER ")"
