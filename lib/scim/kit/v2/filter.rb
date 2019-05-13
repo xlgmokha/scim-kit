@@ -2,17 +2,6 @@
 
 require 'parslet'
 
-module Parslet
-  module Atoms
-    # Monkey patch to disable cache in Parslet
-    class Base
-      def cached?
-        false
-      end
-    end
-  end
-end
-
 module Scim
   module Kit
     module V2
@@ -22,8 +11,7 @@ module Scim
 
         # FILTER = attrExp / logExp / valuePath / *1"not" "(" FILTER ")"
         rule(:filter) do
-          (attribute_expression | logical_expression | value_path) |
-            (not_op >> lparen >> filter >> rparen)
+          attribute_expression | logical_expression | value_path | not_op >> lparen >> filter >> rparen
         end
 
         # valuePath = attrPath "[" valFilter "]" ; FILTER uses sub-attributes of a parent attrPath
@@ -33,15 +21,12 @@ module Scim
 
         # valFilter = attrExp / logExp / *1"not" "(" valFilter ")"
         rule(:value_filter) do
-          attribute_expression |
-            logical_expression |
-            (not_op >> lparen >> value_filter >> rparen)
+          attribute_expression | logical_expression | not_op >> lparen >> value_filter >> rparen
         end
 
         # attrExp = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
         rule(:attribute_expression) do
-          (attribute_path >> space >> presence) |
-            (attribute_path >> space >> comparison_operator >> space >> comparison_value)
+          attribute_path >> space >> presence | attribute_path >> space >> comparison_operator >> space >> comparison_value
         end
 
         # logExp = FILTER SP ("and" / "or") SP FILTER
@@ -128,7 +113,6 @@ module Scim
         rule(:quote) { str('"') }
         rule(:single_quote) { str("'") }
         rule(:space) { match('\s') }
-        rule(:space?) { space.maybe }
         rule(:alpha) { match['a-zA-Z'] }
         rule(:dot) { str('.') }
         rule(:colon) { str(':') }
