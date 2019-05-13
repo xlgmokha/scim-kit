@@ -9,7 +9,7 @@ AllCops:
     - 'vendor/**/*'
   TargetRubyVersion: 2.5
 
-Layout/IndentArray:
+Layout/IndentFirstArrayElement:
   EnforcedStyle: consistent
 
 Metrics/BlockLength:
@@ -26,6 +26,9 @@ Metrics/LineLength:
 Naming/FileName:
   Exclude:
     - 'lib/scim-kit.rb'
+
+Naming/RescuedExceptionsVariableName:
+  PreferredName: error
 
 RSpec/NamedSubject:
   Enabled: false
