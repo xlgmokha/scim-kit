@@ -26,7 +26,7 @@ module Scim
 
         # attrExp = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
         rule(:attribute_expression) do
-          attribute_path >> space >> presence | attribute_path >> space >> comparison_operator >> space >> comparison_value
+          (attribute_path >> space >> presence) | attribute_path >> space >> comparison_operator >> space >> comparison_value
         end
 
         # logExp = FILTER SP ("and" / "or") SP FILTER
