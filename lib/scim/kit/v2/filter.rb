@@ -2,6 +2,17 @@
 
 require 'parslet'
 
+module Parslet
+  module Atoms
+    # Monkey patch to disable cache in Parslet
+    class Base
+      def cached?
+        false
+      end
+    end
+  end
+end
+
 module Scim
   module Kit
     module V2

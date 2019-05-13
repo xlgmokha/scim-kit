@@ -34,7 +34,7 @@ RSpec.describe Scim::Kit::V2::Filter do
   end
 
   specify { expect(subject.parse_with_debug('userName eq "jeramy@ziemann.biz"')).to be_truthy }
-  xspecify { expect(subject.parse_with_debug(%(title pr and userType eq "Employee"))).to be_truthy }
+  specify { expect(subject.parse_with_debug(%(title pr and userType eq "Employee"))).to be_truthy }
   specify { expect(subject.attribute_expression.parse_with_debug(%(title pr and userType eq "Employee"))).not_to be_truthy }
   specify { expect(subject.logical_expression.parse_with_debug(%(title pr and userType eq "Employee"))).to be_truthy }
   specify { expect(subject.value_path.parse_with_debug(%(title pr and userType eq "Employee"))).not_to be_truthy }
@@ -46,8 +46,8 @@ RSpec.describe Scim::Kit::V2::Filter do
   end
 
   [
-    # 'firstName eq "Tsuyoshi" and lastName eq "Garret"',
-    # 'type eq "work" and value co "@example.com"',
+    'firstName eq "Tsuyoshi" and lastName eq "Garret"',
+    'type eq "work" and value co "@example.com"',
     'firstName eq "Tsuyoshi"',
     'firstName pr'
   ].each do |x|
@@ -124,15 +124,15 @@ RSpec.describe Scim::Kit::V2::Filter do
   end
 
   [
-    'title pr'
-    # 'title pr and userType eq "Employee"',
-    # 'title pr or userType eq "Intern"',
     # '',
     # 'userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")',
     # 'userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")',
     # 'userType eq "Employee" and (emails.type eq "work") ',
     # 'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
-    # 'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]'
+    # 'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]',
+    'title pr',
+    'title pr and userType eq "Employee"',
+    'title pr or userType eq "Intern"'
   ].each do |x|
     specify { expect(subject).to parse(x) }
   end
