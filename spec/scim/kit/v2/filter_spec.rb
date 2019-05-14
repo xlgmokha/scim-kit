@@ -131,7 +131,7 @@ RSpec.describe Scim::Kit::V2::Filter do
     # 'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
     # 'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]',
     # 'title pr and userType eq "Employee"',
-    # 'title pr or userType eq "Intern"'
+    # 'title pr or userType eq "Intern"',
     'title pr'
   ].each do |x|
     specify { expect(subject).to parse(x) }
