@@ -81,8 +81,8 @@ module Scim
         rule(:and_op) { str('and').as(:and) }
         rule(:or_op) { str('or').as(:or) }
         rule(:not_op) { str('not').repeat(0, 1).as(:not) }
-        rule(:falsey) { str('false').as(:false) }
-        rule(:truthy) { str('true').as(:true) }
+        rule(:falsey) { str('false').as(:falsey) }
+        rule(:truthy) { str('true').as(:truthy) }
         rule(:null) { str('null').as(:null) }
         rule(:number) do
           str('-').maybe >> (
