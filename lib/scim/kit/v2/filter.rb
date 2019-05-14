@@ -16,7 +16,7 @@ module Scim
 
         # valuePath = attrPath "[" valFilter "]" ; FILTER uses sub-attributes of a parent attrPath
         rule(:value_path) do
-          attribute_path >> lbracket >> value_filter >> rbracket
+          attribute_path.as(:attribute) >> lbracket >> value_filter >> rbracket
         end
 
         # valFilter = attrExp / logExp / *1"not" "(" valFilter ")"
@@ -26,7 +26,7 @@ module Scim
 
         # attrExp = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
         rule(:attribute_expression) do
-          (attribute_path >> space >> presence) | attribute_path >> space >> comparison_operator >> space >> comparison_value
+          (attribute_path.as(:attribute) >> space >> presence) | attribute_path.as(:attribute) >> space >> comparison_operator.as(:comparison_operator) >> space >> comparison_value.as(:comparison_value)
         end
 
         # logExp = FILTER SP ("and" / "or") SP FILTER
@@ -77,13 +77,13 @@ module Scim
             )
           )
         end
-        rule(:presence) { str('pr') }
-        rule(:and_op) { str('and') }
-        rule(:or_op) { str('or') }
-        rule(:not_op) { str('not').repeat(0, 1) }
-        rule(:falsey) { str('false') }
-        rule(:truthy) { str('true') }
-        rule(:null) { str('null') }
+        rule(:presence) { str('pr').as(:presence) }
+        rule(:and_op) { str('and').as(:and) }
+        rule(:or_op) { str('or').as(:or) }
+        rule(:not_op) { str('not').repeat(0, 1).as(:not) }
+        rule(:falsey) { str('false').as(:false) }
+        rule(:truthy) { str('true').as(:true) }
+        rule(:null) { str('null').as(:null) }
         rule(:number) do
           str('-').maybe >> (
             str('0') | (match('[1-9]') >> digit.repeat)
