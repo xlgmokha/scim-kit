@@ -31,7 +31,7 @@ module Scim
 
         # logExp = FILTER SP ("and" / "or") SP FILTER
         rule(:logical_expression) do
-          filter >> space >> (and_op | or_op) >> space >> filter
+          lparen >> filter >> rparen >> space >> (and_op | or_op) >> space >> lparen >> filter >> rparen
         end
 
         # compValue = false / null / true / number / string ; rules from JSON (RFC 7159)

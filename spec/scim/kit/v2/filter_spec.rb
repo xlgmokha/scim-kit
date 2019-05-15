@@ -34,20 +34,20 @@ RSpec.describe Scim::Kit::V2::Filter do
   end
 
   specify { expect(subject.parse_with_debug('userName eq "jeramy@ziemann.biz"')).to be_truthy }
-  # specify { expect(subject.parse_with_debug(%(title pr and userType eq "Employee"))).to be_truthy }
+  specify { expect(subject.parse_with_debug(%((title pr) and (userType eq "Employee")))).to be_truthy }
   specify { expect(subject.attribute_expression.parse_with_debug(%(title pr and userType eq "Employee"))).not_to be_truthy }
-  specify { expect(subject.logical_expression.parse_with_debug(%(title pr and userType eq "Employee"))).to be_truthy }
+  specify { expect(subject.logical_expression.parse_with_debug(%((title pr) and (userType eq "Employee")))).to be_truthy }
   specify { expect(subject.value_path.parse_with_debug(%(title pr and userType eq "Employee"))).not_to be_truthy }
 
   [
-    # 'emails[type eq "work" and value co "@example.com"]'
+    'emails[(type eq "work") and (value co "@example.com")]'
   ].each do |x|
     specify { expect(subject.value_path.parse_with_debug(x)).to be_truthy }
   end
 
   [
-    # 'firstName eq "Tsuyoshi" and lastName eq "Garret"',
-    # 'type eq "work" and value co "@example.com"',
+    '(firstName eq "Tsuyoshi") and (lastName eq "Garret")',
+    '(type eq "work") and (value co "@example.com")',
     'firstName eq "Tsuyoshi"',
     'firstName pr'
   ].each do |x|
@@ -62,10 +62,10 @@ RSpec.describe Scim::Kit::V2::Filter do
   end
 
   [
-    'firstName eq "Tsuyoshi" and lastName eq "Garret"',
-    'firstName eq "Tsuyoshi" or lastName eq "Garret"',
-    'title pr and userType eq "Employee"',
-    'title pr or userType eq "Employee"'
+    '(firstName eq "Tsuyoshi") and (lastName eq "Garret")',
+    '(firstName eq "Tsuyoshi") or (lastName eq "Garret")',
+    '(title pr) and (userType eq "Employee")',
+    '(title pr) or (userType eq "Employee")'
   ].each do |x|
     specify { expect(subject.logical_expression).to parse(x) }
   end
@@ -125,13 +125,13 @@ RSpec.describe Scim::Kit::V2::Filter do
 
   [
     # '',
-    # 'userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")',
+    '(userType eq "Employee") and ((emails co "example.com") or (emails.value co "example.org"))',
     # 'userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")',
-    # 'userType eq "Employee" and (emails.type eq "work") ',
-    # 'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
-    # 'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]',
-    # 'title pr and userType eq "Employee"',
-    # 'title pr or userType eq "Intern"',
+    '(userType eq "Employee") and (emails.type eq "work")',
+    '(userType eq "Employee") and (emails[(type eq "work") and (value co "@example.com")])',
+    '(emails[(type eq "work") and (value co "@example.com")]) or (ims[(type eq "xmpp") and (value co "@foo.com")])',
+    '(title pr) and (userType eq "Employee")',
+    '(title pr) or (userType eq "Intern")',
     # 'email eq "hello@example.org" or name.givenName eq "Tsuyoshi" or id = "4CE7E760-F222-4096-90B1-4AC491D12F2E"',
     'title pr'
   ].each do |x|
