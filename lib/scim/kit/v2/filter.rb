@@ -9,9 +9,9 @@ module Scim
       class Filter < Parslet::Parser
         root :filter
 
-        # FILTER = attrExp / logExp / valuePath / *1"not" "(" FILTER ")"
+        # FILTER = attrExp / logExp / valuePath / assignVariable / *1"not" "(" FILTER ")"
         rule(:filter) do
-          attribute_expression | logical_expression | value_path | not_op >> lparen >> filter >> rparen
+          attribute_expression | logical_expression | value_path | assign_variable | not_op >> lparen >> filter >> rparen
         end
 
         # valuePath = attrPath "[" valFilter "]" ; FILTER uses sub-attributes of a parent attrPath
@@ -77,6 +77,12 @@ module Scim
             )
           )
         end
+
+        # assignVariable = ATTRNAME '=' *(NAMECHAR) | STRING
+        rule(:assign_variable) do
+          attribute_name >> space >> assign >> space >> (name_character.repeat(1, nil) | string)
+        end
+
         rule(:presence) { str('pr').as(:presence) }
         rule(:and_op) { str('and').as(:and) }
         rule(:or_op) { str('or').as(:or) }
@@ -119,6 +125,7 @@ module Scim
         rule(:hyphen) { str('-') }
         rule(:underscore) { str('_') }
         rule(:version) { digit >> dot >> digit }
+        rule(:assign) { str('=') }
       end
     end
   end
