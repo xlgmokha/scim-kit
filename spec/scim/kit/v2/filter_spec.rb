@@ -126,13 +126,13 @@ RSpec.describe Scim::Kit::V2::Filter do
   [
     # '',
     '(userType eq "Employee") and ((emails co "example.com") or (emails.value co "example.org"))',
-    # 'userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")',
+    '(userType ne "Employee") and (not((emails co "example.com") or (emails.value co "example.org")))',
     '(userType eq "Employee") and (emails.type eq "work")',
     '(userType eq "Employee") and (emails[(type eq "work") and (value co "@example.com")])',
     '(emails[(type eq "work") and (value co "@example.com")]) or (ims[(type eq "xmpp") and (value co "@foo.com")])',
     '(title pr) and (userType eq "Employee")',
     '(title pr) or (userType eq "Intern")',
-    # 'email eq "hello@example.org" or name.givenName eq "Tsuyoshi" or id = "4CE7E760-F222-4096-90B1-4AC491D12F2E"',
+    '((email eq "hello@example.org") or (name.givenName eq "Tsuyoshi")) or (id = "4CE7E760-F222-4096-90B1-4AC491D12F2E")',
     'title pr'
   ].each do |x|
     specify { expect(subject).to parse(x) }
