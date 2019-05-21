@@ -107,9 +107,9 @@ RSpec.describe Scim::Kit::V2::Filter do
   specify { expect(subject.presence).to parse('pr') }
   specify { expect(subject.and_op).to parse('and') }
   specify { expect(subject.or_op).to parse('or') }
-  specify { expect(subject.not_op).to parse('not') }
-  specify { expect(subject.not_op).to parse('') }
-  specify { expect(subject.not_op).not_to parse('not not') }
+  specify { expect(subject.not_op?).to parse('not') }
+  specify { expect(subject.not_op?).to parse('') }
+  specify { expect(subject.not_op?).not_to parse('not not') }
   specify { expect(subject.falsey).to parse('false') }
   specify { expect(subject.truthy).to parse('true') }
   specify { expect(subject.null).to parse('null') }
@@ -125,15 +125,30 @@ RSpec.describe Scim::Kit::V2::Filter do
 
   [
     # '',
-    '(userType eq "Employee") and ((emails co "example.com") or (emails.value co "example.org"))',
+    # %Q(userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")),
+    # %Q(userType eq "Employee" and emails[type eq "work" and value co "@example.com"]),
+    # %Q(emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]),
     '(userType ne "Employee") and (not((emails co "example.com") or (emails.value co "example.org")))',
     '(userType eq "Employee") and (emails.type eq "work")',
     '(userType eq "Employee") and (emails[(type eq "work") and (value co "@example.com")])',
     '(emails[(type eq "work") and (value co "@example.com")]) or (ims[(type eq "xmpp") and (value co "@foo.com")])',
     '(title pr) and (userType eq "Employee")',
     '(title pr) or (userType eq "Intern")',
-    '((email eq "hello@example.org") or (name.givenName eq "Tsuyoshi")) or (id = "4CE7E760-F222-4096-90B1-4AC491D12F2E")',
-    'title pr'
+    'title pr',
+    %(userName eq "bjensen"),
+    %(name.familyName co "O'Malley"),
+    %(userName sw "J"),
+    %(urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"),
+    %(title pr),
+    %(meta.lastModified gt "2011-05-13T04:42:34Z"),
+    %(meta.lastModified ge "2011-05-13T04:42:34Z"),
+    %(meta.lastModified lt "2011-05-13T04:42:34Z"),
+    %(meta.lastModified le "2011-05-13T04:42:34Z"),
+    %(title pr and userType eq "Employee"),
+    %(title pr or userType eq "Intern"),
+    %(schemas eq "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"),
+    %(userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")),
+    %(userType eq "Employee" and (emails.type eq "work"))
   ].each do |x|
     specify { expect(subject).to parse(x) }
   end

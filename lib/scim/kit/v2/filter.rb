@@ -11,27 +11,31 @@ module Scim
 
         # FILTER = attrExp / logExp / valuePath / assignVariable / *1"not" "(" FILTER ")"
         rule(:filter) do
-          attribute_expression | logical_expression | value_path | assign_variable | not_op >> lparen >> filter >> rparen
+          logical_expression | filter_atom
+        end
+
+        rule(:filter_atom) do
+          (not_op? >> lparen >> filter >> rparen) | attribute_expression | value_path
         end
 
         # valuePath = attrPath "[" valFilter "]" ; FILTER uses sub-attributes of a parent attrPath
         rule(:value_path) do
-          attribute_path.as(:attribute) >> lbracket >> value_filter >> rbracket
+          attribute_path >> lbracket >> value_filter >> rbracket
         end
 
         # valFilter = attrExp / logExp / *1"not" "(" valFilter ")"
         rule(:value_filter) do
-          attribute_expression | logical_expression | not_op >> lparen >> value_filter >> rparen
+          attribute_expression | logical_expression | not_op? >> lparen >> value_filter >> rparen
         end
 
         # attrExp = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
         rule(:attribute_expression) do
-          (attribute_path.as(:attribute) >> space >> presence) | attribute_path.as(:attribute) >> space >> comparison_operator.as(:comparison_operator) >> space >> comparison_value.as(:comparison_value)
+          (attribute_path >> space >> presence) | (attribute_path >> space >> comparison_operator.as(:comparison_operator) >> space >> comparison_value.as(:comparison_value))
         end
 
         # logExp = FILTER SP ("and" / "or") SP FILTER
         rule(:logical_expression) do
-          lparen >> filter >> rparen >> space >> (and_op | or_op) >> space >> lparen >> filter >> rparen
+          filter_atom >> space >> (and_op | or_op).as(:logical_operator) >> space >> filter
         end
 
         # compValue = false / null / true / number / string ; rules from JSON (RFC 7159)
@@ -47,7 +51,7 @@ module Scim
 
         # attrPath = [URI ":"] ATTRNAME *1subAttr ; SCIM attribute name ; URI is SCIM "schema" URI
         rule(:attribute_path) do
-          (uri >> colon).repeat(0, 1) >> attribute_name >> sub_attribute.repeat(0, 1)
+          ((uri >> colon).repeat(0, 1) >> attribute_name >> sub_attribute.repeat(0, 1)).as(:attribute)
         end
 
         # ATTRNAME  = ALPHA *(nameChar)
@@ -78,18 +82,13 @@ module Scim
           )
         end
 
-        # assignVariable = ATTRNAME '=' *(NAMECHAR) | STRING
-        rule(:assign_variable) do
-          attribute_name >> space >> assign >> space >> (name_character.repeat(1, nil) | string)
-        end
-
         rule(:presence) { str('pr').as(:presence) }
-        rule(:and_op) { str('and').as(:and) }
-        rule(:or_op) { str('or').as(:or) }
-        rule(:not_op) { str('not').repeat(0, 1).as(:not) }
-        rule(:falsey) { str('false').as(:falsey) }
-        rule(:truthy) { str('true').as(:truthy) }
-        rule(:null) { str('null').as(:null) }
+        rule(:and_op) { str('and') }
+        rule(:or_op) { str('or') }
+        rule(:not_op?) { str('not').repeat(0, 1).as(:not) }
+        rule(:falsey) { str('false') }
+        rule(:truthy) { str('true') }
+        rule(:null) { str('null') }
         rule(:number) do
           str('-').maybe >> (
             str('0') | (match('[1-9]') >> digit.repeat)
