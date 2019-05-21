@@ -150,7 +150,7 @@ RSpec.describe Scim::Kit::V2::Filter do
     %(userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")),
     %(userType eq "Employee" and (emails.type eq "work"))
   ].each do |x|
-    specify { expect(subject).to parse(x) }
+    specify { expect(subject.parse_with_debug(x)).to be_truthy }
   end
 
   [
