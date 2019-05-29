@@ -30,12 +30,12 @@ module Scim
 
         # attrExp = (attrPath SP "pr") / (attrPath SP compareOp SP compValue)
         rule(:attribute_expression) do
-          (attribute_path >> space >> presence) | (attribute_path >> space >> comparison_operator.as(:comparison_operator) >> space >> comparison_value.as(:comparison_value))
+          (attribute_path >> space >> presence.as(:operator)) | (attribute_path >> space >> comparison_operator.as(:operator) >> space >> comparison_value.as(:value))
         end
 
         # logExp = FILTER SP ("and" / "or") SP FILTER
         rule(:logical_expression) do
-          filter_atom >> space >> (and_op | or_op).as(:logical_operator) >> space >> filter
+          filter_atom.as(:left) >> space >> (and_op | or_op).as(:operator) >> space >> filter.as(:right)
         end
 
         # compValue = false / null / true / number / string ; rules from JSON (RFC 7159)
