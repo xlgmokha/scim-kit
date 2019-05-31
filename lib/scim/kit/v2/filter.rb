@@ -82,7 +82,7 @@ module Scim
           )
         end
 
-        rule(:presence) { str('pr').as(:presence) }
+        rule(:presence) { str('pr') }
         rule(:and_op) { str('and') }
         rule(:or_op) { str('or') }
         rule(:not_op?) { str('not').repeat(0, 1).as(:not) }
