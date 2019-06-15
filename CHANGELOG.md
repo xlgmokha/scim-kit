@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- NA
+- add implementation of SCIM 2.0 filter parser. [RFC-7644](https://tools.ietf.org/html/rfc7644#section-3.4.2.2)
 
 ## [0.3.2] - 2019-02-23
 ### Changed
