@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['mo']
   spec.email         = ['mo@mokhan.ca']
 
-  spec.summary       = 'A SCIM library.'
-  spec.description   = 'A SCIM library.'
+  spec.summary       = 'A simple toolkit for working with SCIM 2.0'
+  spec.description   = 'A simple toolkit for working with SCIM 2.0'
   spec.homepage      = 'https://www.github.com/mokhan/scim-kit'
   spec.license       = 'MIT'
 
