@@ -149,7 +149,7 @@ RSpec.describe Scim::Kit::V2::Filter do
     '(userType eq "Employee") and (emails.type eq "work")',
     '(userType eq "Employee") and (emails[(type eq "work") and (value co "@example.com")])',
     'title pr',
-    'userName pr and not (userName eq "hello@example.com")',
+    'userName pr and not (userName eq "hello@example.com")'
   ].each do |x|
     specify { expect(subject.parse_with_debug(x)).to be_truthy }
   end
