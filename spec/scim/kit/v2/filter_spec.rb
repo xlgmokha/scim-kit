@@ -107,8 +107,9 @@ RSpec.describe Scim::Kit::V2::Filter do
   specify { expect(subject.presence).to parse('pr') }
   specify { expect(subject.and_op).to parse('and') }
   specify { expect(subject.or_op).to parse('or') }
-  specify { expect(subject.not_op?).to parse('not') }
+  specify { expect(subject.not_op?).to parse('not ') }
   specify { expect(subject.not_op?).to parse('') }
+  specify { expect(subject.not_op?).not_to parse('not') }
   specify { expect(subject.not_op?).not_to parse('not not') }
   specify { expect(subject.falsey).to parse('false') }
   specify { expect(subject.truthy).to parse('true') }
@@ -128,6 +129,7 @@ RSpec.describe Scim::Kit::V2::Filter do
     # %Q(userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")),
     # %Q(userType eq "Employee" and emails[type eq "work" and value co "@example.com"]),
     # %Q(emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]),
+    'userName pr and not (userName eq "hello@example.com")',
     '(userType ne "Employee") and (not((emails co "example.com") or (emails.value co "example.org")))',
     '(userType eq "Employee") and (emails.type eq "work")',
     '(userType eq "Employee") and (emails[(type eq "work") and (value co "@example.com")])',
@@ -150,14 +152,11 @@ RSpec.describe Scim::Kit::V2::Filter do
     %(userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")),
     %(userType eq "Employee" and (emails.type eq "work"))
   ].each do |x|
+    before { puts x }
     specify { expect(subject.parse_with_debug(x)).to be_truthy }
   end
 
-  specify { 
-    result = subject.parse_with_debug('userName pr and not (userName eq "hello@example.com")')
-    puts result.inspect
-    expect(result).to be_truthy
-  }
+  specify { expect(subject.parse_with_debug('userName pr and not (userName eq "hello@example.com")')).to be_truthy }
 
   [
     '"Tsuyoshi"',
