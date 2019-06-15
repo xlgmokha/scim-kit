@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    scim-kit (0.3.2)
+    scim-kit (0.4.0)
       activemodel (>= 5.2.0)
       net-hippie (~> 0.2)
       parslet (~> 1.8)
