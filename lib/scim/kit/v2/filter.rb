@@ -85,7 +85,7 @@ module Scim
         rule(:presence) { str('pr') }
         rule(:and_op) { str('and') }
         rule(:or_op) { str('or') }
-        rule(:not_op?) { str('not').repeat(0, 1).as(:not) }
+        rule(:not_op?) { str('not').repeat(0, 1).as(:not) >> space }
         rule(:falsey) { str('false') }
         rule(:truthy) { str('true') }
         rule(:null) { str('null') }

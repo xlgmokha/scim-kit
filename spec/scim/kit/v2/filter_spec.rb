@@ -153,6 +153,12 @@ RSpec.describe Scim::Kit::V2::Filter do
     specify { expect(subject.parse_with_debug(x)).to be_truthy }
   end
 
+  specify { 
+    result = subject.parse_with_debug('userName pr and not (userName eq "hello@example.com")')
+    puts result.inspect
+    expect(result).to be_truthy
+  }
+
   [
     '"Tsuyoshi"',
     '"hello@example.org"',
