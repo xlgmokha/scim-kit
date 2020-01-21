@@ -201,7 +201,17 @@ RSpec.describe Scim::Kit::V2::Filter do
       'title pr',
       'userName pr and not (userName eq "hello@example.com")'
     ].each do |filter|
+      let(:visitor) { Scim::Kit::V2::Filter::Visitor.new }
+
       specify { expect(subject.parse(filter)).to be_instance_of(Scim::Kit::V2::Filter::Node) }
+
+      specify do
+        node = subject.parse(filter)
+
+        expect do
+          node.accept(visitor)
+        end.to raise_error(Scim::Kit::NotImplementedError)
+      end
     end
   end
 end
