@@ -126,6 +126,7 @@ module Scim
         rule(:version) { digit >> dot >> digit }
         rule(:assign) { str('=') }
 
+        # @private
         class Node
           def initialize(hash)
             @hash = hash

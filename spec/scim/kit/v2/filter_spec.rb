@@ -92,12 +92,12 @@ RSpec.describe Scim::Kit::V2::Filter do
     specify { expect(subject.attribute_path.parse_with_debug(x)).to be_truthy }
   end
 
-  [
-    'userName',
-    'user_name',
-    'user-name',
-    'username1',
-    'schemas'
+  %w[
+    userName
+    user_name
+    user-name
+    username1
+    schemas
   ].each do |x|
     specify { expect(subject.attribute_name).to parse(x) }
   end
@@ -114,6 +114,7 @@ RSpec.describe Scim::Kit::V2::Filter do
   specify { expect(subject.falsey).to parse('false') }
   specify { expect(subject.truthy).to parse('true') }
   specify { expect(subject.null).to parse('null') }
+
   1.upto(100).each { |n| specify { expect(subject.number).to parse(n.to_s) } }
 
   [
@@ -166,13 +167,14 @@ RSpec.describe Scim::Kit::V2::Filter do
 
   specify { expect(subject.hyphen).to parse('-') }
   specify { expect(subject.underscore).to parse('_') }
+
   (0..9).each { |x| specify { expect(subject.digit).to parse(x.to_s) } }
   [*'a'..'z', *'A'..'Z'].each { |x| specify { expect(subject.alpha).to parse(x) } }
   specify { expect(subject.colon).to parse(':') }
   specify { expect(subject.version).to parse('2.0') }
   specify { expect(subject.version).to parse('1.0') }
 
-  describe ".parse" do
+  describe '.parse' do
     subject { described_class }
 
     [

@@ -9,7 +9,7 @@ AllCops:
     - 'vendor/**/*'
   TargetRubyVersion: 2.5
 
-Layout/IndentFirstArrayElement:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
 Metrics/BlockLength:

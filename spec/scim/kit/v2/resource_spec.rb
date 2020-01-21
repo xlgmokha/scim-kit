@@ -566,6 +566,7 @@ RSpec.describe Scim::Kit::V2::Resource do
       specify { expect(subject.name.family_name).to eql('Garrett') }
       specify { expect(subject.emails[0][:value]).to eql(email) }
       specify { expect(subject.emails[0][:primary]).to be(true) }
+
       specify do
         attributes = { schemas: schemas.map(&:id), unknown: 'unknown' }
         expect do
@@ -575,7 +576,7 @@ RSpec.describe Scim::Kit::V2::Resource do
     end
   end
 
-  describe Scim::Kit::V2::Messages::ERROR do
+  describe 'Errors' do
     subject { described_class.new(schemas: schemas) }
 
     let(:schemas) { [Scim::Kit::V2::Error.default_schema] }
