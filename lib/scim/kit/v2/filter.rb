@@ -125,6 +125,56 @@ module Scim
         rule(:underscore) { str('_') }
         rule(:version) { digit >> dot >> digit }
         rule(:assign) { str('=') }
+
+        class Node
+          def initialize(hash)
+            @hash = hash
+          end
+
+          def operator
+            self[:operator].to_sym
+          end
+
+          def attribute
+            self[:attribute].to_s
+          end
+
+          def value
+            self[:value].to_s[1..-2]
+          end
+
+          def not?
+            @hash.key?(:not)
+          end
+
+          def accept(visitor)
+            visitor.visit(self)
+          end
+
+          def left
+            self.class.new(self[:left])
+          end
+
+          def right
+            self.class.new(self[:right])
+          end
+
+          def inspect
+            @hash.inspect
+          end
+
+          private
+
+          def [](key)
+            @hash[key]
+          end
+        end
+
+        class << self
+          def parse(filter)
+            Node.new(new.parse(filter))
+          end
+        end
       end
     end
   end

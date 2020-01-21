@@ -171,4 +171,35 @@ RSpec.describe Scim::Kit::V2::Filter do
   specify { expect(subject.colon).to parse(':') }
   specify { expect(subject.version).to parse('2.0') }
   specify { expect(subject.version).to parse('1.0') }
+
+  describe ".parse" do
+    subject { described_class }
+
+    [
+      %(meta.lastModified ge "2011-05-13T04:42:34Z"),
+      %(meta.lastModified gt "2011-05-13T04:42:34Z"),
+      %(meta.lastModified le "2011-05-13T04:42:34Z"),
+      %(meta.lastModified lt "2011-05-13T04:42:34Z"),
+      %(name.familyName co "O'Malley"),
+      %(schemas eq "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"),
+      %(title pr and userType eq "Employee"),
+      %(title pr or userType eq "Intern"),
+      %(title pr),
+      %(urn:ietf:params:scim:schemas:core:2.0:User:userName sw "J"),
+      %(userName eq "bjensen"),
+      %(userName sw "J"),
+      %(userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")),
+      %(userType eq "Employee" and (emails.type eq "work")),
+      %(userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")),
+      '(emails[(type eq "work") and (value co "@example.com")]) or (ims[(type eq "xmpp") and (value co "@foo.com")])',
+      '(title pr) and (userType eq "Employee")',
+      '(title pr) or (userType eq "Intern")',
+      '(userType eq "Employee") and (emails.type eq "work")',
+      '(userType eq "Employee") and (emails[(type eq "work") and (value co "@example.com")])',
+      'title pr',
+      'userName pr and not (userName eq "hello@example.com")'
+    ].each do |filter|
+      specify { expect(subject.parse(filter)).to be_instance_of(Scim::Kit::V2::Filter::Node) }
+    end
+  end
 end
