@@ -72,12 +72,12 @@ module Scim
             str('core:2.0:User') |
             str('core:2.0:Group') | (
               str('extension') >>
-            colon >>
-            alpha.repeat(1) >>
-            colon >>
-            version >>
-            colon >>
-            alpha.repeat(1)
+              colon >>
+              alpha.repeat(1) >>
+              colon >>
+              version >>
+              colon >>
+              alpha.repeat(1)
             )
           )
         end
