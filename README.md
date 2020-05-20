@@ -1,6 +1,6 @@
 # Scim::Kit
 
-[![Build Status](https://travis-ci.org/mokhan/scim-kit.svg?branch=master)](https://travis-ci.org/mokhan/scim-kit)
+[![Build Status](https://github.com/mokhan/scim-kit/workflows/ci/badge.svg)](https://github.com/mokhan/scim-kit/actions)
 [![Code Climate](https://codeclimate.com/github/mokhan/scim-kit.svg)](https://codeclimate.com/github/mokhan/scim-kit)
 [![Gem Version](https://badge.fury.io/rb/scim-kit.svg)](https://rubygems.org/gems/scim-kit)
 

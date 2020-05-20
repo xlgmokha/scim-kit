@@ -1,0 +1,36 @@
+name: ci
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ '2.5', '2.6', '2.7' ]
+    name: RSpec Ruby ${{ matrix.ruby }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+          submodules: recursive
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: setup
+        run: ./bin/setup
+      - name: test
+        run: ./bin/test
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+          submodules: recursive
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+      - name: setup
+        run: ./bin/setup
+      - name: lint
+        run: ./bin/lint
