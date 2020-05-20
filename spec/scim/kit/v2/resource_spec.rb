@@ -49,7 +49,7 @@ RSpec.describe Scim::Kit::V2::Resource do
     end
   end
 
-  context 'with attribute named "type"' do
+  context 'with attribute named "members"' do
     before do
       schema.add_attribute(name: 'members') do |attribute|
         attribute.mutability = :read_only

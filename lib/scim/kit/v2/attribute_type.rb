@@ -108,7 +108,7 @@ module Scim
         def valid_complex?(item)
           return false unless item.is_a?(Hash)
 
-          item.keys.each do |key|
+          item.each_key do |key|
             return false unless type_for(key)&.valid?(item[key])
           end
         end

@@ -68,7 +68,7 @@ module Scim
             false
           end
         },
-        reference: ->(x) { x =~ /\A#{URI.regexp(%w[http https])}\z/ },
+        reference: ->(x) { x =~ /\A#{URI::DEFAULT_PARSER.make_regexp(%w[http https])}\z/ },
         string: ->(x) { x.is_a?(String) }
       }.freeze
 

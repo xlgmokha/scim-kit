@@ -3,7 +3,7 @@
 json.key_format! camelize: :lower
 if _type.complex? && !_type.multi_valued
   json.set! _type.name do
-    dynamic_attributes.values.each do |attribute|
+    dynamic_attributes.each_value do |attribute|
       render attribute, json: json
     end
   end

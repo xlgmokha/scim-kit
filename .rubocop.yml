@@ -9,19 +9,49 @@ AllCops:
     - 'vendor/**/*'
   TargetRubyVersion: 2.5
 
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/EndOfLine:
+  EnforcedStyle: lf
+
 Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
-Metrics/BlockLength:
-  Exclude:
-    - '*.gemspec'
-    - 'spec/**/*.rb'
-
-Metrics/LineLength:
+Layout/LineLength:
   Exclude:
     - 'spec/**/*.rb'
   IgnoredPatterns:
     - '^#*'
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: true
+  EnforcedStyle: indented
+
+Layout/ParameterAlignment:
+  Enabled: true
+  EnforcedStyle: with_fixed_indentation
+  IndentationWidth: 2
+
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - 'spec/**/*.rb'
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
+Metrics/BlockLength:
+  Exclude:
+    - '*.gemspec'
+    - 'Rakefile'
+    - 'spec/**/*.rb'
+
+Metrics/ModuleLength:
+  Exclude:
+    - 'spec/**/*.rb'
 
 Naming/FileName:
   Exclude:
@@ -29,6 +59,30 @@ Naming/FileName:
 
 Naming/RescuedExceptionsVariableName:
   PreferredName: error
+
+Style/Documentation:
+  Enabled: false
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
+
+Style/StringLiterals:
+  EnforcedStyle: 'single_quotes'
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+RSpec/FilePath:
+  Enabled: false
 
 RSpec/NamedSubject:
   Enabled: false
