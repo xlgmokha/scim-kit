@@ -40,7 +40,8 @@ module Scim
         attr_accessor :resource_types
         attr_accessor :schemas
 
-        def initialize
+        def initialize(http: Scim::Kit::Http.new)
+          @http = http
           @resource_types = {}
           @schemas = {}
 
@@ -48,12 +49,11 @@ module Scim
         end
 
         def load_from(base_url)
+          base_url = "#{base_url}/"
           uri = URI.join(base_url, 'ServiceProviderConfig')
-          response = client.get(uri, headers: {
-                                  'Accept' => 'application/scim+json',
-                                  'Content-Type' => 'application/scim+json'
-                                })
-          self.service_provider_configuration = ServiceProviderConfiguration.parse(response.body)
+          json = http.get(uri)
+
+          self.service_provider_configuration = ServiceProviderConfiguration.parse(json, json)
 
           load_items(base_url, 'Schemas', Schema, schemas)
           load_items(base_url, 'ResourceTypes', ResourceType, resource_types)
@@ -61,24 +61,14 @@ module Scim
 
         private
 
+        attr_reader :http
+
         def load_items(base_url, path, type, items)
-          response = client.get(URI.join(base_url, path), headers: headers)
-          hashes = JSON.parse(response.body, symbolize_names: true)
+          hashes = http.get(URI.join(base_url, path))
           hashes.each do |hash|
             item = type.from(hash)
             items[item.id] = item
           end
-        end
-
-        def client
-          @client ||= Net::Hippie::Client.new
-        end
-
-        def headers
-          {
-            'Accept' => 'application/scim+json',
-            'Content-Type' => 'application/scim+json'
-          }
         end
       end
     end
