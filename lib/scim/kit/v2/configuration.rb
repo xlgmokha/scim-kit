@@ -49,8 +49,11 @@ module Scim
 
         def load_from(base_url)
           uri = URI.join(base_url, 'ServiceProviderConfig')
-          self.service_provider_configuration =
-            ServiceProviderConfiguration.parse(client.get(uri).body)
+          response = client.get(uri, headers: {
+                                  'Accept' => 'application/scim+json',
+                                  'Content-Type' => 'application/scim+json'
+                                })
+          self.service_provider_configuration = ServiceProviderConfiguration.parse(response.body)
 
           load_items(base_url, 'Schemas', Schema, schemas)
           load_items(base_url, 'ResourceTypes', ResourceType, resource_types)
