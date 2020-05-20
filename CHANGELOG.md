@@ -1,4 +1,4 @@
-Version 0.5.0
+Version 0.5.1
 
 # Changelog
 All notable changes to this project will be documented in this file.
@@ -7,7 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- nil
+
+## [0.5.1] - 2020-05-20
+### Fixed
+- Specify `Accept: application/scim+json` header when discovering a SCIM API.
+- Specify `Content-Type: application/scim+json` header when discovering a SCIM API.
+- Specify `User-Agent: scim/kit <version>` header when discovering a SCIM API.
+- Follow HTTP redirects when discovering a SCIM API.
+- Retry 3 times with backoff + jitter when a connection to a SCIM discovery API fails.
+- Specify a 1 second open timeout.
+- Specify a 5 second read timeout.
 
 ## [0.5.0] - 2020-01-21
 ### Added
@@ -44,8 +53,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - \_assign does not coerce values by default.
 - errors are merged together instead of overwritten during attribute validation.
 
-[Unreleased]: https://github.com/mokhan/scim-kit/compare/v0.5.0...HEAD
-[0.4.0]: https://github.com/mokhan/scim-kit/compare/v0.4.0...v0.5.0
+[Unreleased]: https://github.com/mokhan/scim-kit/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/mokhan/scim-kit/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/mokhan/scim-kit/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/mokhan/scim-kit/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/mokhan/scim-kit/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/mokhan/scim-kit/compare/v0.3.0...v0.3.1
