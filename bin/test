@@ -1,21 +1,9 @@
-#!/bin/bash
-
-# script/test: Run test suite for application. Optionally pass in a path to an
-#              individual test file to run a single test.
-
+#!/bin/sh
 
 set -e
 
 cd "$(dirname "$0")/.."
 
-[ -z "$DEBUG" ] || set -x
+export RUBYOPT='-W0'
 
-echo ["$(date "+%H:%M:%S")"] "==> Running setup…"
-bin/setup
-
-echo ["$(date "+%H:%M:%S")"] "==> Running tests…"
-if [[ $# -eq 0 ]]; then
-  bundle exec rake spec
-else
-  bundle exec rspec "$1"
-fi
+bundle exec rspec "$@"

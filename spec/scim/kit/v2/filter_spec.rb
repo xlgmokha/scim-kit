@@ -35,9 +35,9 @@ RSpec.describe Scim::Kit::V2::Filter do
 
   specify { expect(subject.parse_with_debug('userName eq "jeramy@ziemann.biz"')).to be_truthy }
   specify { expect(subject.parse_with_debug(%((title pr) and (userType eq "Employee")))).to be_truthy }
-  specify { expect(subject.attribute_expression.parse_with_debug(%(title pr and userType eq "Employee"))).not_to be_truthy }
+  specify { expect(subject.attribute_expression).not_to parse(%(title pr and userType eq "Employee")) }
   specify { expect(subject.logical_expression.parse_with_debug(%((title pr) and (userType eq "Employee")))).to be_truthy }
-  specify { expect(subject.value_path.parse_with_debug(%(title pr and userType eq "Employee"))).not_to be_truthy }
+  specify { expect(subject.value_path).not_to parse(%(title pr and userType eq "Employee")) }
 
   [
     'emails[(type eq "work") and (value co "@example.com")]'

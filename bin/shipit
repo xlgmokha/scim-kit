@@ -4,6 +4,5 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-export RUBYOPT='-W0'
-
-bundle exec rake lint
+bin/cibuild
+bundle exec rake release
