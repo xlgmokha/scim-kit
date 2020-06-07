@@ -4,7 +4,7 @@ PATH
     scim-kit (0.5.1)
       activemodel (>= 5.2.0)
       net-hippie (~> 0.3)
-      parslet (~> 1.8)
+      parslet (>= 1.8, < 3.0)
       tilt (~> 2.0)
       tilt-jbuilder (~> 0.7)
 
@@ -41,7 +41,7 @@ GEM
     parallel (1.19.1)
     parser (2.7.1.2)
       ast (~> 2.4.0)
-    parslet (1.8.2)
+    parslet (2.0.0)
     public_suffix (4.0.5)
     rainbow (3.0.0)
     rake (13.0.1)
