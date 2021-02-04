@@ -1,7 +1,6 @@
 # Scim::Kit
 
-[![Build Status](https://github.com/mokhan/scim-kit/workflows/ci/badge.svg)](https://github.com/mokhan/scim-kit/actions)
-[![Code Climate](https://codeclimate.com/github/mokhan/scim-kit.svg)](https://codeclimate.com/github/mokhan/scim-kit)
+[![Build Status](https://github.com/xlgmokha/scim-kit/workflows/ci/badge.svg)](https://github.com/xlgmokha/scim-kit/actions)
 [![Gem Version](https://badge.fury.io/rb/scim-kit.svg)](https://rubygems.org/gems/scim-kit)
 
 Scim::Kit is a library with the purpose of simplifying the generation
@@ -87,7 +86,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/mokhan/scim-kit.
+Bug reports and pull requests are welcome on GitHub at https://github.com/xlgmokha/scim-kit.
 
 ## License
 
