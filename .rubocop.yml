@@ -43,6 +43,10 @@ Lint/RaiseException:
 Lint/StructNewOverride:
   Enabled: true
 
+Metrics/AbcSize:
+  Exclude:
+    - 'lib/scim/kit/v2/service_provider_configuration.rb'
+
 Metrics/BlockLength:
   Exclude:
     - '*.gemspec'
@@ -72,6 +76,10 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
+Style/IfUnlessModifier:
+  Exclude:
+    - 'lib/scim/kit/v2/attribute.rb'
+
 Style/StringLiterals:
   EnforcedStyle: 'single_quotes'
 
@@ -82,6 +90,9 @@ Style/TrailingCommaInHashLiteral:
   Enabled: false
 
 RSpec/FilePath:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
 RSpec/NamedSubject:
