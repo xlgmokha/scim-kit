@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/sh
 set -euo pipefail
 IFS=$'\n\t'
 
 ruby -v
-gem install bundler --conservative -v '~> 2.0'
-bundle check || bundle install --jobs "$(sysctl -n hw.ncpu || nproc)"
+bundle check || bundle install
