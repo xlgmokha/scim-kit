@@ -1,36 +1,41 @@
 name: ci
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: [ '2.5', '2.6', '2.7' ]
-    name: RSpec Ruby ${{ matrix.ruby }}
+        ruby-version: ['2.5', '2.6', '2.7']
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          lfs: true
-          submodules: recursive
-      - uses: actions/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
-      - name: setup
-        run: ./bin/setup
-      - name: test
-        run: ./bin/test
-  lint:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+      - name: Running tests…
+        run: sh bin/test
+  style:
     runs-on: ubuntu-latest
-    name: Lint
     steps:
       - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
         with:
-          lfs: true
-          submodules: recursive
-      - uses: actions/setup-ruby@v1
+          ruby-version: '2.7'
+          bundler-cache: true
+      - name: Running style checks…
+        run: sh bin/style
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
-      - name: setup
-        run: ./bin/setup
-      - name: lint
-        run: ./bin/lint
+          ruby-version: '2.7'
+          bundler-cache: true
+      - name: Running audit…
+        run: sh bin/audit

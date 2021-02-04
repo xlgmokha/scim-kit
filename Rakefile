@@ -9,5 +9,4 @@ RSpec::Core::RakeTask.new(:spec)
 RuboCop::RakeTask.new(:rubocop)
 Bundler::Audit::Task.new
 
-task lint: [:rubocop, 'bundle:audit']
 task default: :spec

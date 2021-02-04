@@ -4,4 +4,4 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-bundle exec rake release
+bundle exec rake rubocop
