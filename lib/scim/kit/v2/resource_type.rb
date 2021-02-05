@@ -26,8 +26,8 @@ module Scim
         end
 
         class << self
-          def build(*args)
-            item = new(*args)
+          def build(**args)
+            item = new(**args)
             yield item
             item
           end

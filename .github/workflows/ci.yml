@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['2.5', '2.6', '2.7']
+        ruby-version: ['2.5', '2.6', '2.7', '3.0']
     steps:
       - uses: actions/checkout@v2
       - name: Set up Ruby
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7'
+          ruby-version: '3.0'
           bundler-cache: true
       - name: Running style checks…
         run: sh bin/style
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7'
+          ruby-version: '3.0'
           bundler-cache: true
       - name: Running audit…
         run: sh bin/audit
