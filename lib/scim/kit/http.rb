@@ -21,12 +21,13 @@ module Scim
       end
 
       def self.default_driver
-        @default_driver ||= Net::Hippie::Client.new(headers: headers).tap do |http|
-          http.logger = Scim::Kit.logger
-          http.open_timeout = 1
-          http.read_timeout = 5
-          http.follow_redirects = 3
-        end
+        @default_driver ||= Net::Hippie::Client.new(
+          follow_redirects: 3,
+          headers: headers,
+          logger: Scim::Kit.logger,
+          open_timeout: 1,
+          read_timeout: 5
+        )
       end
 
       def self.headers

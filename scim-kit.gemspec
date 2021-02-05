@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.metadata['yard.run'] = 'yri'
 
   spec.add_dependency 'activemodel', '~> 6.1'
-  spec.add_dependency 'net-hippie', '~> 0.3'
+  spec.add_dependency 'net-hippie', '~> 1.0'
   spec.add_dependency 'parslet', '~> 2.0'
   spec.add_dependency 'tilt', '~> 2.0'
   spec.add_dependency 'tilt-jbuilder', '~> 0.7'
