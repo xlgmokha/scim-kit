@@ -1,9 +1,8 @@
----
 version: 2
 updates:
-  - package-ecosystem: "bundler"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    assignees:
-      - "xlgmokha"
+- package-ecosystem: bundler
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "12:00"
+  open-pull-requests-limit: 10
