@@ -29,7 +29,7 @@ GEM
     crack (0.4.5)
       rexml
     diff-lcs (1.4.4)
-    ffaker (2.18.0)
+    ffaker (2.19.0)
     hashdiff (1.0.1)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
