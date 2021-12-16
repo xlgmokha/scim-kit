@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     scim-kit (0.5.1)
-      activemodel (~> 6.1)
+      activemodel (>= 6.1, < 8.0)
       net-hippie (~> 1.0)
       parslet (~> 2.0)
       tilt (~> 2.0)
@@ -11,9 +11,9 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (6.1.4.3)
-      activesupport (= 6.1.4.3)
-    activesupport (6.1.4.3)
+    activemodel (6.1.4.4)
+      activesupport (= 6.1.4.4)
+    activesupport (6.1.4.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
