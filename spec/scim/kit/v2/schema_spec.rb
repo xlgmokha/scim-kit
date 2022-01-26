@@ -126,7 +126,7 @@ RSpec.describe Scim::Kit::V2::Schema do
   describe '.parse' do
     let(:result) { described_class.parse(subject.to_json) }
 
-    context "with reference attribute type" do
+    context 'with reference attribute type' do
       before do
         subject.add_attribute(name: :display_name) do |x|
           x.multi_valued = true
@@ -148,13 +148,13 @@ RSpec.describe Scim::Kit::V2::Schema do
       specify { expect(result.meta.version).to eql(subject.meta.version) }
       specify { expect(result.meta.location).to eql(subject.meta.location) }
       specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
-      specify { expect(result.attributes.size).to eql(1) }
+      specify { expect(result.attributes.size).to be(1) }
       specify { expect(result.attributes.first.to_h).to eql(subject.attributes.first.to_h) }
       specify { expect(result.to_json).to eql(subject.to_json) }
       specify { expect(result.to_h).to eql(subject.to_h) }
     end
 
-    context "with complex attribute type" do
+    context 'with complex attribute type' do
       before do
         subject.add_attribute(name: :name) do |x|
           x.add_attribute(name: :family_name)
@@ -170,7 +170,7 @@ RSpec.describe Scim::Kit::V2::Schema do
       specify { expect(result.meta.version).to eql(subject.meta.version) }
       specify { expect(result.meta.location).to eql(subject.meta.location) }
       specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
-      specify { expect(result.attributes.size).to eql(1) }
+      specify { expect(result.attributes.size).to be(1) }
       specify { expect(result.attributes.first.to_h).to eql(subject.attributes.first.to_h) }
       specify { expect(result.to_json).to eql(subject.to_json) }
       specify { expect(result.to_h).to eql(subject.to_h) }
