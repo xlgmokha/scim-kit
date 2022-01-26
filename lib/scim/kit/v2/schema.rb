@@ -45,13 +45,23 @@ module Scim
             ) do |x|
               x.meta = Meta.from(hash[:meta])
               hash[:attributes].each do |y|
-                x.attributes << AttributeType.from(y)
+                x.attributes << parse_attribute_type(y)
               end
             end
           end
 
           def parse(json)
             from(JSON.parse(json, symbolize_names: true))
+          end
+
+          private
+
+          def parse_attribute_type(hash)
+            attribute_type = AttributeType.from(hash)
+            hash[:subAttributes]&.each do |sub_attr_hash|
+              attribute_type.attributes << parse_attribute_type(sub_attr_hash)
+            end
+            attribute_type
           end
         end
       end

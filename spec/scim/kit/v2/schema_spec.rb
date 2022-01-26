@@ -126,28 +126,54 @@ RSpec.describe Scim::Kit::V2::Schema do
   describe '.parse' do
     let(:result) { described_class.parse(subject.to_json) }
 
-    before do
-      subject.add_attribute(name: :display_name) do |x|
-        x.multi_valued = true
-        x.required = true
-        x.case_exact = true
-        x.mutability = :read_only
-        x.returned = :never
-        x.uniqueness = :server
-        x.canonical_values = ['honerva']
-        x.reference_types = %w[User Group]
+    context "with reference attribute type" do
+      before do
+        subject.add_attribute(name: :display_name) do |x|
+          x.multi_valued = true
+          x.required = true
+          x.case_exact = true
+          x.mutability = :read_only
+          x.returned = :never
+          x.uniqueness = :server
+          x.canonical_values = ['honerva']
+          x.reference_types = %w[User Group]
+        end
       end
+
+      specify { expect(result.id).to eql(subject.id) }
+      specify { expect(result.name).to eql(subject.name) }
+      specify { expect(result.description).to eql(subject.description) }
+      specify { expect(result.meta.created).to eql(subject.meta.created) }
+      specify { expect(result.meta.last_modified).to eql(subject.meta.last_modified) }
+      specify { expect(result.meta.version).to eql(subject.meta.version) }
+      specify { expect(result.meta.location).to eql(subject.meta.location) }
+      specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
+      specify { expect(result.attributes.size).to eql(1) }
+      specify { expect(result.attributes.first.to_h).to eql(subject.attributes.first.to_h) }
+      specify { expect(result.to_json).to eql(subject.to_json) }
+      specify { expect(result.to_h).to eql(subject.to_h) }
     end
 
-    specify { expect(result.id).to eql(subject.id) }
-    specify { expect(result.name).to eql(subject.name) }
-    specify { expect(result.description).to eql(subject.description) }
-    specify { expect(result.meta.created).to eql(subject.meta.created) }
-    specify { expect(result.meta.last_modified).to eql(subject.meta.last_modified) }
-    specify { expect(result.meta.version).to eql(subject.meta.version) }
-    specify { expect(result.meta.location).to eql(subject.meta.location) }
-    specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
-    specify { expect(result.to_json).to eql(subject.to_json) }
-    specify { expect(result.to_h).to eql(subject.to_h) }
+    context "with complex attribute type" do
+      before do
+        subject.add_attribute(name: :name) do |x|
+          x.add_attribute(name: :family_name)
+          x.add_attribute(name: :given_name)
+        end
+      end
+
+      specify { expect(result.id).to eql(subject.id) }
+      specify { expect(result.name).to eql(subject.name) }
+      specify { expect(result.description).to eql(subject.description) }
+      specify { expect(result.meta.created).to eql(subject.meta.created) }
+      specify { expect(result.meta.last_modified).to eql(subject.meta.last_modified) }
+      specify { expect(result.meta.version).to eql(subject.meta.version) }
+      specify { expect(result.meta.location).to eql(subject.meta.location) }
+      specify { expect(result.meta.resource_type).to eql(subject.meta.resource_type) }
+      specify { expect(result.attributes.size).to eql(1) }
+      specify { expect(result.attributes.first.to_h).to eql(subject.attributes.first.to_h) }
+      specify { expect(result.to_json).to eql(subject.to_json) }
+      specify { expect(result.to_h).to eql(subject.to_h) }
+    end
   end
 end
