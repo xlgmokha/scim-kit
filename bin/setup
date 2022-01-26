@@ -4,5 +4,6 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+gem update --system
 gem install bundler
 bundle install
