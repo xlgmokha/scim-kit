@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2020-05-20
+### Fixed
+
+- fix: Parse sub attributes from schema https://github.com/xlgmokha/scim-kit/pull/38
+
 ## [0.5.1] - 2020-05-20
 ### Fixed
 - Specify `Accept: application/scim+json` header when discovering a SCIM API.
