@@ -16,8 +16,8 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
+      - run: sh bin/setup
       - name: Running tests…
-        run: sh bin/setup
         run: sh bin/test
   style:
     runs-on: ubuntu-latest
