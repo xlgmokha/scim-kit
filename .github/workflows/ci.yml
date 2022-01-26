@@ -17,6 +17,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
       - name: Running tests…
+        run: sh bin/setup
         run: sh bin/test
   style:
     runs-on: ubuntu-latest
