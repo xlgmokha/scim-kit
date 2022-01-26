@@ -1,6 +1,8 @@
 #!/bin/sh
-set -euo pipefail
-IFS=$'\n\t'
 
-ruby -v
-bundle check || bundle install
+set -e
+
+cd "$(dirname "$0")/.."
+
+gem install bundler
+bundle install
