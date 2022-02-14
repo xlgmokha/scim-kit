@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     scim-kit (0.5.2)
-      activemodel (~> 6.1)
+      activemodel (>= 6.1, < 8.0)
       net-hippie (~> 1.0)
       parslet (~> 2.0)
       tilt (~> 2.0)
@@ -11,15 +11,15 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionview (6.1.4.4)
-      activesupport (= 6.1.4.4)
+    actionview (6.1.4.6)
+      activesupport (= 6.1.4.6)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activemodel (6.1.4.4)
-      activesupport (= 6.1.4.4)
-    activesupport (6.1.4.4)
+    activemodel (6.1.4.6)
+      activesupport (= 6.1.4.6)
+    activesupport (6.1.4.6)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -40,12 +40,12 @@ GEM
     erubi (1.10.0)
     ffaker (2.20.0)
     hashdiff (1.0.1)
-    i18n (1.8.11)
+    i18n (1.9.1)
       concurrent-ruby (~> 1.0)
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    loofah (2.13.0)
+    loofah (2.14.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mini_portile2 (2.6.1)
@@ -111,7 +111,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    zeitwerk (2.5.3)
+    zeitwerk (2.5.4)
 
 PLATFORMS
   ruby
