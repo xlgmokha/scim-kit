@@ -11,15 +11,15 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionview (6.1.4.7)
-      activesupport (= 6.1.4.7)
+    actionview (6.1.5)
+      activesupport (= 6.1.5)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activemodel (6.1.4.7)
-      activesupport (= 6.1.4.7)
-    activesupport (6.1.4.7)
+    activemodel (6.1.5)
+      activesupport (= 6.1.5)
+    activesupport (6.1.5)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
