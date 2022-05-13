@@ -6,8 +6,8 @@ module Scim
       # Represents a SCIM Error
       class Error < Resource
         SCIM_TYPES = %w[
+          invalidFilter
           invalidPath
-          invalidSyntax
           invalidSyntax
           invalidValue
           invalidVers
@@ -32,7 +32,7 @@ module Scim
               attribute.canonical_values = SCIM_TYPES
             end
             x.add_attribute(name: :detail)
-            x.add_attribute(name: :status, type: :integer)
+            x.add_attribute(name: :status, type: :string)
           end
         end
       end
