@@ -11,6 +11,7 @@ module Scim
         ENTERPRISE_USER = "#{EXTENSION}:enterprise:2.0:User"
         GROUP = "#{CORE}:Group"
         RESOURCE_TYPE = "#{CORE}:ResourceType"
+        SCHEMA = "#{CORE}:Schema"
         SERVICE_PROVIDER_CONFIGURATION = "#{CORE}:ServiceProviderConfig"
         USER = "#{CORE}:User"
       end
