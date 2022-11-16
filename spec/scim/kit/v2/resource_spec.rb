@@ -185,7 +185,7 @@ RSpec.describe Scim::Kit::V2::Resource do
     specify { expect(subject.as_json[:country]).to eql('canada') }
     specify { expect(subject.as_json[extension_id][:province]).to eql('alberta') }
 
-    context "with an extension attribute with the same name as a core attribute" do
+    context 'with an extension attribute with the same name as a core attribute' do
       before do
         extension.add_attribute(name: :country)
         subject.country = 'usa'
