@@ -189,9 +189,11 @@ RSpec.describe Scim::Kit::V2::Resource do
       before do
         extension.add_attribute(name: :country)
         subject.country = 'usa'
+        subject.write_attribute("#{extension_id}#province", 'canada')
       end
 
       specify { expect(subject.country).to eql('usa') }
+      specify { expect(subject.read_attribute_for("#{extension_id}#province")).to eql('canada') }
       specify { expect(subject.as_json[:country]).to eql('canada') }
       specify { expect(subject.as_json[extension_id][:country]).to eql('usa') }
     end
