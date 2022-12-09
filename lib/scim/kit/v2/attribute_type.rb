@@ -9,17 +9,14 @@ module Scim
         attr_accessor :canonical_values, :case_exact, :description
         attr_accessor :multi_valued, :required
         attr_reader :mutability, :name, :type, :attributes
-        attr_reader :reference_types, :returned, :uniqueness
-        attr_reader :schema
+        attr_reader :reference_types, :returned, :uniqueness, :schema
 
         def initialize(name:, type: :string, schema: nil)
           @name = name.to_s.underscore
           @type = DATATYPES[type.to_sym] ? type.to_sym : (raise TYPE_ERROR)
           @schema = schema
           @description = name.to_s.camelize(:lower)
-          @multi_valued = false
-          @required = false
-          @case_exact = false
+          @multi_valued = @required = @case_exact = false
           @mutability = Mutability::READ_WRITE
           @returned = Returned::DEFAULT
           @uniqueness = Uniqueness::NONE
