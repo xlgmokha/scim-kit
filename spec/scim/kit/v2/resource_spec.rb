@@ -176,24 +176,30 @@ RSpec.describe Scim::Kit::V2::Resource do
     before do
       schema.add_attribute(name: :country)
       extension.add_attribute(name: :province)
-      subject.country = 'canada'
-      subject.province = 'alberta'
     end
 
-    specify { expect(subject.country).to eql('canada') }
-    specify { expect(subject.province).to eql('alberta') }
-    specify { expect(subject.as_json[:country]).to eql('canada') }
-    specify { expect(subject.as_json[extension_id][:province]).to eql('alberta') }
+    context 'without any collisions' do
+      before do
+        subject.country = 'canada'
+        subject.province = 'alberta'
+      end
+
+      specify { expect(subject.country).to eql('canada') }
+      specify { expect(subject.province).to eql('alberta') }
+      specify { expect(subject.as_json[:country]).to eql('canada') }
+      specify { expect(subject.as_json[extension_id][:province]).to eql('alberta') }
+    end
 
     context 'with an extension attribute with the same name as a core attribute' do
       before do
         extension.add_attribute(name: :country)
-        subject.country = 'usa'
-        subject.write_attribute("#{extension_id}#province", 'canada')
+
+        subject.country = 'canada'
+        subject.write_attribute("#{extension_id}#country", 'usa')
       end
 
-      specify { expect(subject.country).to eql('usa') }
-      specify { expect(subject.read_attribute_for("#{extension_id}#province")).to eql('canada') }
+      specify { expect(subject.country).to eql('canada') }
+      specify { expect(subject.read_attribute("#{extension_id}#country")).to eql('usa') }
       specify { expect(subject.as_json[:country]).to eql('canada') }
       specify { expect(subject.as_json[extension_id][:country]).to eql('usa') }
     end
