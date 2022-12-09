@@ -18,7 +18,8 @@ schemas.each do |schema|
   else
     json.set! schema.id do
       schema.attributes.each do |type|
-        attribute = dynamic_attributes[type.name]
+        attribute = dynamic_attributes["#{type.schema.id}##{type.name}"] ||
+          dynamic_attributes[type.name]
         render attribute, json: json
       end
     end
