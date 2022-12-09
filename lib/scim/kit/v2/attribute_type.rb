@@ -8,11 +8,12 @@ module Scim
         include Templatable
         attr_accessor :canonical_values, :case_exact, :description
         attr_accessor :multi_valued, :required
-        attr_reader :mutability, :name, :type, :attributes
+        attr_reader :mutability, :name, :fully_qualified_name, :type, :attributes
         attr_reader :reference_types, :returned, :uniqueness, :schema
 
         def initialize(name:, type: :string, schema: nil)
           @name = name.to_s.underscore
+          @fully_qualified_name = schema ? "#{schema&.id}##{@name}" : @name
           @type = DATATYPES[type.to_sym] ? type.to_sym : (raise TYPE_ERROR)
           @schema = schema
           @description = name.to_s.camelize(:lower)

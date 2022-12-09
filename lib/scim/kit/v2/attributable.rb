@@ -88,13 +88,13 @@ module Scim
         end
 
         def attribute(type, resource)
-          key = type.name
-          if dynamic_attributes.key?(type.name)
-            key = "#{type.schema&.id}##{type.name}"
+          name = type.name
+          if dynamic_attributes.key?(name)
+            name = type.fully_qualified_name
           else
             extend(create_module_for(type))
           end
-          dynamic_attributes[key] = Attribute.new(
+          dynamic_attributes[name] = Attribute.new(
             type: type,
             resource: resource
           )
