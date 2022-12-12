@@ -38,7 +38,9 @@ module Scim
         # @param name [String] the name of the attribute to return
         # @return [Scim::Kit::V2::Attribute] the attribute or {Scim::Kit::V2::UnknownAttribute}
         def attribute_for(name)
-          dynamic_attributes[name.to_s.underscore] || UnknownAttribute.new(name)
+          dynamic_attributes[name.to_s.underscore] ||
+            dynamic_attributes[name] ||
+            UnknownAttribute.new(name)
         end
 
         # Returns the value associated with the attribute name
@@ -86,11 +88,10 @@ module Scim
         end
 
         def attribute(type, resource)
-          dynamic_attributes[type.name] = Attribute.new(
-            type: type,
-            resource: resource
-          )
-          extend(create_module_for(type))
+          previously_defined = dynamic_attributes.key?(type.name)
+          dynamic_attributes[previously_defined ? type.fully_qualified_name : type.name] =
+            Attribute.new(type: type, resource: resource)
+          extend(create_module_for(type)) unless previously_defined
         end
       end
     end

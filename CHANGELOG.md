@@ -1,4 +1,4 @@
-Version 0.7.0
+Version 0.7.1
 
 # Changelog
 All notable changes to this project will be documented in this file.
@@ -8,13 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2022-12-12
+### Fixed
+- Add support for duplicate attribute names
+
 ## [0.7.0] - 2022-09-28
 ### Added
 - Add constant for 'urn:ietf:params:scim:api:messages:2.0:BulkRequest' [RFC-7644](https://www.rfc-editor.org/rfc/rfc7644.html#section-3.7)
 - Add constant for 'urn:ietf:params:scim:api:messages:2.0:BulkResponse' [RFC-7644](https://www.rfc-editor.org/rfc/rfc7644.html#section-3.7)
 - Add constant for 'urn:ietf:params:scim:api:messages:2.0:PatchOp' [RFC-7644](https://www.rfc-editor.org/rfc/rfc7644.html#section-3.5.2)
 - Add constant for 'urn:ietf:params:scim:schemas:core:2.0:Schema' [RFC-7643](https://www.rfc-editor.org/rfc/rfc7643.html#section-7)
-
 
 ## [0.6.0] - 2022-05-23
 ### Added
@@ -82,7 +85,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - \_assign does not coerce values by default.
 - errors are merged together instead of overwritten during attribute validation.
 
-[Unreleased]: https://github.com/xlgmokha/scim-kit/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/xlgmokha/scim-kit/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/xlgmokha/scim-kit/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/xlgmokha/scim-kit/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/xlgmokha/scim-kit/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/xlgmokha/scim-kit/compare/v0.5.2...v0.5.3
