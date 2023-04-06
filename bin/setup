@@ -7,3 +7,4 @@ cd "$(dirname "$0")/.."
 gem update --system
 gem install bundler
 bundle install
+bundle exec appraisal install
