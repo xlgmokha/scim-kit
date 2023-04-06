@@ -6,4 +6,4 @@ cd "$(dirname "$0")/.."
 
 export RUBYOPT='-W0'
 
-bundle exec rspec "$@"
+bundle exec appraisal rspec "$@"
