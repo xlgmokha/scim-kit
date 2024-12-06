@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     scim-kit (0.7.2)
-      activemodel (>= 6.1, < 8.0)
+      activemodel (>= 6.1)
       net-hippie (~> 1.0)
       parslet (~> 2.0)
       tilt (~> 2.0)
@@ -11,15 +11,15 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionview (7.2.2)
-      activesupport (= 7.2.2)
+    actionview (8.0.0)
+      activesupport (= 8.0.0)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activemodel (7.2.2)
-      activesupport (= 7.2.2)
-    activesupport (7.2.2)
+    activemodel (8.0.0)
+      activesupport (= 8.0.0)
+    activesupport (8.0.0)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -31,6 +31,7 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
+      uri (>= 0.13.1)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     ast (2.4.2)
@@ -144,6 +145,7 @@ GEM
     unicode-display_width (3.1.2)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
+    uri (1.0.2)
     webmock (3.24.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
