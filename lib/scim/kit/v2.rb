@@ -29,7 +29,7 @@ module Scim
     module V2
       BASE64 = %r(
         \A([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?\Z
-      )x.freeze
+      )x
       BOOLEAN_VALUES = [true, false].freeze
       DATATYPES = {
         string: 'string',

@@ -66,10 +66,8 @@ module Scim
 
         # yields each attribute to the provided block
         # @param [Block] the block to yield each attribute to.
-        def each
-          dynamic_attributes.each do |_name, attribute|
-            yield attribute
-          end
+        def each(&block)
+          dynamic_attributes.each_value(&block)
         end
 
         private

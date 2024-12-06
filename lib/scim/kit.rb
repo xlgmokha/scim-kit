@@ -25,7 +25,7 @@ module Scim
     TYPE_ERROR = ArgumentError.new(:type)
 
     def self.logger
-      @logger ||= Logger.new(STDOUT)
+      @logger ||= Logger.new($stdout)
     end
 
     def self.logger=(logger)

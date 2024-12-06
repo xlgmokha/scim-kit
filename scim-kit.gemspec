@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
     File.basename(file)
   end
   spec.require_paths = ['lib']
-  spec.required_ruby_version = Gem::Requirement.new('>= 2.7.0')
+  spec.required_ruby_version = Gem::Requirement.new('>= 3.1.0')
   spec.metadata['yard.run'] = 'yri'
 
   spec.add_dependency 'activemodel', '>= 6.1', '< 8.0'
@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'ffaker', '~> 2.7'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'rubocop', '~> 0.52'
-  spec.add_development_dependency 'rubocop-rspec', '~> 1.22'
+  spec.add_development_dependency 'rubocop', '~> 1.0'
+  spec.add_development_dependency 'rubocop-rspec', '~> 2.0'
   spec.add_development_dependency 'webmock', '~> 3.5'
 end
