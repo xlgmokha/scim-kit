@@ -63,12 +63,18 @@ GEM
     loofah (2.23.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mini_portile2 (2.8.8)
     minitest (5.25.4)
     net-hippie (1.2.0)
       logger (~> 1.0)
-    nokogiri (1.16.8)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.16.8-aarch64-linux)
+      racc (~> 1.4)
+    nokogiri (1.16.8-arm-linux)
+      racc (~> 1.4)
+    nokogiri (1.16.8-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.16.8-x86-linux)
+      racc (~> 1.4)
+    nokogiri (1.16.8-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.16.8-x86_64-linux)
       racc (~> 1.4)
@@ -144,7 +150,11 @@ GEM
       hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
-  ruby
+  aarch64-linux
+  arm-linux
+  arm64-darwin
+  x86-linux
+  x86_64-darwin
   x86_64-linux
 
 DEPENDENCIES
@@ -158,4 +168,4 @@ DEPENDENCIES
   webmock (~> 3.5)
 
 BUNDLED WITH
-   2.3.6
+   2.5.23
