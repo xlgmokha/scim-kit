@@ -136,7 +136,7 @@ GEM
     ruby-progressbar (1.13.0)
     securerandom (0.4.0)
     thor (1.3.2)
-    tilt (2.4.0)
+    tilt (2.5.0)
     tilt-jbuilder (0.7.1)
       jbuilder
       tilt (>= 1.3.0, < 3)
