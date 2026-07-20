@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activemodel', '>= 6.1'
   spec.add_dependency 'net-hippie', '~> 1.0'
   spec.add_dependency 'parslet', '~> 2.0'
+  spec.add_dependency 'thor', '~> 1.0'
   spec.add_dependency 'tilt', '~> 2.0'
   spec.add_dependency 'tilt-jbuilder', '~> 0.7'
   spec.add_development_dependency 'bundler-audit', '~> 0.6'

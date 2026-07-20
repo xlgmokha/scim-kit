@@ -88,6 +88,10 @@ Style/IfUnlessModifier:
   Exclude:
     - 'lib/scim/kit/v2/attribute.rb'
 
+Style/StderrPuts:
+  Exclude:
+    - 'lib/scim/kit/cli/reporting.rb'
+
 Style/StringLiterals:
   EnforcedStyle: 'single_quotes'
 

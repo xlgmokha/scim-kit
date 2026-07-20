@@ -1,0 +1,47 @@
+# frozen_string_literal: true
+
+module Scim
+  module Kit
+    module Cli
+      class ResourceTypeResolver
+        def initialize(http, base_url, headers: {})
+          @http = http
+          @base_url = base_url
+          @headers = headers
+        end
+
+        def endpoint_for(name)
+          types = resource_types
+          match = types.find { |x| matches?(x, name) }
+          unless match
+            raise UnknownResourceType.new(name, types.map { |x| x[:name] })
+          end
+
+          endpoint = match[:endpoint]
+          raise MissingEndpoint, name if endpoint.to_s.empty?
+
+          endpoint
+        end
+
+        private
+
+        attr_reader :http, :base_url, :headers
+
+        def matches?(type, name)
+          type[:id]&.casecmp?(name) || type[:name]&.casecmp?(name)
+        end
+
+        def resource_types
+          uri = Cli.join_uri(base_url, 'ResourceTypes')
+          result = http.fetch(uri, headers: headers)
+          raise RequestFailed, result unless result.ok?
+          unless result.body.is_a?(Array)
+            raise InvalidResponse, 'expected /ResourceTypes to return a list'
+          end
+
+          result.body
+        end
+      end
+    end
+  end
+end

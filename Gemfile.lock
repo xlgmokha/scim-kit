@@ -5,6 +5,7 @@ PATH
       activemodel (>= 6.1)
       net-hippie (~> 1.0)
       parslet (~> 2.0)
+      thor (~> 1.0)
       tilt (~> 2.0)
       tilt-jbuilder (~> 0.7)
 

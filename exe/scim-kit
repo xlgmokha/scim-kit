@@ -2,3 +2,8 @@
 # frozen_string_literal: true
 
 require 'scim/kit'
+require 'scim/kit/cli'
+
+Scim::Kit.logger = Logger.new(File::NULL)
+
+Scim::Kit::Cli::App.start(ARGV)
