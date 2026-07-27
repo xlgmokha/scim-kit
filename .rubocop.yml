@@ -51,12 +51,21 @@ Lint/StructNewOverride:
 Metrics/AbcSize:
   Exclude:
     - 'lib/scim/kit/v2/service_provider_configuration.rb'
+    - 'lib/scim/kit/cli/app.rb'
 
 Metrics/BlockLength:
   Exclude:
     - '*.gemspec'
     - 'Rakefile'
     - 'spec/**/*.rb'
+
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/scim/kit/cli/app.rb'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'lib/scim/kit/cli/app.rb'
 
 Metrics/ModuleLength:
   Exclude:

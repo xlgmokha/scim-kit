@@ -10,14 +10,18 @@ module Scim
           @headers = headers
         end
 
-        def endpoint_for(name)
+        def resource_type_for(name)
           types = resource_types
           match = types.find { |x| matches?(x, name) }
           unless match
             raise UnknownResourceType.new(name, types.map { |x| x[:name] })
           end
 
-          endpoint = match[:endpoint]
+          match
+        end
+
+        def endpoint_for(name)
+          endpoint = resource_type_for(name)[:endpoint]
           raise MissingEndpoint, name if endpoint.to_s.empty?
 
           endpoint

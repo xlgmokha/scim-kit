@@ -38,6 +38,31 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
     end
   end
 
+  describe '#resource_type_for' do
+    before do
+      stub_request(:get, "#{base_url}/ResourceTypes").to_return(
+        status: 200,
+        body: [
+          { id: 'User', name: 'User', endpoint: '/Users',
+            schema: 'urn:ietf:params:scim:schemas:core:2.0:User' }
+        ].to_json
+      )
+    end
+
+    it 'returns the full matched resource type entry' do
+      expect(subject.resource_type_for('User')).to include(
+        endpoint: '/Users',
+        schema: 'urn:ietf:params:scim:schemas:core:2.0:User'
+      )
+    end
+
+    it 'raises when no resource type matches the given name' do
+      expect { subject.resource_type_for('Nope') }.to raise_error(
+        Scim::Kit::Cli::UnknownResourceType, /Nope/
+      )
+    end
+  end
+
   context 'when the matched resource type has no endpoint' do
     before do
       stub_request(:get, "#{base_url}/ResourceTypes").to_return(

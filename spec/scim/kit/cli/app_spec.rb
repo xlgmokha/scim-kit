@@ -90,6 +90,94 @@ RSpec.describe Scim::Kit::Cli::App do
         expect(exit_status { app.discover }).to eq(1)
       end
     end
+
+    context 'when --validate is set and every document is valid' do
+      let(:service_provider_configuration) do
+        {
+          schemas: [
+            'urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig'
+          ],
+          patch: { supported: true },
+          bulk: { supported: false, maxOperations: 0, maxPayloadSize: 0 },
+          filter: { supported: true, maxResults: 200 },
+          changePassword: { supported: false },
+          sort: { supported: false },
+          etag: { supported: false },
+          authenticationSchemes: [
+            {
+              type: 'httpbasic', name: 'HTTP Basic',
+              description: 'basic auth'
+            }
+          ]
+        }
+      end
+      let(:schemas) do
+        [
+          {
+            id: 'urn:ietf:params:scim:schemas:core:2.0:User',
+            schemas: ['urn:ietf:params:scim:schemas:core:2.0:Schema'],
+            attributes: [
+              { name: 'userName', type: 'string', required: true }
+            ]
+          }
+        ]
+      end
+      let(:resource_types) do
+        [
+          {
+            schemas: ['urn:ietf:params:scim:schemas:core:2.0:ResourceType'],
+            name: 'User', endpoint: '/Users',
+            schema: 'urn:ietf:params:scim:schemas:core:2.0:User'
+          }
+        ]
+      end
+
+      before do
+        stub_request(:get, "#{base_url}/ServiceProviderConfig").to_return(
+          status: 200, body: service_provider_configuration.to_json
+        )
+        stub_request(:get, "#{base_url}/Schemas")
+          .to_return(status: 200, body: schemas.to_json)
+        stub_request(:get, "#{base_url}/ResourceTypes")
+          .to_return(status: 200, body: resource_types.to_json)
+      end
+
+      it 'exits 0' do
+        allow($stdout).to receive(:print)
+        instance = app('validate' => true)
+
+        expect(exit_status { instance.discover }).to eq(0)
+      end
+    end
+
+    context 'when --validate is set and a document is invalid' do
+      let(:service_provider_configuration) { { patch: { supported: true } } }
+      let(:schemas) { [{ id: 'User', name: 'User' }] }
+
+      before do
+        stub_request(:get, "#{base_url}/ServiceProviderConfig").to_return(
+          status: 200, body: service_provider_configuration.to_json
+        )
+        stub_request(:get, "#{base_url}/Schemas")
+          .to_return(status: 200, body: schemas.to_json)
+      end
+
+      it 'prints validation errors to stderr' do
+        allow($stdout).to receive(:print)
+        instance = app('validate' => true)
+
+        expect { exit_status { instance.discover } }
+          .to output(/validation_errors/).to_stderr
+      end
+
+      it 'exits 1' do
+        allow($stdout).to receive(:print)
+        allow($stderr).to receive(:print)
+        instance = app('validate' => true)
+
+        expect(exit_status { instance.discover }).to eq(1)
+      end
+    end
   end
 
   describe '#list' do
@@ -152,6 +240,109 @@ RSpec.describe Scim::Kit::Cli::App do
         expect(exit_status { app.list('User') }).to eq(1)
       end
     end
+
+    context 'when --validate is set' do
+      let(:core_urn) { 'urn:ietf:params:scim:schemas:core:2.0:User' }
+      let(:resource_types) do
+        [{ id: 'User', name: 'User', endpoint: '/Users', schema: core_urn }]
+      end
+      let(:schemas_response) do
+        [
+          {
+            id: core_urn,
+            attributes: [
+              { name: 'userName', type: 'string', required: true }
+            ]
+          }
+        ]
+      end
+
+      before do
+        stub_request(:get, "#{base_url}/Schemas")
+          .to_return(status: 200, body: schemas_response.to_json)
+      end
+
+      context 'when the list response is valid' do
+        let(:list_response) do
+          {
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+            totalResults: 1, Resources: [{ id: '1', userName: 'bjensen' }]
+          }
+        end
+
+        before do
+          stub_request(:get, "#{base_url}/Users")
+            .to_return(status: 200, body: list_response.to_json)
+        end
+
+        it 'exits 0' do
+          allow($stdout).to receive(:print)
+          instance = app('validate' => true)
+
+          expect(exit_status { instance.list('User') }).to eq(0)
+        end
+      end
+
+      context 'when a resource in the list response is invalid' do
+        let(:list_response) do
+          {
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+            totalResults: 1, Resources: [{ id: '1', userName: 42 }]
+          }
+        end
+
+        before do
+          stub_request(:get, "#{base_url}/Users")
+            .to_return(status: 200, body: list_response.to_json)
+        end
+
+        it 'prints validation errors to stderr' do
+          allow($stdout).to receive(:print)
+          instance = app('validate' => true)
+
+          expect { exit_status { instance.list('User') } }
+            .to output(/validation_errors/).to_stderr
+        end
+
+        it 'exits 1' do
+          allow($stdout).to receive(:print)
+          allow($stderr).to receive(:print)
+          instance = app('validate' => true)
+
+          expect(exit_status { instance.list('User') }).to eq(1)
+        end
+      end
+
+      context 'when the resource type has no resolvable schema' do
+        let(:resource_types) do
+          [
+            { id: 'User', name: 'User', endpoint: '/Users',
+              schema: 'urn:example:Unresolvable' }
+          ]
+        end
+
+        before do
+          stub_request(:get, "#{base_url}/Users")
+            .to_return(status: 200, body: { totalResults: 0 }.to_json)
+        end
+
+        it 'warns and exits 0' do
+          allow($stdout).to receive(:print)
+          instance = app('validate' => true)
+
+          expect { exit_status { instance.list('User') } }
+            .to output(/no schema found/).to_stderr
+        end
+
+        it 'exits 0' do
+          allow($stdout).to receive(:print)
+          allow($stderr).to receive(:print)
+          instance = app('validate' => true)
+
+          expect(exit_status { instance.list('User') }).to eq(0)
+        end
+      end
+    end
   end
 
   describe '#get' do
@@ -194,6 +385,67 @@ RSpec.describe Scim::Kit::Cli::App do
         allow($stderr).to receive(:print)
 
         expect(exit_status { app.get('User', '123') }).to eq(1)
+      end
+    end
+
+    context 'when --validate is set' do
+      let(:core_urn) { 'urn:ietf:params:scim:schemas:core:2.0:User' }
+      let(:resource_types) do
+        [{ id: 'User', name: 'User', endpoint: '/Users', schema: core_urn }]
+      end
+      let(:schemas_response) do
+        [
+          {
+            id: core_urn,
+            attributes: [
+              { name: 'userName', type: 'string', required: true }
+            ]
+          }
+        ]
+      end
+
+      before do
+        stub_request(:get, "#{base_url}/Schemas")
+          .to_return(status: 200, body: schemas_response.to_json)
+      end
+
+      context 'when the resource is valid' do
+        before do
+          stub_request(:get, "#{base_url}/Users/123").to_return(
+            status: 200, body: { id: '123', userName: 'bjensen' }.to_json
+          )
+        end
+
+        it 'exits 0' do
+          allow($stdout).to receive(:print)
+          instance = app('validate' => true)
+
+          expect(exit_status { instance.get('User', '123') }).to eq(0)
+        end
+      end
+
+      context 'when the resource is invalid' do
+        before do
+          stub_request(:get, "#{base_url}/Users/123").to_return(
+            status: 200, body: { id: '123', userName: 42 }.to_json
+          )
+        end
+
+        it 'prints validation errors to stderr' do
+          allow($stdout).to receive(:print)
+          instance = app('validate' => true)
+
+          expect { exit_status { instance.get('User', '123') } }
+            .to output(/validation_errors/).to_stderr
+        end
+
+        it 'exits 1' do
+          allow($stdout).to receive(:print)
+          allow($stderr).to receive(:print)
+          instance = app('validate' => true)
+
+          expect(exit_status { instance.get('User', '123') }).to eq(1)
+        end
       end
     end
   end

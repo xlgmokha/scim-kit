@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemas": { "type": "array", "items": { "type": "string" } },
+    "totalResults": { "type": "integer" },
+    "itemsPerPage": { "type": "integer" },
+    "startIndex": { "type": "integer" },
+    "Resources": { "type": "array", "items": {} }
+  },
+  "required": ["schemas", "totalResults"],
+  "additionalProperties": false
+}

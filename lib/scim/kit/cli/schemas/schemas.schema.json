@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "schemas": { "type": "array", "items": { "type": "string" } },
+      "id": { "type": "string" },
+      "name": { "type": "string" },
+      "description": { "type": "string" },
+      "attributes": {
+        "type": "array",
+        "items": { "$ref": "#/$defs/attribute" }
+      },
+      "externalId": { "type": "string" },
+      "meta": { "$ref": "#/$defs/meta" }
+    },
+    "required": ["schemas", "id", "attributes"],
+    "additionalProperties": false
+  },
+  "$defs": {
+    "attribute": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "string", "boolean", "decimal", "integer", "dateTime",
+            "reference", "complex"
+          ]
+        },
+        "multiValued": { "type": "boolean" },
+        "description": { "type": "string" },
+        "required": { "type": "boolean" },
+        "canonicalValues": { "type": "array" },
+        "caseExact": { "type": "boolean" },
+        "mutability": {
+          "type": "string",
+          "enum": ["readOnly", "readWrite", "immutable", "writeOnly"]
+        },
+        "returned": {
+          "type": "string",
+          "enum": ["always", "never", "default", "request"]
+        },
+        "uniqueness": {
+          "type": "string",
+          "enum": ["none", "server", "global"]
+        },
+        "referenceTypes": { "type": "array", "items": { "type": "string" } },
+        "subAttributes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/attribute" }
+        }
+      },
+      "required": ["name", "type"],
+      "additionalProperties": false
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "resourceType": { "type": "string" },
+        "created": { "type": "string", "format": "date-time" },
+        "lastModified": { "type": "string", "format": "date-time" },
+        "location": { "type": "string" },
+        "version": { "type": "string" }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  }
+}

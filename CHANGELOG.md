@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add a `scim-kit` CLI with `discover`, `list`, and `get` commands for
   reading a remote SCIM server's configuration and resources.
+- Add a `--validate` flag to `discover`, `list`, and `get` for checking
+  responses against a JSON Schema (built-in RFC 7643 schemas for
+  `discover`; derived from the target server's own `/Schemas` for
+  `list`/`get`).
 
 ## [0.8.0] - 2026-03-31
 ### Changed
