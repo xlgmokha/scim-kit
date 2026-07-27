@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
+require 'json_schemer'
 require 'thor'
 
-require 'scim/kit/cli/reporting'
-require 'scim/kit/cli/resource_type_resolver'
-require 'scim/kit/cli/scim_schema_converter'
-require 'json_schemer'
-require 'scim/kit/cli/schema_registry'
-require 'scim/kit/cli/validator'
-require 'scim/kit/cli/resource_schema_resolver'
 require 'scim/kit/cli/app'
+require 'scim/kit/cli/reporting'
+require 'scim/kit/cli/resource_schema_resolver'
+require 'scim/kit/cli/resource_type_resolver'
+require 'scim/kit/cli/schema_registry'
+require 'scim/kit/cli/scim_schema_converter'
+require 'scim/kit/cli/validator'
 
 module Scim
   module Kit

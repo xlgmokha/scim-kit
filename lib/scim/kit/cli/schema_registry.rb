@@ -15,16 +15,16 @@ module Scim
 
         def self.fetch(key)
           @cache ||= {}
-          @cache[key] ||= load(FILES.fetch(key))
+          @cache[key] ||= load_schema(FILES.fetch(key))
         end
 
         def self.list_response_with_items(resource_schema)
-          schema = load('list_response.schema.json')
+          schema = load_schema('list_response.schema.json')
           schema['properties']['Resources']['items'] = resource_schema
           schema
         end
 
-        def self.load(file_name)
+        def self.load_schema(file_name)
           JSON.parse(File.read(File.join(DIR, file_name)))
         end
       end
