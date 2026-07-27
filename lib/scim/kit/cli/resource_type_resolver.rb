@@ -20,13 +20,6 @@ module Scim
           match
         end
 
-        def endpoint_for(name)
-          endpoint = resource_type_for(name)[:endpoint]
-          raise MissingEndpoint, name if endpoint.to_s.empty?
-
-          endpoint
-        end
-
         private
 
         attr_reader :http, :base_url, :headers

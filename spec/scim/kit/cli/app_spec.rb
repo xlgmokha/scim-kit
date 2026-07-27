@@ -37,6 +37,21 @@ RSpec.describe Scim::Kit::Cli::App do
           .to output("#{JSON.pretty_generate(detail: 'boom')}\n").to_stderr
       end
     end
+
+    context 'when the matched resource type has no endpoint' do
+      let(:resource_types) { [{ id: 'User', name: 'User' }] }
+
+      it 'reports a MissingEndpoint error' do
+        expect { exit_status { call.call(app, 'User') } }
+          .to output(/User/).to_stderr
+      end
+
+      it 'exits 1' do
+        allow($stderr).to receive(:print)
+
+        expect(exit_status { call.call(app, 'User') }).to eq(1)
+      end
+    end
   end
 
   describe '#discover' do

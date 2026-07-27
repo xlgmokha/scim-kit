@@ -45,29 +45,20 @@ module Scim
         private
 
         def fetch_discovery
-          responses, error = fetch_discovery_responses
-          return Reporting.report(error, shell) if error
-
-          combined = Http::Result.new(200, responses)
-          report_discovery(combined, responses)
-        end
-
-        def fetch_discovery_responses
           responses = {}
           RESOURCES.each do |key, path|
-            uri = Cli.join_uri(url, path)
-            result = http.fetch(uri, headers: headers)
-            return [responses, result] unless result.ok?
+            result = http.fetch(Cli.join_uri(url, path), headers: headers)
+            return Reporting.report(result, shell) unless result.ok?
 
             responses[key] = result.body
           end
-          [responses, nil]
+          report_discovery(Http::Result.new(200, responses))
         end
 
-        def report_discovery(combined, responses)
+        def report_discovery(combined)
           if options[:validate]
             Reporting.report_with_validation(
-              combined, shell, discovery_errors(responses)
+              combined, shell, discovery_errors(combined.body)
             )
           else
             Reporting.report(combined, shell)
@@ -98,7 +89,7 @@ module Scim
             uri.query = URI.encode_www_form(attributes: options[:attributes])
           end
           result = http.fetch(uri, headers: headers)
-          validate_and_report(result, resource_type) { |schema| schema }
+          validate_and_report(result, resource_type)
         end
 
         def resolve_endpoint(resource_type)
@@ -137,7 +128,8 @@ module Scim
             return Reporting.report(result, shell)
           end
 
-          errors = Validator.errors_for(yield(schema), result.body)
+          schema = yield(schema) if block_given?
+          errors = Validator.errors_for(schema, result.body)
           Reporting.report_with_validation(result, shell, errors)
         end
 

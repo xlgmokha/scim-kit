@@ -6,45 +6,14 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
   let(:base_url) { FFaker::Internet.uri('https') }
   let(:headers) { {} }
 
-  describe '#endpoint_for' do
-    before do
-      stub_request(:get, "#{base_url}/ResourceTypes").to_return(
-        status: 200,
-        body: [
-          { id: 'User', name: 'User', endpoint: '/Users' },
-          { id: 'Group', name: 'Group', endpoint: '/Groups' }
-        ].to_json
-      )
-    end
-
-    specify { expect(subject.endpoint_for('User')).to eql('/Users') }
-    specify { expect(subject.endpoint_for('user')).to eql('/Users') }
-    specify { expect(subject.endpoint_for('Group')).to eql('/Groups') }
-
-    it 'raises when no resource type matches the given name' do
-      expect { subject.endpoint_for('Nope') }.to raise_error(
-        Scim::Kit::Cli::UnknownResourceType, /Nope/
-      )
-    end
-
-    context 'with custom headers' do
-      let(:headers) { { 'Authorization' => 'Bearer xyz' } }
-
-      it 'forwards them to the ResourceTypes request' do
-        subject.endpoint_for('User')
-
-        expect(a_request(:get, "#{base_url}/ResourceTypes").with(headers: headers)).to have_been_made
-      end
-    end
-  end
-
   describe '#resource_type_for' do
     before do
       stub_request(:get, "#{base_url}/ResourceTypes").to_return(
         status: 200,
         body: [
           { id: 'User', name: 'User', endpoint: '/Users',
-            schema: 'urn:ietf:params:scim:schemas:core:2.0:User' }
+            schema: 'urn:ietf:params:scim:schemas:core:2.0:User' },
+          { id: 'Group', name: 'Group', endpoint: '/Groups' }
         ].to_json
       )
     end
@@ -56,25 +25,24 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
       )
     end
 
+    it 'matches case-insensitively' do
+      expect(subject.resource_type_for('user')).to include(endpoint: '/Users')
+    end
+
     it 'raises when no resource type matches the given name' do
       expect { subject.resource_type_for('Nope') }.to raise_error(
         Scim::Kit::Cli::UnknownResourceType, /Nope/
       )
     end
-  end
 
-  context 'when the matched resource type has no endpoint' do
-    before do
-      stub_request(:get, "#{base_url}/ResourceTypes").to_return(
-        status: 200,
-        body: [{ id: 'User', name: 'User' }].to_json
-      )
-    end
+    context 'with custom headers' do
+      let(:headers) { { 'Authorization' => 'Bearer xyz' } }
 
-    it 'raises MissingEndpoint' do
-      expect { subject.endpoint_for('User') }.to raise_error(
-        Scim::Kit::Cli::MissingEndpoint, /User/
-      )
+      it 'forwards them to the ResourceTypes request' do
+        subject.resource_type_for('User')
+
+        expect(a_request(:get, "#{base_url}/ResourceTypes").with(headers: headers)).to have_been_made
+      end
     end
   end
 
@@ -82,7 +50,7 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
     before { stub_request(:get, "#{base_url}/ResourceTypes").to_return(status: 500, body: '{}') }
 
     it 'raises' do
-      expect { subject.endpoint_for('User') }.to raise_error(Scim::Kit::Cli::RequestFailed)
+      expect { subject.resource_type_for('User') }.to raise_error(Scim::Kit::Cli::RequestFailed)
     end
   end
 
@@ -95,7 +63,7 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
     end
 
     it 'raises InvalidResponse' do
-      expect { subject.endpoint_for('User') }.to raise_error(Scim::Kit::Cli::InvalidResponse)
+      expect { subject.resource_type_for('User') }.to raise_error(Scim::Kit::Cli::InvalidResponse)
     end
   end
 end

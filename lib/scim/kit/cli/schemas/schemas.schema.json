@@ -27,7 +27,7 @@
           "type": "string",
           "enum": [
             "string", "boolean", "decimal", "integer", "dateTime",
-            "reference", "complex"
+            "reference", "binary", "complex"
           ]
         },
         "multiValued": { "type": "boolean" },
