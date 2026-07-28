@@ -1,23 +1,34 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "type": "array",
-  "items": {
-    "type": "object",
-    "properties": {
-      "schemas": { "type": "array", "items": { "type": "string" } },
-      "id": { "type": "string" },
-      "name": { "type": "string" },
-      "description": { "type": "string" },
-      "attributes": {
-        "type": "array",
-        "items": { "$ref": "#/$defs/attribute" }
-      },
-      "externalId": { "type": "string" },
-      "meta": { "$ref": "#/$defs/meta" }
-    },
-    "required": ["schemas", "id", "attributes"],
-    "additionalProperties": false
+  "type": "object",
+  "properties": {
+    "schemas": { "type": "array", "items": { "type": "string" } },
+    "totalResults": { "type": "integer" },
+    "itemsPerPage": { "type": "integer" },
+    "startIndex": { "type": "integer" },
+    "Resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "schemas": { "type": "array", "items": { "type": "string" } },
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "attributes": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/attribute" }
+          },
+          "externalId": { "type": "string" },
+          "meta": { "$ref": "#/$defs/meta" }
+        },
+        "required": ["schemas", "id", "attributes"],
+        "additionalProperties": false
+      }
+    }
   },
+  "required": ["schemas", "totalResults", "Resources"],
+  "additionalProperties": false,
   "$defs": {
     "attribute": {
       "type": "object",

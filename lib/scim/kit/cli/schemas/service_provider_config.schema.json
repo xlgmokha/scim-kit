@@ -58,7 +58,8 @@
           "name": { "type": "string" },
           "description": { "type": "string" },
           "specUri": { "type": "string" },
-          "documentationUri": { "type": "string" }
+          "documentationUri": { "type": "string" },
+          "primary": { "type": "boolean" }
         },
         "required": ["type", "name", "description"],
         "additionalProperties": false

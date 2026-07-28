@@ -130,5 +130,28 @@ RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
         )
       end
     end
+
+    context 'when /Schemas returns a ListResponse envelope' do
+      let(:resource_type) do
+        { id: 'User', name: 'User', endpoint: '/Users', schema: core_urn }
+      end
+
+      before do
+        stub_request(:get, "#{base_url}/Schemas").to_return(
+          status: 200,
+          body: {
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+            totalResults: 1,
+            Resources: [core_schema]
+          }.to_json
+        )
+      end
+
+      it 'composes the schema from the Resources array' do
+        schema = subject.schema_for(resource_type)
+
+        expect(schema['properties']).to include('userName')
+      end
+    end
   end
 end

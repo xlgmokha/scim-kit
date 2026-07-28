@@ -85,9 +85,10 @@ module Scim
         def fetch_schemas(urns)
           uri = Cli.join_uri(base_url, 'Schemas')
           result = http.fetch(uri, headers: headers)
-          return {} unless result.ok? && result.body.is_a?(Array)
+          schemas = result.ok? ? Cli.collection(result.body) : nil
+          return {} if schemas.nil?
 
-          result.body.each_with_object({}) do |schema, hash|
+          schemas.each_with_object({}) do |schema, hash|
             hash[schema[:id]] = schema if urns.include?(schema[:id])
           end
         end

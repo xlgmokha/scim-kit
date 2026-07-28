@@ -8,16 +8,60 @@ RSpec.describe Scim::Kit::Cli::SchemaRegistry do
       expect(schema['required']).to include('patch', 'bulk')
     end
 
-    it 'loads the resource_types schema' do
+    it 'expects resource_types wrapped in a ListResponse envelope' do
       schema = described_class.fetch(:resource_types)
 
-      expect(schema['items']['required']).to include('endpoint')
+      expect(schema['required']).to include('totalResults', 'Resources')
     end
 
-    it 'loads the schemas schema' do
+    it 'validates resource_type items inside the envelope' do
+      schema = described_class.fetch(:resource_types)
+
+      items = schema['properties']['Resources']['items']
+      expect(items['required']).to include('endpoint')
+    end
+
+    it 'expects schemas wrapped in a ListResponse envelope' do
       schema = described_class.fetch(:schemas)
 
-      expect(schema['items']['required']).to include('attributes')
+      expect(schema['required']).to include('totalResults', 'Resources')
+    end
+
+    it 'validates schema items inside the envelope' do
+      schema = described_class.fetch(:schemas)
+
+      items = schema['properties']['Resources']['items']
+      expect(items['required']).to include('attributes')
+    end
+  end
+
+  describe 'service_provider_configuration schema' do
+    let(:config) do
+      {
+        schemas: [
+          'urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig'
+        ],
+        patch: { supported: true },
+        bulk: { supported: false, maxOperations: 0, maxPayloadSize: 0 },
+        filter: { supported: false, maxResults: 0 },
+        changePassword: { supported: false },
+        sort: { supported: false },
+        etag: { supported: false },
+        authenticationSchemes: [
+          {
+            type: 'oauthbearertoken', name: 'OAuth Bearer Token',
+            description: 'desc', primary: true
+          }
+        ]
+      }
+    end
+
+    it 'accepts a primary flag on authentication schemes' do
+      schema = described_class.fetch(:service_provider_configuration)
+
+      errors = Scim::Kit::Cli::Validator.errors_for(schema, config)
+
+      expect(errors).to be_empty
     end
   end
 

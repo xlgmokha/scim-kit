@@ -44,6 +44,23 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
         expect(a_request(:get, "#{base_url}/ResourceTypes").with(headers: headers)).to have_been_made
       end
     end
+
+    context 'when /ResourceTypes returns a ListResponse envelope' do
+      before do
+        stub_request(:get, "#{base_url}/ResourceTypes").to_return(
+          status: 200,
+          body: {
+            schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+            totalResults: 1,
+            Resources: [{ id: 'User', name: 'User', endpoint: '/Users' }]
+          }.to_json
+        )
+      end
+
+      it 'resolves the entry from the Resources array' do
+        expect(subject.resource_type_for('User')).to include(endpoint: '/Users')
+      end
+    end
   end
 
   context 'when the request fails' do
@@ -54,11 +71,11 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
     end
   end
 
-  context 'when the response body is not a list' do
+  context 'when the response body is neither a list nor a ListResponse' do
     before do
       stub_request(:get, "#{base_url}/ResourceTypes").to_return(
         status: 200,
-        body: { Resources: [] }.to_json
+        body: { detail: 'not a collection' }.to_json
       )
     end
 

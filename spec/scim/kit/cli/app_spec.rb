@@ -127,24 +127,32 @@ RSpec.describe Scim::Kit::Cli::App do
         }
       end
       let(:schemas) do
-        [
-          {
-            id: 'urn:ietf:params:scim:schemas:core:2.0:User',
-            schemas: ['urn:ietf:params:scim:schemas:core:2.0:Schema'],
-            attributes: [
-              { name: 'userName', type: 'string', required: true }
-            ]
-          }
-        ]
+        {
+          schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+          totalResults: 1,
+          Resources: [
+            {
+              id: 'urn:ietf:params:scim:schemas:core:2.0:User',
+              schemas: ['urn:ietf:params:scim:schemas:core:2.0:Schema'],
+              attributes: [
+                { name: 'userName', type: 'string', required: true }
+              ]
+            }
+          ]
+        }
       end
       let(:resource_types) do
-        [
-          {
-            schemas: ['urn:ietf:params:scim:schemas:core:2.0:ResourceType'],
-            name: 'User', endpoint: '/Users',
-            schema: 'urn:ietf:params:scim:schemas:core:2.0:User'
-          }
-        ]
+        {
+          schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+          totalResults: 1,
+          Resources: [
+            {
+              schemas: ['urn:ietf:params:scim:schemas:core:2.0:ResourceType'],
+              name: 'User', endpoint: '/Users',
+              schema: 'urn:ietf:params:scim:schemas:core:2.0:User'
+            }
+          ]
+        }
       end
 
       before do
@@ -162,6 +170,34 @@ RSpec.describe Scim::Kit::Cli::App do
         instance = app('validate' => true)
 
         expect(exit_status { instance.discover }).to eq(0)
+      end
+    end
+
+    context 'when --validate is set and a collection is a bare array' do
+      let(:schemas) do
+        [
+          {
+            id: 'urn:ietf:params:scim:schemas:core:2.0:User',
+            schemas: ['urn:ietf:params:scim:schemas:core:2.0:Schema'],
+            attributes: [{ name: 'userName', type: 'string' }]
+          }
+        ]
+      end
+
+      before do
+        stub_request(:get, "#{base_url}/ServiceProviderConfig").to_return(
+          status: 200, body: service_provider_configuration.to_json
+        )
+        stub_request(:get, "#{base_url}/Schemas")
+          .to_return(status: 200, body: schemas.to_json)
+      end
+
+      it 'flags the bare array as non-compliant with ListResponse format' do
+        allow($stdout).to receive(:print)
+        instance = app('validate' => true)
+
+        expect { exit_status { instance.discover } }
+          .to output(/root is not of type: object/).to_stderr
       end
     end
 

@@ -32,11 +32,13 @@ module Scim
           uri = Cli.join_uri(base_url, 'ResourceTypes')
           result = http.fetch(uri, headers: headers)
           raise RequestFailed, result unless result.ok?
-          unless result.body.is_a?(Array)
+
+          types = Cli.collection(result.body)
+          unless types
             raise InvalidResponse, 'expected /ResourceTypes to return a list'
           end
 
-          result.body
+          types
         end
       end
     end
