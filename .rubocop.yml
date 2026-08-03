@@ -58,10 +58,6 @@ Metrics/BlockLength:
     - 'Rakefile'
     - 'spec/**/*.rb'
 
-Metrics/ClassLength:
-  Exclude:
-    - 'lib/scim/kit/cli/app.rb'
-
 Metrics/ModuleLength:
   Exclude:
     - 'spec/**/*.rb'

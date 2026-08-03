@@ -4,12 +4,6 @@ module Scim
   module Kit
     module Cli
       class App < Thor
-        RESOURCES = {
-          service_provider_configuration: 'ServiceProviderConfig',
-          schemas: 'Schemas',
-          resource_types: 'ResourceTypes'
-        }.freeze
-
         def self.exit_on_failure?
           true
         end
@@ -51,33 +45,16 @@ module Scim
         end
 
         def fetch_discovery
-          responses = {}
-          RESOURCES.each do |key, path|
-            result = client.fetch(path)
-            return reporter.report(result) unless result.ok?
+          discovery = Discovery.new(client)
+          result = discovery.fetch
+          return reporter.report(result) unless result.ok? && options[:validate]
 
-            responses[key] = result.body
-          end
-          report_discovery(Http::Result.new(200, responses))
-        end
-
-        def report_discovery(combined)
-          return reporter.report(combined) unless options[:validate]
-
-          reporter.report_validation(combined, discovery_errors(combined.body))
-        end
-
-        def discovery_errors(responses)
-          responses.each_with_object({}) do |(key, body), errors|
-            schema = SchemaRegistry.fetch(key)
-            body_errors = Validator.errors_for(schema, body)
-            errors[key] = body_errors unless body_errors.empty?
-          end
+          reporter.report_validation(result, discovery.errors_for(result.body))
         end
 
         def fetch_list(resource_type)
           endpoint = resolve_endpoint(resource_type)
-          result = client.fetch(endpoint, query: list_query)
+          result = client.fetch(endpoint, query: settings.list_query)
           validate_and_report(result, resource_type) do |schema|
             SchemaRegistry.list_response_with_items(schema)
           end
@@ -114,86 +91,29 @@ module Scim
         def validate_and_report(result, resource_type, &transform)
           return reporter.report(result) unless result.ok? && options[:validate]
 
-          schema = schema_for(resource_type)
-          return reporter.report(result) unless schema
+          entry = resource_type_entry(resource_type)
+          errors = validation.errors_for(entry, result.body, &transform)
+          return reporter.report(result) unless errors
 
-          errors = Validator.errors_for(
-            prepare(schema, &transform), result.body
-          )
           reporter.report_validation(result, errors)
         end
 
-        def schema_for(resource_type)
-          entry = resource_type_entry(resource_type)
-          schema = resource_schema_resolver.schema_for(entry)
-          if schema
-            warn_undeclared_extensions
-          else
-            warn_unresolvable_schema(resource_type)
-          end
-          schema
-        end
-
-        def prepare(schema)
-          schema = SparseSchema.relax(schema) if options[:attributes]
-          block_given? ? yield(schema) : schema
-        end
-
-        def warn_unresolvable_schema(resource_type)
-          reporter.warn(
-            "no schema found for resource type #{resource_type.inspect}; " \
-            'skipping validation'
+        def validation
+          @validation ||= ResourceValidation.new(
+            resource_schema_resolver, reporter, sparse: !options[:attributes].nil?
           )
-        end
-
-        def warn_undeclared_extensions
-          resource_schema_resolver.undeclared_extensions.each do |urn|
-            reporter.warn(
-              "schema extension #{urn.inspect} is declared by the resource " \
-              'type but missing from /Schemas'
-            )
-          end
         end
 
         def reporter
           @reporter ||= Reporter.new(shell)
         end
 
-        def list_query
-          {
-            'filter' => options[:filter],
-            'startIndex' => options[:start_index],
-            'count' => options[:count],
-            'sortBy' => options[:sort_by],
-            'sortOrder' => options[:sort_order],
-            'attributes' => options[:attributes]
-          }
-        end
-
-        def url
-          @url ||= begin
-            resolved = options[:url] || ENV.fetch('SCIM_KIT_URL', nil)
-            raise Thor::Error, '--url is required' if resolved.to_s.empty?
-
-            resolved
-          end
-        end
-
-        def headers
-          @headers ||= options[:header].each_with_object({}) do |header, hash|
-            name, value = header.split(':', 2)
-            if value.nil?
-              raise Thor::Error,
-                "malformed --header #{header.inspect} " \
-                '(expected "Name: Value")'
-            end
-
-            hash[name.to_s.strip] = value.to_s.strip
-          end
+        def settings
+          @settings ||= Settings.new(options)
         end
 
         def client
-          @client ||= Client.new(url, headers: headers)
+          @client ||= Client.new(settings.url, headers: settings.headers)
         end
       end
     end
