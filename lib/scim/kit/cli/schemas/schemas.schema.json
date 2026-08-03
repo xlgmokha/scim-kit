@@ -22,13 +22,11 @@
           "externalId": { "type": "string" },
           "meta": { "$ref": "#/$defs/meta" }
         },
-        "required": ["schemas", "id", "attributes"],
-        "additionalProperties": false
+        "required": ["schemas", "id", "attributes"]
       }
     }
   },
   "required": ["schemas", "totalResults", "Resources"],
-  "additionalProperties": false,
   "$defs": {
     "attribute": {
       "type": "object",
@@ -64,8 +62,7 @@
           "items": { "$ref": "#/$defs/attribute" }
         }
       },
-      "required": ["name", "type"],
-      "additionalProperties": false
+      "required": ["name", "type"]
     },
     "meta": {
       "type": "object",
@@ -75,9 +72,7 @@
         "lastModified": { "type": "string", "format": "date-time" },
         "location": { "type": "string" },
         "version": { "type": "string" }
-      },
-      "required": [],
-      "additionalProperties": false
+      }
     }
   }
 }

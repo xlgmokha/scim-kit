@@ -4,10 +4,8 @@ module Scim
   module Kit
     module Cli
       class ResourceTypeResolver
-        def initialize(http, base_url, headers: {})
-          @http = http
-          @base_url = base_url
-          @headers = headers
+        def initialize(client)
+          @client = client
         end
 
         def resource_type_for(name)
@@ -22,15 +20,18 @@ module Scim
 
         private
 
-        attr_reader :http, :base_url, :headers
+        attr_reader :client
 
         def matches?(type, name)
           type[:id]&.casecmp?(name) || type[:name]&.casecmp?(name)
         end
 
         def resource_types
-          uri = Cli.join_uri(base_url, 'ResourceTypes')
-          result = http.fetch(uri, headers: headers)
+          @resource_types ||= fetch_resource_types
+        end
+
+        def fetch_resource_types
+          result = client.fetch('ResourceTypes')
           raise RequestFailed, result unless result.ok?
 
           types = Cli.collection(result.body)

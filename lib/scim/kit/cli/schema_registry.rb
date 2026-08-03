@@ -5,6 +5,7 @@ module Scim
     module Cli
       module SchemaRegistry
         DIR = File.expand_path('schemas', __dir__)
+        LIST_RESPONSE = 'list_response.schema.json'
 
         FILES = {
           service_provider_configuration:
@@ -13,19 +14,30 @@ module Scim
           resource_types: 'resource_types.schema.json'
         }.freeze
 
-        def self.fetch(key)
-          @cache ||= {}
-          @cache[key] ||= load_schema(FILES.fetch(key))
-        end
+        class << self
+          def fetch(key)
+            load_schema(FILES.fetch(key))
+          end
 
-        def self.list_response_with_items(resource_schema)
-          schema = load_schema('list_response.schema.json')
-          schema['properties']['Resources']['items'] = resource_schema
-          schema
-        end
+          def list_response_with_items(resource_schema)
+            schema = load_schema(LIST_RESPONSE)
+            schema['properties']['Resources']['items'] = resource_schema
+            schema
+          end
 
-        def self.load_schema(file_name)
-          JSON.parse(File.read(File.join(DIR, file_name)))
+          private
+
+          def load_schema(file_name)
+            JSON.parse(sources[file_name] ||= read(file_name))
+          end
+
+          def read(file_name)
+            File.read(File.join(DIR, file_name))
+          end
+
+          def sources
+            @sources ||= {}
+          end
         end
       end
     end

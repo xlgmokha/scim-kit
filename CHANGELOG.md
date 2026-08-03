@@ -14,6 +14,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   responses against a JSON Schema (built-in RFC 7643 schemas for
   `discover`; derived from the target server's own `/Schemas` for
   `list`/`get`).
+- Validate the attributes RFC 7643 section 3.1 requires of a returned
+  resource (`schemas`, `id`, and `meta.resourceType`), which were
+  previously accepted when absent.
+- Warn when a resource type declares a schema extension that the
+  server's `/Schemas` does not publish.
+
+### Fixed
+- Stop reporting valid responses as invalid: undeclared vendor
+  properties are now permitted, and `--attributes` relaxes required
+  checks so sparse responses pass.
+- Stop raising `KeyError` when a server's `/Schemas` omits an attribute
+  `type` or uses an unrecognized one.
+- Escape resource ids when building request URIs, which previously
+  raised `URI::InvalidURIError` for ids containing a space.
+- Resolve each resource type independently so a second `list`/`get` in
+  the same process no longer reuses the first lookup.
 
 ## [0.8.0] - 2026-03-31
 ### Changed

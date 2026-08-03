@@ -4,11 +4,13 @@ require 'json_schemer'
 require 'thor'
 
 require 'scim/kit/cli/app'
-require 'scim/kit/cli/reporting'
+require 'scim/kit/cli/client'
+require 'scim/kit/cli/reporter'
 require 'scim/kit/cli/resource_schema_resolver'
 require 'scim/kit/cli/resource_type_resolver'
 require 'scim/kit/cli/schema_registry'
 require 'scim/kit/cli/scim_schema_converter'
+require 'scim/kit/cli/sparse_schema'
 require 'scim/kit/cli/validator'
 
 module Scim
@@ -38,10 +40,6 @@ module Scim
       end
 
       class InvalidResponse < Error; end
-
-      def self.join_uri(base_url, path)
-        URI.join("#{base_url.to_s.sub(%r{/+\z}, '')}/", path)
-      end
 
       # SCIM collection endpoints (/Schemas, /ResourceTypes) return a
       # ListResponse per RFC 7644 section 4, but some servers return a

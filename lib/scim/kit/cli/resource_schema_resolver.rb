@@ -21,15 +21,17 @@ module Scim
               'location' => { 'type' => 'string' },
               'version' => { 'type' => 'string' }
             },
-            'required' => [],
-            'additionalProperties' => false
+            'required' => ['resourceType']
           }
         }.freeze
 
-        def initialize(http, base_url, headers: {})
-          @http = http
-          @base_url = base_url
-          @headers = headers
+        COMMON_REQUIRED = %w[schemas id].freeze
+
+        attr_reader :undeclared_extensions
+
+        def initialize(client)
+          @client = client
+          @undeclared_extensions = []
         end
 
         def schema_for(resource_type)
@@ -42,7 +44,7 @@ module Scim
 
         private
 
-        attr_reader :http, :base_url, :headers
+        attr_reader :client
 
         def urns_for(resource_type)
           extensions = Array(resource_type[:schemaExtensions])
@@ -66,15 +68,17 @@ module Scim
           {
             'type' => 'object',
             'properties' => properties,
-            'required' => required,
-            'additionalProperties' => false
+            'required' => COMMON_REQUIRED | required
           }
         end
 
         def merge_extensions(resource_type, schemas, properties, required)
           Array(resource_type[:schemaExtensions]).each do |extension|
             extension_schema = schemas[extension[:schema]]
-            next unless extension_schema
+            unless extension_schema
+              undeclared_extensions << extension[:schema]
+              next
+            end
 
             properties[extension[:schema]] =
               ScimSchemaConverter.convert(extension_schema)
@@ -83,8 +87,7 @@ module Scim
         end
 
         def fetch_schemas(urns)
-          uri = Cli.join_uri(base_url, 'Schemas')
-          result = http.fetch(uri, headers: headers)
+          result = client.fetch('Schemas')
           schemas = result.ok? ? Cli.collection(result.body) : nil
           return {} if schemas.nil?
 

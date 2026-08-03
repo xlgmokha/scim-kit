@@ -9,8 +9,7 @@
     "patch": {
       "type": "object",
       "properties": { "supported": { "type": "boolean" } },
-      "required": ["supported"],
-      "additionalProperties": false
+      "required": ["supported"]
     },
     "bulk": {
       "type": "object",
@@ -19,8 +18,7 @@
         "maxOperations": { "type": "integer" },
         "maxPayloadSize": { "type": "integer" }
       },
-      "required": ["supported", "maxOperations", "maxPayloadSize"],
-      "additionalProperties": false
+      "required": ["supported", "maxOperations", "maxPayloadSize"]
     },
     "filter": {
       "type": "object",
@@ -28,26 +26,22 @@
         "supported": { "type": "boolean" },
         "maxResults": { "type": "integer" }
       },
-      "required": ["supported", "maxResults"],
-      "additionalProperties": false
+      "required": ["supported", "maxResults"]
     },
     "changePassword": {
       "type": "object",
       "properties": { "supported": { "type": "boolean" } },
-      "required": ["supported"],
-      "additionalProperties": false
+      "required": ["supported"]
     },
     "sort": {
       "type": "object",
       "properties": { "supported": { "type": "boolean" } },
-      "required": ["supported"],
-      "additionalProperties": false
+      "required": ["supported"]
     },
     "etag": {
       "type": "object",
       "properties": { "supported": { "type": "boolean" } },
-      "required": ["supported"],
-      "additionalProperties": false
+      "required": ["supported"]
     },
     "authenticationSchemes": {
       "type": "array",
@@ -61,8 +55,7 @@
           "documentationUri": { "type": "string" },
           "primary": { "type": "boolean" }
         },
-        "required": ["type", "name", "description"],
-        "additionalProperties": false
+        "required": ["type", "name", "description"]
       }
     },
     "meta": {
@@ -73,14 +66,11 @@
         "lastModified": { "type": "string", "format": "date-time" },
         "location": { "type": "string" },
         "version": { "type": "string" }
-      },
-      "required": [],
-      "additionalProperties": false
+      }
     }
   },
   "required": [
     "schemas", "patch", "bulk", "filter", "changePassword", "sort", "etag",
     "authenticationSchemes"
-  ],
-  "additionalProperties": false
+  ]
 }

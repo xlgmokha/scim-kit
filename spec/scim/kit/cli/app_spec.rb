@@ -317,7 +317,10 @@ RSpec.describe Scim::Kit::Cli::App do
         let(:list_response) do
           {
             schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
-            totalResults: 1, Resources: [{ id: '1', userName: 'bjensen' }]
+            totalResults: 1,
+            Resources: [
+              { schemas: [core_urn], id: '1', userName: 'bjensen' }
+            ]
           }
         end
 
@@ -328,6 +331,66 @@ RSpec.describe Scim::Kit::Cli::App do
 
         it 'exits 0' do
           allow($stdout).to receive(:print)
+          instance = app('validate' => true)
+
+          expect(exit_status { instance.list('User') }).to eq(0)
+        end
+      end
+
+      context 'when --attributes narrows the response' do
+        before do
+          stub_request(:get, "#{base_url}/Users?attributes=id")
+            .to_return(
+              status: 200,
+              body: {
+                schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+                totalResults: 1,
+                Resources: [{ schemas: [core_urn], id: '1' }]
+              }.to_json
+            )
+        end
+
+        it 'exits 0 without demanding attributes the server was not asked for' do
+          allow($stdout).to receive(:print)
+          instance = app('validate' => true, 'attributes' => 'id')
+
+          expect(exit_status { instance.list('User') }).to eq(0)
+        end
+      end
+
+      context 'when the resource type declares an extension /Schemas omits' do
+        let(:extension_urn) { 'urn:vendor:2.0:Thing' }
+        let(:resource_types) do
+          [{
+            id: 'User', name: 'User', endpoint: '/Users', schema: core_urn,
+            schemaExtensions: [{ schema: extension_urn, required: true }]
+          }]
+        end
+
+        before do
+          stub_request(:get, "#{base_url}/Users").to_return(
+            status: 200,
+            body: {
+              schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+              totalResults: 1,
+              Resources: [
+                { schemas: [core_urn], id: '1', userName: 'bjensen' }
+              ]
+            }.to_json
+          )
+        end
+
+        it 'warns about the undeclared extension' do
+          allow($stdout).to receive(:print)
+          instance = app('validate' => true)
+
+          expect { exit_status { instance.list('User') } }
+            .to output(/#{Regexp.escape(extension_urn)}/).to_stderr
+        end
+
+        it 'still exits 0' do
+          allow($stdout).to receive(:print)
+          allow($stderr).to receive(:print)
           instance = app('validate' => true)
 
           expect(exit_status { instance.list('User') }).to eq(0)
@@ -421,6 +484,28 @@ RSpec.describe Scim::Kit::Cli::App do
       end
     end
 
+    context 'when the id needs escaping' do
+      it 'escapes a space rather than raising URI::InvalidURIError' do
+        stub = stub_request(:get, "#{base_url}/Users/mo%20khan")
+          .to_return(status: 200, body: {}.to_json)
+        allow($stdout).to receive(:print)
+
+        exit_status { app.get('User', 'mo khan') }
+
+        expect(stub).to have_been_requested
+      end
+
+      it 'escapes separators so an id cannot traverse the endpoint' do
+        stub = stub_request(:get, "#{base_url}/Users/..%2Fadmin%23x%3Fy")
+          .to_return(status: 200, body: {}.to_json)
+        allow($stdout).to receive(:print)
+
+        exit_status { app.get('User', '../admin#x?y') }
+
+        expect(stub).to have_been_requested
+      end
+    end
+
     context 'when the get request fails' do
       before do
         stub_request(:get, "#{base_url}/Users/123")
@@ -463,7 +548,10 @@ RSpec.describe Scim::Kit::Cli::App do
       context 'when the resource is valid' do
         before do
           stub_request(:get, "#{base_url}/Users/123").to_return(
-            status: 200, body: { id: '123', userName: 'bjensen' }.to_json
+            status: 200,
+            body: {
+              schemas: [core_urn], id: '123', userName: 'bjensen'
+            }.to_json
           )
         end
 

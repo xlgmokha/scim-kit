@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
-  subject { described_class.new(Scim::Kit::Http.new, base_url, headers: headers) }
+  subject do
+    described_class.new(
+      Scim::Kit::Cli::Client.new(base_url, headers: headers)
+    )
+  end
 
   let(:base_url) { FFaker::Internet.uri('https') }
   let(:headers) { {} }
@@ -27,6 +31,19 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
 
     it 'matches case-insensitively' do
       expect(subject.resource_type_for('user')).to include(endpoint: '/Users')
+    end
+
+    it 'resolves each name independently' do
+      subject.resource_type_for('User')
+
+      expect(subject.resource_type_for('Group')).to include(endpoint: '/Groups')
+    end
+
+    it 'fetches ResourceTypes once across repeated lookups' do
+      subject.resource_type_for('User')
+      subject.resource_type_for('Group')
+
+      expect(a_request(:get, "#{base_url}/ResourceTypes")).to have_been_made.once
     end
 
     it 'raises when no resource type matches the given name' do

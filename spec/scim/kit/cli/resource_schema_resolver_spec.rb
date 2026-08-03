@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
-  subject { described_class.new(Scim::Kit::Http.new, base_url, headers: {}) }
+  subject { described_class.new(Scim::Kit::Cli::Client.new(base_url)) }
 
   let(:base_url) { FFaker::Internet.uri('https') }
   let(:core_urn) { 'urn:ietf:params:scim:schemas:core:2.0:User' }
@@ -31,14 +31,25 @@ RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
   end
 
   describe '#schema_for' do
+    let(:schema) { subject.schema_for(resource_type) }
+    let(:resource) do
+      {
+        schemas: [core_urn], id: '1', userName: 'mo',
+        meta: { resourceType: 'User' },
+        extension_urn => { employeeNumber: '1' }
+      }
+    end
+
+    def errors_for(body)
+      Scim::Kit::Cli::Validator.errors_for(schema, body)
+    end
+
     context 'when the core and extension schemas are both found' do
-      let(:schema) { subject.schema_for(resource_type) }
       let(:expected_extension_schema) do
         {
           'type' => 'object',
           'properties' => { 'employeeNumber' => { 'type' => 'string' } },
-          'required' => [],
-          'additionalProperties' => false
+          'required' => []
         }
       end
 
@@ -68,8 +79,42 @@ RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
         expect(schema['required']).to include(extension_urn)
       end
 
-      it 'disallows undeclared top-level properties' do
-        expect(schema['additionalProperties']).to be(false)
+      it 'allows vendor properties the server adds' do
+        errors = errors_for(resource.merge('urn:vendor:custom' => { a: true }))
+
+        expect(errors).to be_empty
+      end
+
+      it 'requires the attributes RFC 7643 section 3.1 mandates' do
+        expect(errors_for(userName: 'mo'))
+          .to include(/missing required keys.*schemas/)
+      end
+
+      it 'requires id' do
+        expect(errors_for(userName: 'mo'))
+          .to include(/missing required keys.*id/)
+      end
+
+      it 'requires meta.resourceType when meta is returned' do
+        expect(errors_for(resource.merge(meta: {})))
+          .to include(/meta.*missing required keys.*resourceType/)
+      end
+    end
+
+    context 'when the resource type declares an extension /Schemas omits' do
+      before do
+        stub_request(:get, "#{base_url}/Schemas")
+          .to_return(status: 200, body: [core_schema].to_json)
+      end
+
+      it 'records the undeclared extension URN' do
+        subject.schema_for(resource_type)
+
+        expect(subject.undeclared_extensions).to eql([extension_urn])
+      end
+
+      it 'still accepts a resource carrying that extension' do
+        expect(errors_for(resource)).to be_empty
       end
     end
 

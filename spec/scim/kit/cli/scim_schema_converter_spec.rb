@@ -8,8 +8,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
         {
           'type' => 'object',
           'properties' => { 'userName' => { 'type' => 'string' } },
-          'required' => [],
-          'additionalProperties' => false
+          'required' => []
         }
       end
 
@@ -89,8 +88,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
             'givenName' => { 'type' => 'string' },
             'familyName' => { 'type' => 'string' }
           },
-          'required' => ['givenName'],
-          'additionalProperties' => false
+          'required' => ['givenName']
         }
       end
 
@@ -127,6 +125,36 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       result = described_class.convert({})
 
       expect(result['properties']).to eql({})
+    end
+
+    context 'with an attribute type the spec does not define' do
+      it 'leaves an unrecognized type unconstrained instead of raising' do
+        schema = { attributes: [{ name: 'x', type: 'Reference' }] }
+
+        expect(described_class.convert(schema)['properties']['x']).to eql({})
+      end
+
+      it 'leaves a missing type unconstrained instead of raising' do
+        schema = { attributes: [{ name: 'x' }] }
+
+        expect(described_class.convert(schema)['properties']['x']).to eql({})
+      end
+    end
+
+    context 'with a required attribute the server never returns' do
+      let(:schema) do
+        {
+          attributes: [
+            { name: 'password', type: 'string', required: true,
+              returned: 'never' },
+            { name: 'userName', type: 'string', required: true }
+          ]
+        }
+      end
+
+      it 'excludes it from required' do
+        expect(described_class.convert(schema)['required']).to eql(['userName'])
+      end
     end
   end
 end

@@ -51,7 +51,6 @@ Lint/StructNewOverride:
 Metrics/AbcSize:
   Exclude:
     - 'lib/scim/kit/v2/service_provider_configuration.rb'
-    - 'lib/scim/kit/cli/app.rb'
 
 Metrics/BlockLength:
   Exclude:
@@ -60,10 +59,6 @@ Metrics/BlockLength:
     - 'spec/**/*.rb'
 
 Metrics/ClassLength:
-  Exclude:
-    - 'lib/scim/kit/cli/app.rb'
-
-Metrics/MethodLength:
   Exclude:
     - 'lib/scim/kit/cli/app.rb'
 
@@ -96,10 +91,6 @@ Style/HashTransformValues:
 Style/IfUnlessModifier:
   Exclude:
     - 'lib/scim/kit/v2/attribute.rb'
-
-Style/StderrPuts:
-  Exclude:
-    - 'lib/scim/kit/cli/reporting.rb'
 
 Style/StringLiterals:
   EnforcedStyle: 'single_quotes'

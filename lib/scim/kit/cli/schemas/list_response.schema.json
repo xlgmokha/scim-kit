@@ -8,6 +8,5 @@
     "startIndex": { "type": "integer" },
     "Resources": { "type": "array", "items": {} }
   },
-  "required": ["schemas", "totalResults"],
-  "additionalProperties": false
+  "required": ["schemas", "totalResults"]
 }
