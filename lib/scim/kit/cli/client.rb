@@ -20,9 +20,18 @@ module Scim
 
         def uri_for(path, query)
           uri = URI.join("#{base_url.to_s.sub(%r{/+\z}, '')}/", path)
-          encoded = URI.encode_www_form(query.compact)
+          encoded = encode_query(query)
           uri.query = encoded unless encoded.empty?
           uri
+        end
+
+        # Percent-encode per RFC 3986 rather than as a form body, so a SCIM
+        # filter arrives with %20 instead of +.
+        def encode_query(query)
+          query.compact.map do |name, value|
+            "#{URI.encode_uri_component(name.to_s)}=" \
+              "#{URI.encode_uri_component(value.to_s)}"
+          end.join('&')
         end
       end
     end

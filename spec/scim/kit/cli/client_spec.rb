@@ -45,6 +45,16 @@ RSpec.describe Scim::Kit::Cli::Client do
       expect(stub).to have_been_requested
     end
 
+    it 'percent-encodes spaces in query values' do
+      http = instance_double(Scim::Kit::Http, fetch: nil)
+      expected = URI('https://example.com/Users?filter=userName%20eq%20%22bj%22')
+
+      described_class.new('https://example.com', http: http)
+        .fetch('Users', query: { 'filter' => 'userName eq "bj"' })
+
+      expect(http).to have_received(:fetch).with(expected, headers: {})
+    end
+
     it 'omits blank query values' do
       stub = stub_request(:get, 'https://example.com/Users')
         .to_return(status: 200, body: body)
