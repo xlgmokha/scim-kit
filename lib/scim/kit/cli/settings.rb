@@ -30,6 +30,18 @@ module Scim
           QUERY.transform_values { |name| options[name] }
         end
 
+        def resource_query
+          list_query.slice('attributes')
+        end
+
+        def validate?
+          options[:validate]
+        end
+
+        def sparse?
+          !options[:attributes].nil?
+        end
+
         private
 
         attr_reader :options, :env

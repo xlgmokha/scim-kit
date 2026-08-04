@@ -47,31 +47,33 @@ module Scim
         def fetch_discovery
           discovery = Discovery.new(client)
           result = discovery.fetch
-          return reporter.report(result) unless result.ok? && options[:validate]
+          return reporter.report(result) unless result.ok? && settings.validate?
 
           reporter.report_validation(result, discovery.errors_for(result.body))
         end
 
         def fetch_list(resource_type)
-          endpoint = resolve_endpoint(resource_type)
-          result = client.fetch(endpoint, query: settings.list_query)
-          validate_and_report(result, resource_type) do |schema|
+          entry = resource_type_entry(resource_type)
+          result = client.fetch(
+            endpoint_for(entry), query: settings.list_query
+          )
+          validate_and_report(result, entry) do |schema|
             SchemaRegistry.list_response_with_items(schema)
           end
         end
 
         def fetch_resource(resource_type, id)
-          endpoint = resolve_endpoint(resource_type)
-          path = "#{endpoint}/#{URI.encode_uri_component(id)}"
-          result = client.fetch(
-            path, query: { 'attributes' => options[:attributes] }
-          )
-          validate_and_report(result, resource_type)
+          entry = resource_type_entry(resource_type)
+          path = "#{endpoint_for(entry)}/#{URI.encode_uri_component(id)}"
+          result = client.fetch(path, query: settings.resource_query)
+          validate_and_report(result, entry)
         end
 
-        def resolve_endpoint(resource_type)
-          endpoint = resource_type_entry(resource_type)[:endpoint]
-          raise MissingEndpoint, resource_type if endpoint.to_s.empty?
+        def endpoint_for(entry)
+          endpoint = entry[:endpoint]
+          if endpoint.to_s.empty?
+            raise MissingEndpoint, entry[:name] || entry[:id]
+          end
 
           endpoint.delete_prefix('/')
         end
@@ -88,11 +90,12 @@ module Scim
           @resource_schema_resolver ||= ResourceSchemaResolver.new(client)
         end
 
-        def validate_and_report(result, resource_type, &transform)
-          return reporter.report(result) unless result.ok? && options[:validate]
+        def validate_and_report(result, entry, &transform)
+          return reporter.report(result) unless result.ok? && settings.validate?
 
-          entry = resource_type_entry(resource_type)
-          errors = validation.errors_for(entry, result.body, &transform)
+          errors = validation.errors_for(
+            entry, result.body, sparse: settings.sparse?, &transform
+          )
           return reporter.report_unvalidated(result) unless errors
 
           reporter.report_validation(result, errors)
@@ -100,7 +103,7 @@ module Scim
 
         def validation
           @validation ||= ResourceValidation.new(
-            resource_schema_resolver, reporter, sparse: !options[:attributes].nil?
+            resource_schema_resolver, reporter
           )
         end
 

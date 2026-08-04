@@ -52,10 +52,10 @@ RSpec.describe Scim::Kit::Cli::Discovery do
 
   describe '#errors_for' do
     it 'is empty when every document conforms' do
-      documents = subject.fetch.body
-      documents[:service_provider_configuration] = valid_config
-      documents[:schemas] = valid_list
-      documents[:resource_types] = valid_list
+      documents = {
+        service_provider_configuration: valid_config,
+        schemas: valid_list, resource_types: valid_list
+      }
 
       expect(subject.errors_for(documents)).to eql({})
     end

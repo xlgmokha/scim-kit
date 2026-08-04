@@ -4,22 +4,21 @@ module Scim
   module Kit
     module Cli
       class ResourceValidation
-        def initialize(resolver, reporter, sparse: false)
+        def initialize(resolver, reporter)
           @resolver = resolver
           @reporter = reporter
-          @sparse = sparse
         end
 
-        def errors_for(entry, body, &transform)
+        def errors_for(entry, body, sparse: false, &transform)
           schema = schema_for(entry)
           return unless schema
 
-          Validator.errors_for(prepare(schema, &transform), body)
+          Validator.errors_for(prepare(schema, sparse, &transform), body)
         end
 
         private
 
-        attr_reader :resolver, :reporter, :sparse
+        attr_reader :resolver, :reporter
 
         def schema_for(entry)
           schema = resolver.schema_for(entry)
@@ -27,7 +26,7 @@ module Scim
           schema
         end
 
-        def prepare(schema)
+        def prepare(schema, sparse)
           schema = SparseSchema.relax(schema) if sparse
           block_given? ? yield(schema) : schema
         end
