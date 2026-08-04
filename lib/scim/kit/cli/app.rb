@@ -93,7 +93,7 @@ module Scim
 
           entry = resource_type_entry(resource_type)
           errors = validation.errors_for(entry, result.body, &transform)
-          return reporter.report(result) unless errors
+          return reporter.report_unvalidated(result) unless errors
 
           reporter.report_validation(result, errors)
         end

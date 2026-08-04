@@ -103,8 +103,10 @@ scim-kit list User --header "Authorization: Bearer $TOKEN"
 ### Validating a server
 
 `--validate` checks responses against JSON Schema and exits non-zero when a
-response does not conform. The body is always printed to stdout; validation
-errors go to stderr.
+response does not conform, or when the validation could not be carried out at
+all -- for example when the server's `/Schemas` document is unreachable, so a
+CI job gating on the exit code never passes on an unvalidated response. The
+body is always printed to stdout; validation errors go to stderr.
 
 ```bash
 scim-kit discover --validate

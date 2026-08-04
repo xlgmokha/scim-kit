@@ -103,6 +103,21 @@ RSpec.describe Scim::Kit::Cli::Reporter do
     end
   end
 
+  describe '#report_unvalidated' do
+    let(:result) { Scim::Kit::Http::Result.new(200, body) }
+
+    it 'prints the body to stdout' do
+      expect { subject.report_unvalidated(result) }
+        .to output("#{pretty}\n").to_stdout
+    end
+
+    it 'returns a failure status' do
+      allow($stdout).to receive(:print)
+
+      expect(subject.report_unvalidated(result)).to eq(1)
+    end
+  end
+
   describe '#warn' do
     it 'prefixes the message and writes it to stderr' do
       expect { subject.warn('watch out') }

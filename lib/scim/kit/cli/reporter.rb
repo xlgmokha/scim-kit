@@ -22,6 +22,13 @@ module Scim
           failure(validation_errors: errors)
         end
 
+        # --validate was asked for and could not be carried out, so the
+        # response is reported but the command still fails.
+        def report_unvalidated(result)
+          shell.say(pretty(result.body))
+          FAILURE
+        end
+
         def success(body)
           shell.say(pretty(body))
           SUCCESS

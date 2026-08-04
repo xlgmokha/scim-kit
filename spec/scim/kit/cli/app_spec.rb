@@ -440,7 +440,7 @@ RSpec.describe Scim::Kit::Cli::App do
             .to_return(status: 200, body: { totalResults: 0 }.to_json)
         end
 
-        it 'warns and exits 0' do
+        it 'warns that it could not validate' do
           allow($stdout).to receive(:print)
           instance = app('validate' => true)
 
@@ -448,12 +448,12 @@ RSpec.describe Scim::Kit::Cli::App do
             .to output(/no schema found/).to_stderr
         end
 
-        it 'exits 0' do
+        it 'exits 1 rather than reporting an unvalidated success' do
           allow($stdout).to receive(:print)
           allow($stderr).to receive(:print)
           instance = app('validate' => true)
 
-          expect(exit_status { instance.list('User') }).to eq(0)
+          expect(exit_status { instance.list('User') }).to eq(1)
         end
       end
     end
