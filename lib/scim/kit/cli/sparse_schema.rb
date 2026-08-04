@@ -16,13 +16,23 @@ module Scim
           def strip_required(value)
             case value
             when Hash
-              value.except('required')
-                .transform_values { |v| strip_required(v) }
+              value.except('required').to_h do |keyword, subschema|
+                [keyword, strip_keyword(keyword, subschema)]
+              end
             when Array
               value.map { |v| strip_required(v) }
             else
               value
             end
+          end
+
+          # Keys under 'properties' are attribute names, not schema keywords,
+          # so an attribute named 'required' must not be stripped.
+          def strip_keyword(keyword, subschema)
+            return strip_required(subschema) unless keyword == 'properties'
+            return subschema unless subschema.is_a?(Hash)
+
+            subschema.transform_values { |v| strip_required(v) }
           end
         end
       end

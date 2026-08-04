@@ -18,7 +18,10 @@ RSpec.describe Scim::Kit::Cli::SparseSchema do
             'type' => 'array',
             'items' => {
               'type' => 'object',
-              'properties' => { 'value' => { 'type' => 'string' } },
+              'properties' => {
+                'value' => { 'type' => 'string' },
+                'required' => { 'type' => 'boolean' }
+              },
               'required' => ['value']
             }
           }
@@ -42,6 +45,13 @@ RSpec.describe Scim::Kit::Cli::SparseSchema do
 
       expect(relaxed['properties']['emails']['items'])
         .not_to include('required')
+    end
+
+    it 'keeps a sub-attribute named required' do
+      relaxed = described_class.relax(schema)
+
+      expect(relaxed['properties']['emails']['items']['properties'])
+        .to include('required' => { 'type' => 'boolean' })
     end
 
     it 'leaves the original schema untouched' do
