@@ -6,7 +6,7 @@ PATH
       json_schemer (~> 2.0)
       net-hippie (~> 1.0)
       parslet (~> 2.0)
-      thor (~> 1.0)
+      thor (~> 1.2)
       tilt (~> 2.0)
       tilt-jbuilder (~> 0.7)
 
