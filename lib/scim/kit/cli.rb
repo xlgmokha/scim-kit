@@ -15,6 +15,7 @@ require 'scim/kit/cli/schema_registry'
 require 'scim/kit/cli/scim_schema_converter'
 require 'scim/kit/cli/settings'
 require 'scim/kit/cli/sparse_schema'
+require 'scim/kit/cli/unassigned_values'
 require 'scim/kit/cli/validator'
 
 module Scim

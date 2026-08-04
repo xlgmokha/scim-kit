@@ -6,8 +6,9 @@ module Scim
       module Validator
         class << self
           def errors_for(schema, data)
+            document = UnassignedValues.strip(normalize(data))
             JSONSchemer.schema(schema)
-              .validate(CanonicalKeys.apply(schema, normalize(data)))
+              .validate(CanonicalKeys.apply(schema, document))
               .map { |error| JSONSchemer::Errors.pretty(error) }
           end
 
