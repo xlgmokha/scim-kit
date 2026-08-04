@@ -3,9 +3,9 @@
 module Scim
   module Kit
     class Http
-      Result = Struct.new(:status, :body) do
+      Result = Struct.new(:status, :body, :unparsed) do
         def ok?
-          !status.nil? && (200..299).cover?(status)
+          !status.nil? && (200..299).cover?(status) && !unparsed
         end
       end
 
@@ -25,8 +25,7 @@ module Scim
 
       def fetch(uri, headers: {})
         driver.with_retry(retries: retries) do |client|
-          response = get_following_redirects(client, uri, headers)
-          Result.new(response.code.to_i, parse(response.body))
+          result_for(get_following_redirects(client, uri, headers))
         end
       rescue *Net::Hippie::CONNECTION_ERRORS => error
         Scim::Kit.logger.error(error)
@@ -79,12 +78,19 @@ module Scim
         [uri.scheme, uri.host, uri.port]
       end
 
+      # An unparsed body is reported rather than raised, so the caller can
+      # show it, but it is never a successful result.
+      def result_for(response)
+        Result.new(response.code.to_i, parse(response.body))
+      rescue JSON::ParserError => error
+        Scim::Kit.logger.error(error)
+        Result.new(response.code.to_i, { detail: response.body }, true)
+      end
+
       def parse(body)
         return {} if body.nil?
 
         JSON.parse(body, symbolize_names: true)
-      rescue JSON::ParserError
-        { detail: body }
       end
     end
   end

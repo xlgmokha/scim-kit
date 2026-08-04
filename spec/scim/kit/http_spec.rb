@@ -74,6 +74,13 @@ RSpec.describe Scim::Kit::Http do
       specify { expect(subject.fetch(uri).body).to eql(detail: 'boom') }
     end
 
+    context 'when a successful response body is not json' do
+      before { stub_request(:get, uri).to_return(status: 200, body: '<html>') }
+
+      specify { expect(subject.fetch(uri)).not_to be_ok }
+      specify { expect(subject.fetch(uri).body).to eql(detail: '<html>') }
+    end
+
     context 'when the response has no body' do
       before { stub_request(:get, uri).to_return(status: 204, body: nil) }
 
@@ -130,6 +137,22 @@ RSpec.describe Scim::Kit::Http do
 
         expect(a_request(:get, redirect_uri)
           .with(headers: credentials)).not_to have_been_made
+      end
+    end
+  end
+
+  describe '#get' do
+    context 'when the response is successful' do
+      before { stub_request(:get, uri).to_return(status: 200, body: '{"a":1}') }
+
+      specify { expect(subject.get(uri)).to eql(a: 1) }
+    end
+
+    context 'when a successful response body is not json' do
+      before { stub_request(:get, uri).to_return(status: 200, body: '<html>') }
+
+      it 'does not hand the unparsed body to the caller' do
+        expect(subject.get(uri)).to eql({})
       end
     end
   end
