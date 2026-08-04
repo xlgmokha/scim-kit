@@ -29,6 +29,18 @@ RSpec.describe Scim::Kit::Cli::Validator do
       expect(errors).to eql(["property '/userName' is not of type: string"])
     end
 
+    it 'accepts a declared attribute the server spelled differently' do
+      errors = described_class.errors_for(schema, { USERNAME: 'bjensen' })
+
+      expect(errors).to eql([])
+    end
+
+    it 'reports the canonical name when a differently spelled value is wrong' do
+      errors = described_class.errors_for(schema, { USERNAME: 1 })
+
+      expect(errors).to eql(["property '/userName' is not of type: string"])
+    end
+
     it 'returns a readable error for an undeclared property' do
       errors = described_class.errors_for(schema, { userName: 'bjensen', extra: true })
 

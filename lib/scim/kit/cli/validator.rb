@@ -7,7 +7,7 @@ module Scim
         class << self
           def errors_for(schema, data)
             JSONSchemer.schema(schema)
-              .validate(normalize(data))
+              .validate(CanonicalKeys.apply(schema, normalize(data)))
               .map { |error| JSONSchemer::Errors.pretty(error) }
           end
 

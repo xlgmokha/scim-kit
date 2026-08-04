@@ -126,6 +126,10 @@ types, canonical values, and required attributes the server declares. Every
 and `--attributes` relaxes the required checks so sparse responses are not
 reported as errors.
 
+Attribute names are matched case insensitively per RFC 7643 §2.1, so a server
+that returns `USERNAME` where its schema declares `userName` is not reported as
+non-conforming. Errors always name the attribute as the schema declares it.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

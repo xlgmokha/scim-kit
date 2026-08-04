@@ -4,6 +4,7 @@ require 'json_schemer'
 require 'thor'
 
 require 'scim/kit/cli/app'
+require 'scim/kit/cli/canonical_keys'
 require 'scim/kit/cli/client'
 require 'scim/kit/cli/discovery'
 require 'scim/kit/cli/reporter'
