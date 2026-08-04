@@ -25,6 +25,25 @@ RSpec.describe Scim::Kit::Cli::Settings do
       expect { settings({ url: '' }).url }
         .to raise_error(Thor::Error, /--url is required/)
     end
+
+    it 'raises when the url has no scheme' do
+      expect { settings({ url: 'example.com/scim/v2' }).url }
+        .to raise_error(Thor::Error, /--url must be an absolute http/)
+    end
+
+    it 'raises when the url scheme is not http(s)' do
+      expect { settings({ url: 'ftp://example.com' }).url }
+        .to raise_error(Thor::Error, /--url must be an absolute http/)
+    end
+
+    it 'raises when the url is unparseable' do
+      expect { settings({ url: 'http://exa mple.com' }).url }
+        .to raise_error(Thor::Error, /--url must be an absolute http/)
+    end
+
+    it 'accepts an http url' do
+      expect(settings({ url: 'http://a' }).url).to eql('http://a')
+    end
   end
 
   describe '#headers' do

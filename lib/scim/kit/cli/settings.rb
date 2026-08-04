@@ -19,12 +19,7 @@ module Scim
         end
 
         def url
-          @url ||= begin
-            resolved = options[:url] || env.fetch('SCIM_KIT_URL', nil)
-            raise Thor::Error, '--url is required' if resolved.to_s.empty?
-
-            resolved
-          end
+          @url ||= validate(options[:url] || env.fetch('SCIM_KIT_URL', nil))
         end
 
         def headers
@@ -38,6 +33,24 @@ module Scim
         private
 
         attr_reader :options, :env
+
+        def validate(url)
+          raise Thor::Error, '--url is required' if url.to_s.empty?
+
+          unless absolute_http?(url)
+            raise Thor::Error,
+              "--url must be an absolute http(s) URL, got #{url.inspect}"
+          end
+
+          url
+        end
+
+        def absolute_http?(url)
+          uri = URI.parse(url)
+          uri.is_a?(URI::HTTP) && !uri.host.to_s.empty?
+        rescue URI::InvalidURIError
+          false
+        end
 
         def split_header(header)
           name, value = header.split(':', 2)
