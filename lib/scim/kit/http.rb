@@ -33,11 +33,13 @@ module Scim
         Result.new(nil, { detail: error.message })
       end
 
+      # No :logger here on purpose -- net-hippie hands it to
+      # Net::HTTP#set_debug_output, which dumps raw requests (credentials
+      # included) to the log.
       def self.default_driver
         @default_driver ||= Net::Hippie::Client.new(
           follow_redirects: 0,
           headers: headers,
-          logger: Scim::Kit.logger,
           open_timeout: 1,
           read_timeout: 5
         )

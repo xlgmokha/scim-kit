@@ -5,6 +5,47 @@ RSpec.describe Scim::Kit::Http do
 
   let(:uri) { URI(FFaker::Internet.uri('https')) }
 
+  describe 'request logging' do
+    let(:log) { StringIO.new }
+    let(:server) { TCPServer.new('127.0.0.1', 0) }
+
+    around do |example|
+      WebMock.disable!
+      original = Scim::Kit.logger
+      Scim::Kit.logger = Logger.new(log)
+      described_class.instance_variable_set(:@default_driver, nil)
+      example.run
+      Scim::Kit.logger = original
+      described_class.instance_variable_set(:@default_driver, nil)
+      WebMock.enable!
+      server.close
+    end
+
+    def respond_once
+      Thread.new do
+        socket = server.accept
+        loop { break if socket.gets.to_s.strip.empty? }
+        socket.print("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\n{}")
+        socket.close
+      end
+    end
+
+    def fetch_with_credentials
+      responder = respond_once
+      described_class.new(retries: 0).fetch(
+        URI("http://127.0.0.1:#{server.addr[1]}/Users"),
+        headers: { 'Authorization' => 'Bearer s3cret' }
+      )
+      responder.join
+    end
+
+    it 'keeps credentials out of the log' do
+      fetch_with_credentials
+
+      expect(log.string).not_to include('s3cret')
+    end
+  end
+
   describe '#fetch' do
     context 'when the response is successful' do
       let(:body) { { id: '123' } }
