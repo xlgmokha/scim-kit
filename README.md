@@ -116,11 +116,13 @@ scim-kit list User --validate
 and `get` build a schema from the target server's *own* `/Schemas` document,
 so they check that a server's resources match the schema it advertises.
 
-Validation enforces what RFC 7643 §3.1 requires of a returned resource — the
-`schemas` and `id` attributes, and `meta.resourceType` when `meta` is present
-— along with the types, canonical values, and required attributes the server
-declares. Undeclared vendor properties are permitted, and `--attributes`
-relaxes the required checks so sparse responses are not reported as errors.
+Validation enforces what RFC 7643 §3.1 requires of a returned resource - the
+`schemas` and `id` attributes, except that `id` is optional on the
+`ResourceType` and `ServiceProviderConfig` resources per §6 - along with the
+types, canonical values, and required attributes the server declares. Every
+`meta` sub-attribute is optional. Undeclared vendor properties are permitted,
+and `--attributes` relaxes the required checks so sparse responses are not
+reported as errors.
 
 ## Development
 

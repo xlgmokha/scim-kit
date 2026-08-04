@@ -20,12 +20,17 @@ module Scim
               },
               'location' => { 'type' => 'string' },
               'version' => { 'type' => 'string' }
-            },
-            'required' => ['resourceType']
+            }
           }
         }.freeze
 
         COMMON_REQUIRED = %w[schemas id].freeze
+
+        # RFC 7643 6 makes "id" OPTIONAL for these discovery resources.
+        OPTIONAL_ID_SCHEMAS = [
+          'urn:ietf:params:scim:schemas:core:2.0:ResourceType',
+          'urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig'
+        ].freeze
 
         attr_reader :undeclared_extensions
 
@@ -61,15 +66,22 @@ module Scim
           merge_extensions(
             resource_type, schemas, properties, required
           )
-          build_schema(properties, required)
+          build_schema(properties, common_required(resource_type) | required)
         end
 
         def build_schema(properties, required)
           {
             'type' => 'object',
             'properties' => properties,
-            'required' => COMMON_REQUIRED | required
+            'required' => required
           }
+        end
+
+        def common_required(resource_type)
+          return COMMON_REQUIRED unless
+            OPTIONAL_ID_SCHEMAS.include?(resource_type[:schema])
+
+          COMMON_REQUIRED - ['id']
         end
 
         def merge_extensions(resource_type, schemas, properties, required)

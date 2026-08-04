@@ -95,9 +95,38 @@ RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
           .to include(/missing required keys.*id/)
       end
 
-      it 'requires meta.resourceType when meta is returned' do
-        expect(errors_for(resource.merge(meta: {})))
-          .to include(/meta.*missing required keys.*resourceType/)
+      it 'accepts a partial meta, which RFC 7643 3.1 leaves optional' do
+        expect(errors_for(resource.merge(meta: { location: '/Users/1' })))
+          .to be_empty
+      end
+    end
+
+    context 'when the resource type is ResourceType' do
+      let(:resource_type_urn) do
+        'urn:ietf:params:scim:schemas:core:2.0:ResourceType'
+      end
+      let(:resource_type) do
+        {
+          id: 'ResourceType', name: 'ResourceType',
+          endpoint: '/ResourceTypes', schema: resource_type_urn
+        }
+      end
+      let(:core_schema) do
+        {
+          id: resource_type_urn,
+          attributes: [{ name: 'name', type: 'string', required: true }]
+        }
+      end
+
+      before do
+        stub_request(:get, "#{base_url}/Schemas")
+          .to_return(status: 200, body: [core_schema].to_json)
+      end
+
+      it 'does not require id, which RFC 7643 6 leaves optional' do
+        errors = errors_for(schemas: [resource_type_urn], name: 'User')
+
+        expect(errors).to be_empty
       end
     end
 
