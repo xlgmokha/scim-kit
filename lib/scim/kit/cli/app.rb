@@ -9,7 +9,7 @@ module Scim
         end
 
         class_option :url, desc: 'Base URL of the SCIM server (or SCIM_KIT_URL)'
-        class_option :header, type: :array, default: [], desc: 'Extra header as "Name: Value" (repeatable)'
+        class_option :header, type: :string, repeatable: true, default: [], desc: 'Extra header as "Name: Value" (repeatable)'
         class_option :validate, type: :boolean, default: false, desc: 'Validate the response against a JSON Schema'
 
         desc 'discover', "Discover a server's ServiceProviderConfig, Schemas, and ResourceTypes"

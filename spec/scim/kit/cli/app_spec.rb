@@ -643,6 +643,29 @@ RSpec.describe Scim::Kit::Cli::App do
       expect(status).to eq(0)
     end
 
+    context 'with repeated --header flags' do
+      let(:headers) { { 'Authorization' => 'Bearer xyz', 'X-Test' => 'value' } }
+      let(:argv) do
+        ['list', 'User', '--url', base_url,
+         '--header', 'Authorization: Bearer xyz',
+         '--header', 'X-Test: value']
+      end
+
+      before do
+        allow($stdout).to receive(:print)
+        stub_request(:get, "#{base_url}/Users")
+          .with(headers: headers).to_return(status: 200, body: '{}')
+      end
+
+      it 'sends every header on the request' do
+        exit_status { described_class.start(argv) }
+
+        expect(
+          a_request(:get, "#{base_url}/Users").with(headers: headers)
+        ).to have_been_made
+      end
+    end
+
     it 'exits 1 with a usage message for a malformed --header' do
       allow($stderr).to receive(:print)
       argv = ['list', 'User', '--url', base_url, '--header', 'BearerXYZ']
