@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    scim-kit (0.8.0)
+    scim-kit (0.9.0)
       activemodel (>= 6.1)
       json_schemer (~> 2.0)
       net-hippie (~> 1.0)

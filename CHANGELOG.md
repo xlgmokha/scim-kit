@@ -1,5 +1,3 @@
-Version 0.8.0
-
 # Changelog
 All notable changes to this project will be documented in this file.
 
@@ -7,20 +5,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.9.0] - 2026-08-04
+### Security
+- Stop writing credentials to the log. `Scim::Kit::Http` passed its
+  logger to `Net::HTTP#set_debug_output`, which dumps the raw request,
+  so any consumer of `Http#fetch(headers:)` printed its bearer token to
+  the default `$stdout` logger.
+- Stop forwarding credentials across a redirect to another origin, and
+  keep per-request headers when following a same-origin redirect.
+  net-hippie rebuilds the redirected request without them, so a redirect
+  previously dropped `Authorization` and reported a 401 for a valid
+  token.
+
 ### Added
-- Add a `scim-kit` CLI with `discover`, `list`, and `get` commands for
-  reading a remote SCIM server's configuration and resources.
+- Add a `scim-kit` executable with `discover`, `list`, and `get`
+  commands for reading a remote SCIM server's configuration and
+  resources. This adds `thor` and `json_schemer` as runtime
+  dependencies; `require 'scim/kit'` does not load either.
 - Add a `--validate` flag to `discover`, `list`, and `get` for checking
   responses against a JSON Schema (built-in RFC 7643 schemas for
   `discover`; derived from the target server's own `/Schemas` for
   `list`/`get`).
-- Validate the attributes RFC 7643 section 3.1 requires of a returned
-  resource (`schemas`, `id`, and `meta.resourceType`), which were
-  previously accepted when absent.
+- Validate what RFC 7643 section 3.1 requires of a returned resource
+  (`schemas` and `id`), which were previously accepted when absent.
+  `id` stays optional for `ResourceType` and `ServiceProviderConfig`
+  per section 6, and every `meta` sub-attribute is optional.
 - Warn when a resource type declares a schema extension that the
   server's `/Schemas` does not publish.
 
 ### Fixed
+- Match attribute names case insensitively, as RFC 7643 section 2.1
+  requires. A server that spelled an attribute differently from its own
+  schema was reported as missing a required attribute, and a wrong
+  value nested under such a name went unreported entirely. Validation
+  errors still name the attribute as the schema declares it.
+- Treat a success response with an unparseable body as a failure rather
+  than returning `{ detail: <raw body> }` for a caller to iterate.
+- Exit non-zero when `--validate` cannot be carried out — for example
+  when `/Schemas` is unreachable — so a CI job gating on the exit code
+  no longer passes having validated nothing.
+- Send every repeated `--header` flag. Thor overwrites an `:array`
+  option on each occurrence, so only the last one survived and requests
+  went out without their credentials.
+- Percent-encode query values per RFC 3986, so a SCIM filter arrives as
+  `userName%20eq%20%22bj%22` rather than form-encoded with `+`.
+- Reject a `--url` that is not an absolute http(s) URL instead of
+  printing a `URI::BadURIError` backtrace.
+- Keep schema properties named `required` under `--attributes`, which
+  were previously stripped as if they were the schema keyword.
 - Stop reporting valid responses as invalid: undeclared vendor
   properties are now permitted, and `--attributes` relaxes required
   checks so sparse responses pass.
@@ -30,6 +63,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   raised `URI::InvalidURIError` for ids containing a space.
 - Resolve each resource type independently so a second `list`/`get` in
   the same process no longer reuses the first lookup.
+
+### Changed
+- Require Ruby 3.3 or newer. Ruby 3.2 reached end of life on
+  2026-03-31 and no longer receives security fixes.
+- Require `thor` 1.2 or newer for `Thor::Shell::Basic#say_error`.
 
 ## [0.8.0] - 2026-03-31
 ### Changed
@@ -116,7 +154,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - \_assign does not coerce values by default.
 - errors are merged together instead of overwritten during attribute validation.
 
-[Unreleased]: https://github.com/xlgmokha/scim-kit/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/xlgmokha/scim-kit/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/xlgmokha/scim-kit/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/xlgmokha/scim-kit/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/xlgmokha/scim-kit/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/xlgmokha/scim-kit/compare/v0.7.0...v0.7.1
