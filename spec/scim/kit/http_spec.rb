@@ -59,5 +59,37 @@ RSpec.describe Scim::Kit::Http do
 
       specify { expect(subject.fetch(uri, headers: { 'X-Test' => 'value' })).to be_ok }
     end
+
+    context 'when the response redirects to the same origin' do
+      let(:credentials) { { 'Authorization' => 'Bearer xyz' } }
+      let(:redirect_uri) { URI.join(uri, '/v2/Users') }
+
+      before do
+        stub_request(:get, uri)
+          .to_return(status: 301, headers: { 'Location' => redirect_uri.to_s })
+        stub_request(:get, redirect_uri)
+          .with(headers: credentials).to_return(status: 200, body: '{}')
+      end
+
+      specify { expect(subject.fetch(uri, headers: credentials)).to be_ok }
+    end
+
+    context 'when the response redirects to another origin' do
+      let(:credentials) { { 'Authorization' => 'Bearer xyz' } }
+      let(:redirect_uri) { URI('https://elsewhere.example.com/Users') }
+
+      before do
+        stub_request(:get, uri)
+          .to_return(status: 301, headers: { 'Location' => redirect_uri.to_s })
+        stub_request(:get, redirect_uri).to_return(status: 200, body: '{}')
+      end
+
+      it 'does not forward the credentials' do
+        subject.fetch(uri, headers: credentials)
+
+        expect(a_request(:get, redirect_uri)
+          .with(headers: credentials)).not_to have_been_made
+      end
+    end
   end
 end
