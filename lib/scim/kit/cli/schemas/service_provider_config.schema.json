@@ -2,7 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
-    "schemas": { "type": "array", "items": { "type": "string" } },
+    "schemas": {
+      "type": "array", "items": { "type": "string" },
+      "contains": { "const": "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig" }
+    },
     "id": { "type": "string" },
     "externalId": { "type": "string" },
     "documentationUri": { "type": "string" },
@@ -65,7 +68,7 @@
         "created": { "type": "string", "format": "date-time" },
         "lastModified": { "type": "string", "format": "date-time" },
         "location": { "type": "string" },
-        "version": { "type": "string" }
+        "version": { "type": "string", "pattern": "^(W/)?\"[!#-~]*\"$" }
       }
     }
   },

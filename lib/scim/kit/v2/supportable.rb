@@ -10,10 +10,12 @@ module Scim
 
         attr_accessor :supported
 
+        # RFC 7643 5 marks every maximum REQUIRED, so they default to 0 --
+        # "no limit stated" -- rather than to null, which is unassigned.
         def initialize(*dynamic_attributes)
           dynamic_attributes.delete(:supported)
           @dynamic_attributes = Hash[
-            dynamic_attributes.map { |x| ["#{x}=".to_sym, nil] }
+            dynamic_attributes.map { |x| ["#{x}=".to_sym, 0] }
           ]
           @supported = false
         end

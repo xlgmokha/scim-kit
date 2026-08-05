@@ -22,7 +22,10 @@ RSpec.describe Scim::Kit::V2::ServiceProviderConfiguration do
     specify { expect(result[:meta][:resourceType]).to eql('ServiceProviderConfig') }
     specify { expect(result[:meta][:created]).to eql(now.iso8601) }
     specify { expect(result[:meta][:lastModified]).to eql(now.iso8601) }
-    specify { expect(result[:meta][:version]).not_to be_nil }
+    specify { expect(result[:meta][:version]).to match(%r{\AW/"[^"]+"\z}) }
+    specify { expect(result[:bulk][:maxOperations]).to be(0) }
+    specify { expect(result[:bulk][:maxPayloadSize]).to be(0) }
+    specify { expect(result[:filter][:maxResults]).to be(0) }
 
     context 'with documentation uri' do
       before do

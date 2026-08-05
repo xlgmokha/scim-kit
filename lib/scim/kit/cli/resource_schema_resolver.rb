@@ -4,6 +4,11 @@ module Scim
   module Kit
     module Cli
       class ResourceSchemaResolver
+        # RFC 7232 2.3: entity-tag = [ "W/" ] DQUOTE *etagc DQUOTE, where
+        # etagc is a visible character other than a double quote. obs-text is
+        # left out, being obsolete.
+        ENTITY_TAG = '^(W/)?"[!#-~]*"$'
+
         COMMON_PROPERTIES = {
           'schemas' => {
             'type' => 'array', 'items' => { 'type' => 'string' }
@@ -19,7 +24,7 @@ module Scim
                 'type' => 'string', 'format' => 'date-time'
               },
               'location' => { 'type' => 'string' },
-              'version' => { 'type' => 'string' }
+              'version' => { 'type' => 'string', 'pattern' => ENTITY_TAG }
             }
           }
         }.freeze
@@ -62,11 +67,22 @@ module Scim
         def compose(resource_type, schemas, core)
           converted = ScimSchemaConverter.convert(core)
           properties = COMMON_PROPERTIES.merge(converted['properties'])
+          # RFC 7643 3.1 gives the common attributes precedence over any
+          # definition a server repeats in its own schema.
+          properties['schemas'] = schemas_property(resource_type)
           required = converted['required']
           merge_extensions(
             resource_type, schemas, properties, required
           )
           build_schema(properties, common_required(resource_type) | required)
+        end
+
+        # RFC 7643 3.1: a non-empty array naming the URIs of the schemas the
+        # representation supports, so the resource type's own schema is one.
+        def schemas_property(resource_type)
+          COMMON_PROPERTIES['schemas'].merge(
+            'contains' => { 'const' => resource_type[:schema] }
+          )
         end
 
         def build_schema(properties, required)

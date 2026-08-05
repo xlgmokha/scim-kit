@@ -2,7 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "properties": {
-    "schemas": { "type": "array", "items": { "type": "string" } },
+    "schemas": {
+      "type": "array", "items": { "type": "string" },
+      "contains": { "const": "urn:ietf:params:scim:api:messages:2.0:ListResponse" }
+    },
     "totalResults": { "type": "integer" },
     "itemsPerPage": { "type": "integer" },
     "startIndex": { "type": "integer" },
