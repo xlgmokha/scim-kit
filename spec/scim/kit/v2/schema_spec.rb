@@ -9,6 +9,7 @@ RSpec.describe Scim::Kit::V2::Schema do
   let(:description) { FFaker::Name.name }
   let(:result) { JSON.parse(subject.to_json, symbolize_names: true) }
 
+  specify { expect(result[:schemas]).to eql([Scim::Kit::V2::Schemas::SCHEMA]) }
   specify { expect(result[:id]).to eql(id) }
   specify { expect(result[:name]).to eql(name) }
   specify { expect(result[:description]).to eql(name) }
