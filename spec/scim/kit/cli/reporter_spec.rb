@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::Cli::Reporter do
-  subject { described_class.new(Thor::Shell::Basic.new) }
+  subject { described_class.new }
 
   let(:body) { { id: '123' } }
   let(:pretty) { JSON.pretty_generate(body) }
@@ -15,7 +15,7 @@ RSpec.describe Scim::Kit::Cli::Reporter do
       end
 
       it 'returns a success status' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
 
         expect(subject.report(result)).to eq(0)
       end
@@ -29,7 +29,7 @@ RSpec.describe Scim::Kit::Cli::Reporter do
       end
 
       it 'returns a failure status' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect(subject.report(result)).to eq(1)
       end
@@ -46,7 +46,7 @@ RSpec.describe Scim::Kit::Cli::Reporter do
       end
 
       it 'returns a success status' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
 
         expect(subject.report_validation(result, [])).to eq(0)
       end
@@ -56,22 +56,22 @@ RSpec.describe Scim::Kit::Cli::Reporter do
       let(:errors) { ['root is missing required keys: id'] }
 
       it 'prints the errors to stderr' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
 
         expect { subject.report_validation(result, errors) }
           .to output(/validation_errors/).to_stderr
       end
 
       it 'still prints the body to stdout' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect { subject.report_validation(result, errors) }
           .to output(/#{pretty}/).to_stdout
       end
 
       it 'returns a failure status' do
-        allow($stdout).to receive(:print)
-        allow($stderr).to receive(:print)
+        allow($stdout).to receive(:puts)
+        allow($stderr).to receive(:puts)
 
         expect(subject.report_validation(result, errors)).to eq(1)
       end
@@ -85,7 +85,7 @@ RSpec.describe Scim::Kit::Cli::Reporter do
     end
 
     it 'returns a failure status' do
-      allow($stderr).to receive(:print)
+      allow($stderr).to receive(:puts)
 
       expect(subject.failure(detail: 'boom')).to eq(1)
     end
@@ -97,7 +97,7 @@ RSpec.describe Scim::Kit::Cli::Reporter do
     end
 
     it 'returns a success status' do
-      allow($stdout).to receive(:print)
+      allow($stdout).to receive(:puts)
 
       expect(subject.success(body)).to eq(0)
     end
@@ -112,7 +112,7 @@ RSpec.describe Scim::Kit::Cli::Reporter do
     end
 
     it 'returns a failure status' do
-      allow($stdout).to receive(:print)
+      allow($stdout).to receive(:puts)
 
       expect(subject.report_unvalidated(result)).to eq(1)
     end

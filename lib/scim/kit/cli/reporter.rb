@@ -7,8 +7,9 @@ module Scim
         SUCCESS = 0
         FAILURE = 1
 
-        def initialize(shell)
-          @shell = shell
+        def initialize(out = $stdout, err = $stderr)
+          @out = out
+          @err = err
         end
 
         def report(result)
@@ -16,7 +17,7 @@ module Scim
         end
 
         def report_validation(result, errors)
-          shell.say(pretty(result.body))
+          out.puts(pretty(result.body))
           return SUCCESS if errors.empty?
 
           failure(validation_errors: errors)
@@ -25,27 +26,27 @@ module Scim
         # --validate was asked for and could not be carried out, so the
         # response is reported but the command still fails.
         def report_unvalidated(result)
-          shell.say(pretty(result.body))
+          out.puts(pretty(result.body))
           FAILURE
         end
 
         def success(body)
-          shell.say(pretty(body))
+          out.puts(pretty(body))
           SUCCESS
         end
 
         def failure(body)
-          shell.say_error(pretty(body))
+          err.puts(pretty(body))
           FAILURE
         end
 
         def warn(message)
-          shell.say_error("warning: #{message}")
+          err.puts("warning: #{message}")
         end
 
         private
 
-        attr_reader :shell
+        attr_reader :out, :err
 
         def pretty(body)
           JSON.pretty_generate(body)

@@ -108,7 +108,7 @@ module Scim
         end
 
         def reporter
-          @reporter ||= Reporter.new(shell)
+          @reporter ||= Reporter.new
         end
 
         def settings

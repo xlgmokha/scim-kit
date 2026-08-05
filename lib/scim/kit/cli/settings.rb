@@ -47,10 +47,10 @@ module Scim
         attr_reader :options, :env
 
         def validate(url)
-          raise Thor::Error, '--url is required' if url.to_s.empty?
+          raise InvalidOption, '--url is required' if url.to_s.empty?
 
           unless absolute_http?(url)
-            raise Thor::Error,
+            raise InvalidOption,
               "--url must be an absolute http(s) URL, got #{url.inspect}"
           end
 
@@ -67,7 +67,7 @@ module Scim
         def split_header(header)
           name, value = header.split(':', 2)
           if value.nil?
-            raise Thor::Error,
+            raise InvalidOption,
               "malformed --header #{header.inspect} " \
               '(expected "Name: Value")'
           end

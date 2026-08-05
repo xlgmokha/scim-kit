@@ -3,7 +3,7 @@
 RSpec.describe Scim::Kit::Cli::ResourceValidation do
   subject { described_class.new(resolver, reporter) }
 
-  let(:reporter) { Scim::Kit::Cli::Reporter.new(Thor::Shell::Basic.new) }
+  let(:reporter) { Scim::Kit::Cli::Reporter.new }
   let(:entry) { { name: 'User', schema: core_urn } }
   let(:core_urn) { 'urn:ietf:params:scim:schemas:core:2.0:User' }
   let(:schema) do
@@ -62,7 +62,7 @@ RSpec.describe Scim::Kit::Cli::ResourceValidation do
       end
 
       it 'returns nil so the caller can flag it as unvalidated' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect(subject.errors_for(entry, resource)).to be_nil
       end
@@ -87,7 +87,7 @@ RSpec.describe Scim::Kit::Cli::ResourceValidation do
       end
 
       it 'still validates the resource' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect(subject.errors_for(entry, resource)).to eql([])
       end

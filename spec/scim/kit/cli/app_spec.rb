@@ -20,7 +20,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 1' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect(exit_status { call.call(app, 'Nope') }).to eq(1)
       end
@@ -47,7 +47,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 1' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect(exit_status { call.call(app, 'User') }).to eq(1)
       end
@@ -80,7 +80,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 0' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
 
         expect(exit_status { app.discover }).to eq(0)
       end
@@ -93,14 +93,14 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'reports the failure without requesting Schemas' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
         exit_status { app.discover }
 
         expect(a_request(:get, "#{base_url}/Schemas")).not_to have_been_made
       end
 
       it 'exits 1' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect(exit_status { app.discover }).to eq(1)
       end
@@ -166,7 +166,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 0' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
         instance = app('validate' => true)
 
         expect(exit_status { instance.discover }).to eq(0)
@@ -193,7 +193,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'flags the bare array as non-compliant with ListResponse format' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
         instance = app('validate' => true)
 
         expect { exit_status { instance.discover } }
@@ -214,7 +214,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'prints validation errors to stderr' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
         instance = app('validate' => true)
 
         expect { exit_status { instance.discover } }
@@ -222,8 +222,8 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 1' do
-        allow($stdout).to receive(:print)
-        allow($stderr).to receive(:print)
+        allow($stdout).to receive(:puts)
+        allow($stderr).to receive(:puts)
         instance = app('validate' => true)
 
         expect(exit_status { instance.discover }).to eq(1)
@@ -268,7 +268,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 0' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
 
         expect(exit_status { instance.list('User') }).to eq(0)
       end
@@ -286,7 +286,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 1' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect(exit_status { app.list('User') }).to eq(1)
       end
@@ -330,7 +330,7 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'exits 0' do
-          allow($stdout).to receive(:print)
+          allow($stdout).to receive(:puts)
           instance = app('validate' => true)
 
           expect(exit_status { instance.list('User') }).to eq(0)
@@ -351,7 +351,7 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'exits 0 without demanding attributes the server was not asked for' do
-          allow($stdout).to receive(:print)
+          allow($stdout).to receive(:puts)
           instance = app('validate' => true, 'attributes' => 'id')
 
           expect(exit_status { instance.list('User') }).to eq(0)
@@ -381,7 +381,7 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'warns about the undeclared extension' do
-          allow($stdout).to receive(:print)
+          allow($stdout).to receive(:puts)
           instance = app('validate' => true)
 
           expect { exit_status { instance.list('User') } }
@@ -389,8 +389,8 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'still exits 0' do
-          allow($stdout).to receive(:print)
-          allow($stderr).to receive(:print)
+          allow($stdout).to receive(:puts)
+          allow($stderr).to receive(:puts)
           instance = app('validate' => true)
 
           expect(exit_status { instance.list('User') }).to eq(0)
@@ -411,7 +411,7 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'prints validation errors to stderr' do
-          allow($stdout).to receive(:print)
+          allow($stdout).to receive(:puts)
           instance = app('validate' => true)
 
           expect { exit_status { instance.list('User') } }
@@ -419,8 +419,8 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'exits 1' do
-          allow($stdout).to receive(:print)
-          allow($stderr).to receive(:print)
+          allow($stdout).to receive(:puts)
+          allow($stderr).to receive(:puts)
           instance = app('validate' => true)
 
           expect(exit_status { instance.list('User') }).to eq(1)
@@ -441,7 +441,7 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'warns that it could not validate' do
-          allow($stdout).to receive(:print)
+          allow($stdout).to receive(:puts)
           instance = app('validate' => true)
 
           expect { exit_status { instance.list('User') } }
@@ -449,8 +449,8 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'exits 1 rather than reporting an unvalidated success' do
-          allow($stdout).to receive(:print)
-          allow($stderr).to receive(:print)
+          allow($stdout).to receive(:puts)
+          allow($stderr).to receive(:puts)
           instance = app('validate' => true)
 
           expect(exit_status { instance.list('User') }).to eq(1)
@@ -478,7 +478,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 0' do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
 
         expect(exit_status { instance.get('User', '123') }).to eq(0)
       end
@@ -488,7 +488,7 @@ RSpec.describe Scim::Kit::Cli::App do
       it 'escapes a space rather than raising URI::InvalidURIError' do
         stub = stub_request(:get, "#{base_url}/Users/mo%20khan")
           .to_return(status: 200, body: {}.to_json)
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
 
         exit_status { app.get('User', 'mo khan') }
 
@@ -498,7 +498,7 @@ RSpec.describe Scim::Kit::Cli::App do
       it 'escapes separators so an id cannot traverse the endpoint' do
         stub = stub_request(:get, "#{base_url}/Users/..%2Fadmin%23x%3Fy")
           .to_return(status: 200, body: {}.to_json)
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
 
         exit_status { app.get('User', '../admin#x?y') }
 
@@ -518,7 +518,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       it 'exits 1' do
-        allow($stderr).to receive(:print)
+        allow($stderr).to receive(:puts)
 
         expect(exit_status { app.get('User', '123') }).to eq(1)
       end
@@ -556,7 +556,7 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'exits 0' do
-          allow($stdout).to receive(:print)
+          allow($stdout).to receive(:puts)
           instance = app('validate' => true)
 
           expect(exit_status { instance.get('User', '123') }).to eq(0)
@@ -571,7 +571,7 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'prints validation errors to stderr' do
-          allow($stdout).to receive(:print)
+          allow($stdout).to receive(:puts)
           instance = app('validate' => true)
 
           expect { exit_status { instance.get('User', '123') } }
@@ -579,8 +579,8 @@ RSpec.describe Scim::Kit::Cli::App do
         end
 
         it 'exits 1' do
-          allow($stdout).to receive(:print)
-          allow($stderr).to receive(:print)
+          allow($stdout).to receive(:puts)
+          allow($stderr).to receive(:puts)
           instance = app('validate' => true)
 
           expect(exit_status { instance.get('User', '123') }).to eq(1)
@@ -598,7 +598,7 @@ RSpec.describe Scim::Kit::Cli::App do
     end
 
     it 'sends repeated --header flags as request headers' do
-      allow($stdout).to receive(:print)
+      allow($stdout).to receive(:puts)
       instance = app('header' => ['Authorization: Bearer xyz', 'X-Test: value'])
 
       exit_status { instance.list('User') }
@@ -620,7 +620,7 @@ RSpec.describe Scim::Kit::Cli::App do
     end
 
     it 'exits 1 with a usage message when RESOURCE_TYPE is missing' do
-      allow($stderr).to receive(:print)
+      allow($stderr).to receive(:puts)
 
       expect { exit_status { described_class.start(['list', '--url', base_url]) } }
         .to output(/no arguments/).to_stderr
@@ -636,7 +636,7 @@ RSpec.describe Scim::Kit::Cli::App do
 
     it 'reads --url from SCIM_KIT_URL when --url is omitted' do
       ENV['SCIM_KIT_URL'] = base_url
-      allow($stdout).to receive(:print)
+      allow($stdout).to receive(:puts)
 
       status = exit_status { described_class.start(%w[list User]) }
 
@@ -652,7 +652,7 @@ RSpec.describe Scim::Kit::Cli::App do
       end
 
       before do
-        allow($stdout).to receive(:print)
+        allow($stdout).to receive(:puts)
         stub_request(:get, "#{base_url}/Users")
           .with(headers: headers).to_return(status: 200, body: '{}')
       end
@@ -667,7 +667,7 @@ RSpec.describe Scim::Kit::Cli::App do
     end
 
     it 'exits 1 with a usage message for a malformed --header' do
-      allow($stderr).to receive(:print)
+      allow($stderr).to receive(:puts)
       argv = ['list', 'User', '--url', base_url, '--header', 'BearerXYZ']
 
       expect { exit_status { described_class.start(argv) } }

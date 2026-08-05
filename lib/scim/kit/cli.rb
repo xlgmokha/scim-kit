@@ -46,6 +46,8 @@ module Scim
 
       class InvalidResponse < Error; end
 
+      class InvalidOption < Error; end
+
       # SCIM collection endpoints (/Schemas, /ResourceTypes) return a
       # ListResponse per RFC 7644 section 4, but some servers return a
       # bare array. Return the underlying array for either shape, or nil.

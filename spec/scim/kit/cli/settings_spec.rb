@@ -18,27 +18,27 @@ RSpec.describe Scim::Kit::Cli::Settings do
 
     it 'raises when neither is given' do
       expect { settings({}).url }
-        .to raise_error(Thor::Error, /--url is required/)
+        .to raise_error(Scim::Kit::Cli::InvalidOption, /--url is required/)
     end
 
     it 'raises when the url is blank' do
       expect { settings({ url: '' }).url }
-        .to raise_error(Thor::Error, /--url is required/)
+        .to raise_error(Scim::Kit::Cli::InvalidOption, /--url is required/)
     end
 
     it 'raises when the url has no scheme' do
       expect { settings({ url: 'example.com/scim/v2' }).url }
-        .to raise_error(Thor::Error, /--url must be an absolute http/)
+        .to raise_error(Scim::Kit::Cli::InvalidOption, /--url must be an absolute http/)
     end
 
     it 'raises when the url scheme is not http(s)' do
       expect { settings({ url: 'ftp://example.com' }).url }
-        .to raise_error(Thor::Error, /--url must be an absolute http/)
+        .to raise_error(Scim::Kit::Cli::InvalidOption, /--url must be an absolute http/)
     end
 
     it 'raises when the url is unparseable' do
       expect { settings({ url: 'http://exa mple.com' }).url }
-        .to raise_error(Thor::Error, /--url must be an absolute http/)
+        .to raise_error(Scim::Kit::Cli::InvalidOption, /--url must be an absolute http/)
     end
 
     it 'accepts an http url' do
@@ -71,7 +71,7 @@ RSpec.describe Scim::Kit::Cli::Settings do
 
     it 'raises on a header without a colon' do
       expect { settings({ header: ['nope'] }).headers }
-        .to raise_error(Thor::Error, /malformed --header/)
+        .to raise_error(Scim::Kit::Cli::InvalidOption, /malformed --header/)
     end
   end
 
