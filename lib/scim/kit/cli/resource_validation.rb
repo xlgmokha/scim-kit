@@ -34,7 +34,7 @@ module Scim
         def warn_unresolvable_schema(entry)
           reporter.warn(
             "no schema found for resource type #{entry[:name].inspect}; " \
-            'skipping validation'
+            'cannot validate the response'
           )
         end
 

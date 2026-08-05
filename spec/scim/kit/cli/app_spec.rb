@@ -290,6 +290,50 @@ RSpec.describe Scim::Kit::Cli::App do
 
         expect(exit_status { app.list('User') }).to eq(1)
       end
+
+      it 'leaves the error document unchecked without --validate' do
+        expect { exit_status { app.list('User') } }
+          .not_to output(/validation_errors/).to_stderr
+      end
+    end
+
+    context 'when the error document does not conform' do
+      let(:instance) { app('validate' => true) }
+
+      before do
+        stub_request(:get, "#{base_url}/Users").to_return(
+          status: 404,
+          body: { schemas: [Scim::Kit::Cli::SchemaRegistry::ERROR_URN],
+                  status: 404, detail: 'not found' }.to_json
+        )
+      end
+
+      it 'reports that status is not a string, per RFC 7644 3.12' do
+        expect { exit_status { instance.list('User') } }
+          .to output(%r{property '/status' is not of type: string}).to_stderr
+      end
+
+      it 'still reports the error document itself' do
+        expect { exit_status { instance.list('User') } }
+          .to output(/not found/).to_stderr
+      end
+    end
+
+    context 'when the error document conforms' do
+      let(:instance) { app('validate' => true) }
+
+      before do
+        stub_request(:get, "#{base_url}/Users").to_return(
+          status: 404,
+          body: { schemas: [Scim::Kit::Cli::SchemaRegistry::ERROR_URN],
+                  status: '404', scimType: 'invalidValue' }.to_json
+        )
+      end
+
+      it 'reports no validation errors' do
+        expect { exit_status { instance.list('User') } }
+          .not_to output(/validation_errors/).to_stderr
+      end
     end
 
     context 'when --validate is set' do

@@ -39,15 +39,27 @@ module Scim
         def run
           exit(yield)
         rescue RequestFailed => error
-          exit(reporter.failure(error.result.body))
+          exit(report(error.result))
         rescue Error => error
           exit(reporter.failure(detail: error.message))
+        end
+
+        # A failed request carries the server's Error document, so --validate
+        # checks that too -- RFC 7644 3.12 defines its shape.
+        def report(result)
+          return reporter.report(result) if result.ok? || !settings.validate?
+
+          reporter.report(
+            result, Validator.errors_for(
+              SchemaRegistry.fetch(:error), result.body
+            )
+          )
         end
 
         def fetch_discovery
           discovery = Discovery.new(client)
           result = discovery.fetch
-          return reporter.report(result) unless result.ok? && settings.validate?
+          return report(result) unless result.ok? && settings.validate?
 
           reporter.report_validation(result, discovery.errors_for(result.body))
         end
@@ -91,7 +103,7 @@ module Scim
         end
 
         def validate_and_report(result, entry, &transform)
-          return reporter.report(result) unless result.ok? && settings.validate?
+          return report(result) unless result.ok? && settings.validate?
 
           errors = validation.errors_for(
             entry, result.body, sparse: settings.sparse?, &transform

@@ -20,9 +20,19 @@ module Scim
 
         def uri_for(path, query)
           uri = URI.join("#{base_url.to_s.sub(%r{/+\z}, '')}/", path)
+          raise OffOrigin.new(uri, base_url) unless same_origin?(uri)
+
           encoded = encode_query(query)
           uri.query = encoded unless encoded.empty?
           uri
+        end
+
+        def same_origin?(uri)
+          origin(uri) == origin(URI.parse(base_url.to_s))
+        end
+
+        def origin(uri)
+          [uri.scheme, uri.host, uri.port]
         end
 
         # Percent-encode per RFC 3986 rather than as a form body, so a SCIM

@@ -48,6 +48,18 @@ module Scim
 
       class InvalidOption < Error; end
 
+      # RFC 7643 section 6 defines a resource type endpoint as relative to the
+      # base URL. A server that advertises an absolute one on another origin
+      # would otherwise be handed the credentials meant for the base URL.
+      class OffOrigin < Error
+        def initialize(uri, base_url)
+          super(
+            "refusing to send a request for #{base_url} to #{uri}, " \
+            'which is a different origin'
+          )
+        end
+      end
+
       # SCIM collection endpoints (/Schemas, /ResourceTypes) return a
       # ListResponse per RFC 7644 section 4, but some servers return a
       # bare array. Return the underlying array for either shape, or nil.

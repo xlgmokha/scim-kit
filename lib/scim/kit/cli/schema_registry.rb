@@ -6,12 +6,14 @@ module Scim
       module SchemaRegistry
         DIR = File.expand_path('schemas', __dir__)
         LIST_RESPONSE = 'list_response.schema.json'
+        ERROR_URN = 'urn:ietf:params:scim:api:messages:2.0:Error'
 
         FILES = {
           service_provider_configuration:
             'service_provider_config.schema.json',
           schemas: 'schemas.schema.json',
-          resource_types: 'resource_types.schema.json'
+          resource_types: 'resource_types.schema.json',
+          error: 'error.schema.json'
         }.freeze
 
         class << self

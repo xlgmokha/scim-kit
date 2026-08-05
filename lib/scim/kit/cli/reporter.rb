@@ -12,8 +12,12 @@ module Scim
           @err = err
         end
 
-        def report(result)
-          result.ok? ? success(result.body) : failure(result.body)
+        def report(result, errors = [])
+          return success(result.body) if result.ok?
+
+          say_error(result.body)
+          say_error(validation_errors: errors) unless errors.empty?
+          FAILURE
         end
 
         def report_validation(result, errors)
@@ -36,7 +40,7 @@ module Scim
         end
 
         def failure(body)
-          err.puts(pretty(body))
+          say_error(body)
           FAILURE
         end
 
@@ -47,6 +51,10 @@ module Scim
         private
 
         attr_reader :out, :err
+
+        def say_error(body)
+          err.puts(pretty(body))
+        end
 
         def pretty(body)
           JSON.pretty_generate(body)

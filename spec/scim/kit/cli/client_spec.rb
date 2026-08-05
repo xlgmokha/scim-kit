@@ -3,8 +3,16 @@
 RSpec.describe Scim::Kit::Cli::Client do
   let(:body) { { id: '1' }.to_json }
 
+  let(:auth) { { 'Authorization' => 'Bearer xyz' } }
+
   def client(base_url, headers: {})
     described_class.new(base_url, headers: headers)
+  end
+
+  def off_origin
+    yield.fetch('https://evil.test/Users')
+  rescue Scim::Kit::Cli::OffOrigin
+    nil
   end
 
   describe '#fetch' do
@@ -43,6 +51,26 @@ RSpec.describe Scim::Kit::Cli::Client do
         .fetch('Users', query: { 'filter' => 'x', 'count' => 2 })
 
       expect(stub).to have_been_requested
+    end
+
+    it 'refuses a path that leaves the base url origin' do
+      expect { client('https://example.com').fetch('https://evil.test/Users') }
+        .to raise_error(Scim::Kit::Cli::OffOrigin, /evil\.test/)
+    end
+
+    it 'allows an absolute path on the same origin' do
+      stub = stub_request(:get, 'https://example.com/scim/Users')
+        .to_return(status: 200, body: body)
+
+      client('https://example.com').fetch('https://example.com/scim/Users')
+
+      expect(stub).to have_been_requested
+    end
+
+    it 'does not send the headers off origin' do
+      off_origin { client('https://example.com', headers: auth) }
+
+      expect(a_request(:get, 'https://evil.test/Users')).not_to have_been_made
     end
 
     it 'percent-encodes spaces in query values' do

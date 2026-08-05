@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schemas": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": "string" },
+    "scimType": {
+      "type": "string",
+      "enum": [
+        "invalidFilter",
+        "tooMany",
+        "uniqueness",
+        "mutability",
+        "invalidSyntax",
+        "invalidPath",
+        "noTarget",
+        "invalidValue",
+        "invalidVers",
+        "sensitive"
+      ]
+    },
+    "detail": { "type": "string" }
+  },
+  "required": ["schemas", "status"]
+}
