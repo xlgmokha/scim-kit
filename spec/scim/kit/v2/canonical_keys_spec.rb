@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Scim::Kit::Cli::CanonicalKeys do
+RSpec.describe Scim::Kit::V2::CanonicalKeys do
   let(:schema) do
     {
       'type' => 'object',

@@ -303,7 +303,7 @@ RSpec.describe Scim::Kit::Cli::App do
       before do
         stub_request(:get, "#{base_url}/Users").to_return(
           status: 404,
-          body: { schemas: [Scim::Kit::Cli::SchemaRegistry::ERROR_URN],
+          body: { schemas: [Scim::Kit::V2::Messages::ERROR],
                   status: 404, detail: 'not found' }.to_json
         )
       end
@@ -325,7 +325,7 @@ RSpec.describe Scim::Kit::Cli::App do
       before do
         stub_request(:get, "#{base_url}/Users").to_return(
           status: 404,
-          body: { schemas: [Scim::Kit::Cli::SchemaRegistry::ERROR_URN],
+          body: { schemas: [Scim::Kit::V2::Messages::ERROR],
                   status: '404', scimType: 'invalidValue' }.to_json
         )
       end

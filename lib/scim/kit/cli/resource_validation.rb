@@ -13,7 +13,7 @@ module Scim
           schema = schema_for(entry)
           return unless schema
 
-          Validator.errors_for(prepare(schema, sparse, &transform), body)
+          V2::JsonSchema.new(prepare(schema, sparse, &transform)).errors_for(body)
         end
 
         private
@@ -27,7 +27,7 @@ module Scim
         end
 
         def prepare(schema, sparse)
-          schema = SparseSchema.relax(schema) if sparse
+          schema = V2::SparseSchema.relax(schema) if sparse
           block_given? ? yield(schema) : schema
         end
 

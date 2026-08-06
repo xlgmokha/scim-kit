@@ -2,7 +2,7 @@
 
 module Scim
   module Kit
-    module Cli
+    module V2
       module SparseSchema
         ALWAYS_RETURNED = %w[schemas id].freeze
 

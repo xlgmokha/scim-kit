@@ -2,7 +2,7 @@
 
 module Scim
   module Kit
-    module Cli
+    module V2
       module CanonicalKeys
         class << self
           def apply(schema, data)

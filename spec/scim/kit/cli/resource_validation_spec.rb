@@ -33,7 +33,7 @@ RSpec.describe Scim::Kit::Cli::ResourceValidation do
 
     it 'applies the transform block to the schema' do
       errors = subject.errors_for(entry, { totalResults: 1 }) do |resource_schema|
-        Scim::Kit::Cli::SchemaRegistry.list_response_with_items(resource_schema)
+        Scim::Kit::V2::JsonSchema.list_of(resource_schema).to_h
       end
 
       expect(errors).to include(/missing required keys.*schemas/)

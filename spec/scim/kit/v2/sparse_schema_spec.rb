@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Scim::Kit::Cli::SparseSchema do
+RSpec.describe Scim::Kit::V2::SparseSchema do
   describe '.relax' do
     let(:schema) do
       {
@@ -67,9 +67,9 @@ RSpec.describe Scim::Kit::Cli::SparseSchema do
     end
 
     it 'accepts a resource carrying only the requested attributes' do
-      errors = Scim::Kit::Cli::Validator.errors_for(
-        described_class.relax(schema), schemas: ['urn:x'], id: '1'
-      )
+      errors = Scim::Kit::V2::JsonSchema
+        .new(described_class.relax(schema))
+        .errors_for(schemas: ['urn:x'], id: '1')
 
       expect(errors).to be_empty
     end

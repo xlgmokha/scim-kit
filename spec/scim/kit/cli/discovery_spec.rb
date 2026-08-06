@@ -62,7 +62,8 @@ RSpec.describe Scim::Kit::Cli::Discovery do
         service_provider_configuration: valid_config.merge(schemas: ['urn:x'])
       )
 
-      expect(errors[:service_provider_configuration]).not_to be_empty
+      expect(errors[:service_provider_configuration])
+        .to include(%r{'/schemas' does not contain: ".*ServiceProviderConfig"})
     end
 
     it 'reports a Schema resource without the Schema URI' do

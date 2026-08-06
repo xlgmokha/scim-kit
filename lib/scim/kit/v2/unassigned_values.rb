@@ -2,7 +2,7 @@
 
 module Scim
   module Kit
-    module Cli
+    module V2
       # RFC 7643 2.5 makes the null value equivalent to an unassigned
       # attribute, and omitting an unassigned attribute is only a MAY.
       # Dropping nulls before validation is what makes the two spellings

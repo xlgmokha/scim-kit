@@ -50,9 +50,7 @@ module Scim
           return reporter.report(result) if result.ok? || !settings.validate?
 
           reporter.report(
-            result, Validator.errors_for(
-              SchemaRegistry.fetch(:error), result.body
-            )
+            result, V2::JsonSchema.fetch(:error).errors_for(result.body)
           )
         end
 
@@ -70,7 +68,7 @@ module Scim
             endpoint_for(entry), query: settings.list_query
           )
           validate_and_report(result, entry) do |schema|
-            SchemaRegistry.list_response_with_items(schema)
+            V2::JsonSchema.list_of(schema).to_h
           end
         end
 

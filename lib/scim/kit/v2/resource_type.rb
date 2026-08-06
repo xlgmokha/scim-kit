@@ -34,11 +34,13 @@ module Scim
 
           def from(hash)
             x = new(location: hash[:location])
-            x.meta = Meta.from(hash[:meta])
+            # RFC 7643 6 makes schemaExtensions OPTIONAL and requires no meta
+            # sub-attribute, so a server may omit either.
+            x.meta = Meta.from(hash[:meta]) if hash[:meta]
             %i[id name description endpoint schema].each do |key|
               x.public_send("#{key}=", hash[key])
             end
-            hash[:schemaExtensions].each do |y|
+            Array(hash[:schemaExtensions]).each do |y|
               x.add_schema_extension(schema: y[:schema], required: y[:required])
             end
             x

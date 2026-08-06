@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
+RSpec.describe Scim::Kit::V2::AttributeSchema do
   describe '.convert' do
     context 'with a string attribute' do
       let(:schema) { { attributes: [{ name: 'userName', type: 'string' }] } }
@@ -13,7 +13,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       end
 
       it 'maps a string attribute' do
-        result = described_class.convert(schema)
+        result = described_class.for(schema[:attributes] || [])
 
         expect(result).to eql(expected_schema)
       end
@@ -29,7 +29,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       end
 
       it 'marks required attributes' do
-        result = described_class.convert(schema)
+        result = described_class.for(schema[:attributes] || [])
 
         expect(result['required']).to eql(['userName'])
       end
@@ -45,7 +45,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       end
 
       it 'wraps multiValued attributes in an array schema' do
-        result = described_class.convert(schema)
+        result = described_class.for(schema[:attributes] || [])
 
         expect(result['properties']['emails']).to eql('type' => 'array', 'items' => { 'type' => 'string' })
       end
@@ -61,7 +61,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       end
 
       it 'maps canonicalValues to enum' do
-        result = described_class.convert(schema)
+        result = described_class.for(schema[:attributes] || [])
 
         expect(result['properties']['type']).to eql('type' => 'string', 'enum' => %w[work home])
       end
@@ -93,7 +93,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       end
 
       it 'maps complex attributes with nested subAttributes' do
-        result = described_class.convert(schema)
+        result = described_class.for(schema[:attributes] || [])
 
         expect(result['properties']['name']).to eql(expected_name_schema)
       end
@@ -114,7 +114,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       it 'maps every scalar SCIM type to its JSON Schema equivalent' do
         types.each do |scim_type, json_schema|
           schema = { attributes: [{ name: 'x', type: scim_type }] }
-          result = described_class.convert(schema)
+          result = described_class.for(schema[:attributes] || [])
 
           expect(result['properties']['x']).to eql(json_schema)
         end
@@ -122,7 +122,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
     end
 
     it 'defaults to no attributes when attributes is missing' do
-      result = described_class.convert({})
+      result = described_class.for({}[:attributes] || [])
 
       expect(result['properties']).to eql({})
     end
@@ -131,13 +131,13 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       it 'leaves an unrecognized type unconstrained instead of raising' do
         schema = { attributes: [{ name: 'x', type: 'Reference' }] }
 
-        expect(described_class.convert(schema)['properties']['x']).to eql({})
+        expect(described_class.for(schema[:attributes] || [])['properties']['x']).to eql({})
       end
 
       it 'leaves a missing type unconstrained instead of raising' do
         schema = { attributes: [{ name: 'x' }] }
 
-        expect(described_class.convert(schema)['properties']['x']).to eql({})
+        expect(described_class.for(schema[:attributes] || [])['properties']['x']).to eql({})
       end
     end
 
@@ -153,7 +153,7 @@ RSpec.describe Scim::Kit::Cli::ScimSchemaConverter do
       end
 
       it 'excludes it from required' do
-        expect(described_class.convert(schema)['required']).to eql(['userName'])
+        expect(described_class.for(schema[:attributes] || [])['required']).to eql(['userName'])
       end
     end
   end

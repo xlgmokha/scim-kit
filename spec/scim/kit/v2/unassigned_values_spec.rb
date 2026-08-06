@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Scim::Kit::Cli::UnassignedValues do
+RSpec.describe Scim::Kit::V2::UnassignedValues do
   describe '.strip' do
     it { expect(described_class.strip('userName' => 'mo', 'externalId' => nil)).to eql('userName' => 'mo') }
     it { expect(described_class.strip('Resources' => [])).to eql('Resources' => []) }

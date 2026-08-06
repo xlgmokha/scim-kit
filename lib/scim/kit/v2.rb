@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 require 'scim/kit/v2/attributable'
+require 'scim/kit/v2/attribute_schema'
+require 'scim/kit/v2/unassigned_values'
+require 'scim/kit/v2/sparse_schema'
+require 'scim/kit/v2/json_schema'
+require 'scim/kit/v2/canonical_keys'
 require 'scim/kit/v2/attribute'
 require 'scim/kit/v2/attribute_type'
 require 'scim/kit/v2/authentication_scheme'

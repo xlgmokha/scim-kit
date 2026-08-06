@@ -27,9 +27,7 @@ module Scim
 
         def errors_for(documents)
           documents.each_with_object({}) do |(key, body), errors|
-            document_errors = Validator.errors_for(
-              SchemaRegistry.fetch(key), body
-            )
+            document_errors = V2::JsonSchema.fetch(key).errors_for(body)
             errors[key] = document_errors unless document_errors.empty?
           end
         end

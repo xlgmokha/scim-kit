@@ -6,7 +6,7 @@ RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
   let(:base_url) { FFaker::Internet.uri('https') }
   let(:core_urn) { 'urn:ietf:params:scim:schemas:core:2.0:User' }
   let(:extension_urn) { 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User' }
-  let(:resource_type) { { id: 'User', name: 'User', endpoint: '/Users', schema: core_urn, schemaExtensions: [{ schema: extension_urn, required: true }] }
+  let(:resource_type) { { id: 'User', name: 'User', endpoint: '/Users', schema: core_urn, schemaExtensions: [{ schema: extension_urn, required: true }] } }
   let(:core_schema) { { id: core_urn, attributes: [{ name: 'userName', type: 'string', required: true }] } }
   let(:extension_schema) { { id: extension_urn, attributes: [{ name: 'employeeNumber', type: 'string' }] } }
 
@@ -15,7 +15,7 @@ RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
     let(:resource) { { schemas: [core_urn], id: '1', userName: 'mo', meta: { resourceType: 'User' }, extension_urn => { employeeNumber: '1' } } }
 
     def errors_for(body)
-      Scim::Kit::Cli::Validator.errors_for(schema, body)
+      Scim::Kit::V2::JsonSchema.new(schema).errors_for(body)
     end
 
     context 'when the core and extension schemas are both found' do
@@ -36,7 +36,7 @@ RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
       specify { expect(schema['properties']).to include('id', 'meta', 'schemas') }
       specify { expect(schema['properties'][extension_urn]).to eql(expected_extension_schema) }
       specify { expect(schema['required']).to include(extension_urn) }
-      specify { expect(errors_for(resource.merge('urn:vendor:custom' => { a: true })).to be_empty }
+      specify { expect(errors_for(resource.merge('urn:vendor:custom' => { a: true }))).to be_empty }
       specify { expect(errors_for(userName: 'mo')).to include(/missing required keys.*schemas/) }
       specify { expect(errors_for(userName: 'mo')).to include(/missing required keys.*id/) }
       specify { expect(errors_for(resource.merge(meta: { version: '123' }))).not_to be_empty }

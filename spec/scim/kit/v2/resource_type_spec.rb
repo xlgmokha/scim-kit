@@ -31,6 +31,16 @@ RSpec.describe Scim::Kit::V2::ResourceType do
     specify { expect(subject.to_h[:schemaExtensions]).to match_array([{ schema: extension, required: false }]) }
   end
 
+  describe '.from' do
+    # RFC 7643 6 makes schemaExtensions OPTIONAL, and no meta sub-attribute is
+    # required, so a server may legally omit either.
+    let(:minimal) { { name: 'User', endpoint: '/Users', schema: 'urn:x' } }
+
+    specify { expect { described_class.from(minimal) }.not_to raise_error }
+    specify { expect(described_class.from(minimal).schema_extensions).to be_empty }
+    specify { expect(described_class.from(minimal).name).to eql('User') }
+  end
+
   describe '.parse' do
     let(:extension) { 'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User' }
     let(:result) { described_class.parse(subject.to_json) }

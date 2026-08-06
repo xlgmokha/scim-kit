@@ -124,6 +124,51 @@ RSpec.describe Scim::Kit::V2::Schema do
     specify { expect(result[:meta][:location]).to eql(location) }
   end
 
+  describe '#to_json_schema' do
+    subject do
+      described_class.build(id: id, name: name, location: location) do |x|
+        x.add_attribute(name: 'userName') { |y| y.required = true }
+        x.add_attribute(name: 'emails') do |y|
+          y.multi_valued = true
+          y.add_attribute(name: 'value')
+        end
+      end
+    end
+
+    let(:result) { subject.to_json_schema }
+
+    specify { expect(result['type']).to eql('object') }
+    specify { expect(result['required']).to eql(['userName']) }
+    specify { expect(result['properties']['userName']).to eql('type' => 'string') }
+    specify { expect(result['properties']['emails']['type']).to eql('array') }
+
+    it 'describes a multi-valued complex attribute by its items' do
+      expect(result['properties']['emails']['items']['properties'])
+        .to include('value' => { 'type' => 'string' })
+    end
+
+    it 'validates a resource built against the same schema' do
+      errors = Scim::Kit::V2::JsonSchema.new(result)
+        .errors_for(userName: 'mo', emails: [{ value: 'mo@example.com' }])
+
+      expect(errors).to be_empty
+    end
+  end
+
+  describe '.from' do
+    let(:minimal) { { id: 'urn:x', name: 'User' } }
+
+    specify { expect { described_class.from(minimal) }.not_to raise_error }
+    specify { expect(described_class.from(minimal).attributes).to be_empty }
+    specify { expect(described_class.from(minimal).name).to eql('User') }
+
+    it 'keeps the description the server sent' do
+      parsed = described_class.from(minimal.merge(description: 'User Account'))
+
+      expect(parsed.description).to eql('User Account')
+    end
+  end
+
   describe '.parse' do
     let(:result) { described_class.parse(subject.to_json) }
 

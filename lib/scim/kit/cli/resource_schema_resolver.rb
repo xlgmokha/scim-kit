@@ -4,29 +4,8 @@ module Scim
   module Kit
     module Cli
       class ResourceSchemaResolver
-        # RFC 7232 2.3: entity-tag = [ "W/" ] DQUOTE *etagc DQUOTE, where
-        # etagc is a visible character other than a double quote. obs-text is
-        # left out, being obsolete.
-        ENTITY_TAG = '^(W/)?"[!#-~]*"$'
-
-        COMMON_PROPERTIES = {
-          'schemas' => {
-            'type' => 'array', 'items' => { 'type' => 'string' }
-          },
-          'id' => { 'type' => 'string' },
-          'externalId' => { 'type' => 'string' },
-          'meta' => {
-            'type' => 'object',
-            'properties' => {
-              'resourceType' => { 'type' => 'string' },
-              'created' => { 'type' => 'string', 'format' => 'date-time' },
-              'lastModified' => {
-                'type' => 'string', 'format' => 'date-time'
-              },
-              'location' => { 'type' => 'string' },
-              'version' => { 'type' => 'string', 'pattern' => ENTITY_TAG }
-            }
-          }
+        SCHEMAS_PROPERTY = {
+          'type' => 'array', 'items' => { 'type' => 'string' }
         }.freeze
 
         COMMON_REQUIRED = %w[schemas id].freeze
@@ -65,8 +44,8 @@ module Scim
         end
 
         def compose(resource_type, schemas, core)
-          converted = ScimSchemaConverter.convert(core)
-          properties = COMMON_PROPERTIES.merge(converted['properties'])
+          converted = V2::AttributeSchema.for(core[:attributes] || [])
+          properties = common_properties.merge(converted['properties'])
           # RFC 7643 3.1 gives the common attributes precedence over any
           # definition a server repeats in its own schema.
           properties['schemas'] = schemas_property(resource_type)
@@ -77,10 +56,19 @@ module Scim
           build_schema(properties, common_required(resource_type) | required)
         end
 
+        def common_properties
+          {
+            'schemas' => SCHEMAS_PROPERTY,
+            'id' => { 'type' => 'string' },
+            'externalId' => { 'type' => 'string' },
+            'meta' => V2::JsonSchema.definition('meta')
+          }
+        end
+
         # RFC 7643 3.1: a non-empty array naming the URIs of the schemas the
         # representation supports, so the resource type's own schema is one.
         def schemas_property(resource_type)
-          COMMON_PROPERTIES['schemas'].merge(
+          SCHEMAS_PROPERTY.merge(
             'contains' => { 'const' => resource_type[:schema] }
           )
         end
@@ -109,7 +97,7 @@ module Scim
             end
 
             properties[extension[:schema]] =
-              ScimSchemaConverter.convert(extension_schema)
+              V2::AttributeSchema.for(extension_schema[:attributes] || [])
             required << extension[:schema] if extension[:required]
           end
         end

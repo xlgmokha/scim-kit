@@ -2,8 +2,10 @@
 
 module Scim
   module Kit
-    module Cli
-      module ScimSchemaConverter
+    module V2
+      # The JSON Schema describing a set of SCIM attribute definitions
+      # (RFC 7643 7), so a server's own /Schemas can validate its resources.
+      module AttributeSchema
         TYPE_MAP = {
           'string' => { 'type' => 'string' },
           'reference' => { 'type' => 'string' },
@@ -15,19 +17,15 @@ module Scim
         }.each_value(&:freeze).freeze
 
         class << self
-          def convert(schema)
-            object_schema(schema[:attributes] || [])
-          end
-
-          private
-
-          def object_schema(attributes)
+          def for(attributes)
             {
               'type' => 'object',
               'properties' => properties_for(attributes),
               'required' => required_for(attributes)
             }
           end
+
+          private
 
           def properties_for(attributes)
             attributes.to_h { |a| [a[:name], attribute_schema(a)] }
@@ -48,7 +46,7 @@ module Scim
 
           def leaf_schema(attribute)
             if attribute[:type] == 'complex'
-              object_schema(attribute[:subAttributes] || [])
+              self.for(attribute[:subAttributes] || [])
             else
               with_enum(attribute)
             end
