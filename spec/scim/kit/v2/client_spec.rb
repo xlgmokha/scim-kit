@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Scim::Kit::Cli::Client do
+RSpec.describe Scim::Kit::V2::Client do
   let(:body) { { id: '1' }.to_json }
 
   let(:auth) { { 'Authorization' => 'Bearer xyz' } }
@@ -11,8 +11,39 @@ RSpec.describe Scim::Kit::Cli::Client do
 
   def off_origin
     yield.fetch('https://evil.test/Users')
-  rescue Scim::Kit::Cli::OffOrigin
+  rescue Scim::Kit::OffOrigin
     nil
+  end
+
+  describe '#discover' do
+    let(:base_url) { 'https://example.com/scim/v2' }
+    let(:spc) { { schemas: [Scim::Kit::V2::Schemas::SERVICE_PROVIDER_CONFIGURATION] } }
+    let(:list) { { schemas: [Scim::Kit::V2::Messages::LIST_RESPONSE], totalResults: 0, Resources: [] } }
+
+    before do
+      stub_request(:get, "#{base_url}/ServiceProviderConfig").to_return(status: 200, body: spc.to_json)
+      stub_request(:get, "#{base_url}/Schemas").to_return(status: 200, body: list.to_json)
+      stub_request(:get, "#{base_url}/ResourceTypes").to_return(status: 200, body: list.to_json)
+    end
+
+    specify { expect(client(base_url).discover).to be_ok }
+    specify { expect(client(base_url).discover.body.keys).to eql(%i[service_provider_configuration schemas resource_types]) }
+    specify { expect(client(base_url).discover.body[:service_provider_configuration]).to eql(spc) }
+
+    context 'when a request fails' do
+      before do
+        stub_request(:get, "#{base_url}/ServiceProviderConfig")
+          .to_return(status: 500, body: { detail: 'boom' }.to_json)
+      end
+
+      specify { expect(client(base_url).discover).not_to be_ok }
+
+      it 'stops before requesting the later documents' do
+        client(base_url).discover
+
+        expect(a_request(:get, "#{base_url}/Schemas")).not_to have_been_made
+      end
+    end
   end
 
   describe '#fetch' do
@@ -55,7 +86,7 @@ RSpec.describe Scim::Kit::Cli::Client do
 
     it 'refuses a path that leaves the base url origin' do
       expect { client('https://example.com').fetch('https://evil.test/Users') }
-        .to raise_error(Scim::Kit::Cli::OffOrigin, /evil\.test/)
+        .to raise_error(Scim::Kit::OffOrigin, /evil\.test/)
     end
 
     it 'allows an absolute path on the same origin' do

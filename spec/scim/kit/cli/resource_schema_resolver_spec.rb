@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::Cli::ResourceSchemaResolver do
-  subject { described_class.new(Scim::Kit::Cli::Client.new(base_url)) }
+  subject { described_class.new(Scim::Kit::V2::Client.new(base_url)) }
 
   let(:base_url) { FFaker::Internet.uri('https') }
   let(:core_urn) { 'urn:ietf:params:scim:schemas:core:2.0:User' }

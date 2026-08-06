@@ -3,7 +3,7 @@
 RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
   subject do
     described_class.new(
-      Scim::Kit::Cli::Client.new(base_url, headers: headers)
+      Scim::Kit::V2::Client.new(base_url, headers: headers)
     )
   end
 
@@ -48,7 +48,7 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
 
     it 'raises when no resource type matches the given name' do
       expect { subject.resource_type_for('Nope') }.to raise_error(
-        Scim::Kit::Cli::UnknownResourceType, /Nope/
+        Scim::Kit::UnknownResourceType, /Nope/
       )
     end
 
@@ -84,7 +84,7 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
     before { stub_request(:get, "#{base_url}/ResourceTypes").to_return(status: 500, body: '{}') }
 
     it 'raises' do
-      expect { subject.resource_type_for('User') }.to raise_error(Scim::Kit::Cli::RequestFailed)
+      expect { subject.resource_type_for('User') }.to raise_error(Scim::Kit::RequestFailed)
     end
   end
 
@@ -97,7 +97,7 @@ RSpec.describe Scim::Kit::Cli::ResourceTypeResolver do
     end
 
     it 'raises InvalidResponse' do
-      expect { subject.resource_type_for('User') }.to raise_error(Scim::Kit::Cli::InvalidResponse)
+      expect { subject.resource_type_for('User') }.to raise_error(Scim::Kit::InvalidResponse)
     end
   end
 end

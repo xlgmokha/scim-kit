@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'scim/kit/v2/attributable'
+require 'scim/kit/v2/client'
 require 'scim/kit/v2/attribute_schema'
 require 'scim/kit/v2/unassigned_values'
 require 'scim/kit/v2/sparse_schema'
@@ -27,6 +28,7 @@ require 'scim/kit/v2/service_provider_configuration'
 require 'scim/kit/v2/supportable'
 require 'scim/kit/v2/uniqueness'
 require 'scim/kit/v2/unknown_attribute'
+require 'scim/kit/v2/resource_schema'
 require 'scim/kit/v2/schema_validatable'
 require 'scim/kit/v2/document'
 require 'scim/kit/v2/documents'

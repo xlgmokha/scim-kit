@@ -2,7 +2,7 @@
 
 module Scim
   module Kit
-    module Cli
+    module V2
       class Client
         def initialize(base_url, headers: {}, http: Scim::Kit::Http.new)
           @base_url = base_url
@@ -10,8 +10,28 @@ module Scim
           @http = http
         end
 
+        # RFC 7644 4 defines the three endpoints a client reads to learn what
+        # a server supports.
+        DISCOVERY = {
+          service_provider_configuration: 'ServiceProviderConfig',
+          schemas: 'Schemas',
+          resource_types: 'ResourceTypes'
+        }.freeze
+
         def fetch(path, query: {})
           http.fetch(uri_for(path, query), headers: headers)
+        end
+
+        # The three discovery documents as one result, or the first failure.
+        def discover
+          documents = {}
+          DISCOVERY.each do |key, path|
+            result = fetch(path)
+            return result unless result.ok?
+
+            documents[key] = result.body
+          end
+          Http::Result.new(200, documents)
         end
 
         private

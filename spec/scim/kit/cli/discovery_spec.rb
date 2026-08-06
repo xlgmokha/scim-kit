@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Scim::Kit::Cli::Discovery do
-  subject { described_class.new(Scim::Kit::Cli::Client.new(base_url)) }
+  subject { described_class.new(Scim::Kit::V2::Client.new(base_url)) }
 
   let(:base_url) { FFaker::Internet.uri('https') }
   let(:config) { { schemas: ['urn:x'], patch: { supported: true } } }

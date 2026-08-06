@@ -48,27 +48,67 @@ module Scim
           yield Builder.new(self) if block_given?
         end
 
-        def load_from(base_url)
-          base_url = "#{base_url}/"
-          uri = URI.join(base_url, 'ServiceProviderConfig')
-          json = http.get(uri)
+        # RFC 7643 6: a resource type is addressed by its id or its name.
+        def resource_type_for(name)
+          match = resource_types.values.find do |x|
+            x.id&.casecmp?(name) || x.name&.casecmp?(name)
+          end
+          return match if match
 
-          self.service_provider_configuration = ServiceProviderConfiguration.parse(json, json)
+          raise UnknownResourceType.new(
+            name, resource_types.values.map(&:name)
+          )
+        end
 
-          load_items(base_url, 'Schemas', Schema, schemas)
-          load_items(base_url, 'ResourceTypes', ResourceType, resource_types)
+        def schema_for(urn)
+          schemas[urn]
+        end
+
+        # The JSON Schema a resource of this type must satisfy, or nil when
+        # the server never published its base schema.
+        def json_schema_for(resource_type, sparse: false)
+          schema = resource_type.to_json_schema(schemas: schemas)
+          return nil unless schema
+
+          JsonSchema.new(sparse ? SparseSchema.relax(schema) : schema)
+        end
+
+        # Reads a server's three discovery documents (RFC 7644 4) and rebuilds
+        # them as models. A failed request is raised rather than swallowed: a
+        # silently empty configuration is not a useful outcome.
+        def load_from(base_url, headers: {})
+          client = Client.new(base_url, headers: headers, http: http)
+          result = client.discover
+          raise Scim::Kit::RequestFailed, result unless result.ok?
+
+          body = result.body
+          self.service_provider_configuration =
+            ServiceProviderConfiguration.parse(
+              nil, body[:service_provider_configuration]
+            )
+          load_items(body[:schemas], Schema, schemas)
+          load_items(body[:resource_types], ResourceType, resource_types)
         end
 
         private
 
         attr_reader :http
 
-        def load_items(base_url, path, type, items)
-          hashes = http.get(URI.join(base_url, path))
-          hashes.each do |hash|
+        def load_items(body, type, items)
+          collection(body).each do |hash|
             item = type.from(hash)
             items[item.id] = item
           end
+        end
+
+        # RFC 7644 4 says a collection SHALL use the ListResponse form, but
+        # some servers return a bare array. Read either.
+        def collection(body)
+          return body if body.is_a?(Array)
+          return [] unless body.is_a?(Hash)
+
+          resources = body[:Resources]
+          resources.is_a?(Array) ? resources : []
         end
       end
     end

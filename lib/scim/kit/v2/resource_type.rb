@@ -25,6 +25,25 @@ module Scim
           @schema_extensions.push(schema: schema, required: required)
         end
 
+        # The JSON Schema for a resource of this type: the RFC 7643 3.1
+        # common attributes, the base schema's own attributes, and each
+        # declared extension namespaced under its URN (3.3).
+        # Returns nil when the base schema is not among those given.
+        def to_json_schema(schemas:)
+          core = schemas[schema]
+          return nil unless core
+
+          ResourceSchema.new(self, schemas, core).to_h
+        end
+
+        # The extension URNs this type declares that the given schemas omit,
+        # which means /ResourceTypes and /Schemas disagree.
+        def undeclared_extensions(schemas:)
+          schema_extensions
+            .map { |x| x[:schema] }
+            .reject { |urn| schemas.key?(urn) }
+        end
+
         class << self
           def build(**args)
             item = new(**args)

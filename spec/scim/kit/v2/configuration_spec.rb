@@ -69,4 +69,124 @@ RSpec.describe Scim::Kit::V2::Configuration do
     specify { expect(subject.schemas[schema.id].to_h).to eql(schema.to_h) }
     specify { expect(subject.resource_types[resource_type.id].to_h).to eql(resource_type.to_h) }
   end
+
+  describe 'lookups' do
+    let(:base_url) { FFaker::Internet.uri('https') }
+    let(:user_urn) { Scim::Kit::V2::Schemas::USER }
+    let(:schema) do
+      Scim::Kit::V2::Schema.build(id: user_urn, name: 'User', location: base_url) do |x|
+        x.add_attribute(name: 'userName') { |y| y.required = true }
+      end
+    end
+    let(:resource_type) do
+      Scim::Kit::V2::ResourceType.build(location: base_url) do |x|
+        x.id = 'User'
+        x.name = 'User'
+        x.endpoint = '/Users'
+        x.schema = user_urn
+      end
+    end
+
+    before do
+      subject.schemas[schema.id] = schema
+      subject.resource_types[resource_type.id] = resource_type
+    end
+
+    # RFC 7643 2.1 makes attribute names case insensitive; the same courtesy
+    # for a resource type name spares callers guessing the server's casing.
+    specify { expect(subject.resource_type_for('User')).to eql(resource_type) }
+    specify { expect(subject.resource_type_for('user')).to eql(resource_type) }
+    specify { expect(subject.resource_type_for('USER')).to eql(resource_type) }
+    specify { expect(subject.schema_for(user_urn)).to eql(schema) }
+    specify { expect(subject.schema_for('urn:nope')).to be_nil }
+
+    it 'names what it knows when a resource type is unknown' do
+      expect { subject.resource_type_for('Nope') }
+        .to raise_error(Scim::Kit::UnknownResourceType, /User/)
+    end
+
+    describe '#json_schema_for' do
+      let(:json_schema) { subject.json_schema_for(resource_type) }
+      let(:resource) { { schemas: [user_urn], id: '1', userName: 'mo' } }
+
+      let(:unknown_type) do
+        Scim::Kit::V2::ResourceType.build(location: base_url) do |x|
+          x.name = 'Nope'
+          x.schema = 'urn:nope'
+        end
+      end
+
+      specify { expect(json_schema.errors_for(resource)).to be_empty }
+      specify { expect(json_schema.errors_for({ schemas: [user_urn], id: '1' })).to include(/userName/) }
+      specify { expect(json_schema.errors_for({ schemas: [user_urn], userName: 'mo' })).to include(/id/) }
+      specify { expect(json_schema.errors_for(resource.merge(schemas: ['urn:x']))).not_to be_empty }
+      specify { expect(subject.json_schema_for(unknown_type)).to be_nil }
+
+      it 'relaxes required attributes for a sparse response' do
+        sparse = subject.json_schema_for(resource_type, sparse: true)
+
+        expect(sparse.errors_for({ schemas: [user_urn], id: '1' })).to be_empty
+      end
+    end
+  end
+
+  # RFC 7644 4: /Schemas and /ResourceTypes SHALL use the ListResponse form,
+  # though some servers return a bare array. Both are accepted.
+  describe '#load_from with a ListResponse envelope' do
+    let(:base_url) { FFaker::Internet.uri('https') }
+    let(:schema) do
+      Scim::Kit::V2::Schema.new(id: 'User', name: 'User', location: FFaker::Internet.uri('https'))
+    end
+
+    def envelope(*resources)
+      { schemas: [Scim::Kit::V2::Messages::LIST_RESPONSE],
+        totalResults: resources.length, Resources: resources }
+    end
+
+    before do
+      stub_request(:get, "#{base_url}/ServiceProviderConfig")
+        .to_return(status: 200, body: { schemas: [Scim::Kit::V2::Schemas::SERVICE_PROVIDER_CONFIGURATION] }.to_json)
+      stub_request(:get, "#{base_url}/Schemas")
+        .to_return(status: 200, body: envelope(schema.to_h).to_json)
+      stub_request(:get, "#{base_url}/ResourceTypes")
+        .to_return(status: 200, body: envelope.to_json)
+    end
+
+    specify { expect { subject.load_from(base_url) }.not_to raise_error }
+
+    it 'reads the resources out of the envelope' do
+      subject.load_from(base_url)
+
+      expect(subject.schemas[schema.id].to_h).to eql(schema.to_h)
+    end
+  end
+
+  describe '#load_from when the server fails' do
+    let(:base_url) { FFaker::Internet.uri('https') }
+
+    before do
+      stub_request(:get, "#{base_url}/ServiceProviderConfig")
+        .to_return(status: 500, body: { detail: 'boom' }.to_json)
+    end
+
+    # Silently leaving the configuration empty hides the failure.
+    specify { expect { subject.load_from(base_url) }.to raise_error(Scim::Kit::RequestFailed) }
+  end
+
+  describe '#load_from with credentials' do
+    let(:base_url) { FFaker::Internet.uri('https') }
+    let(:headers) { { 'Authorization' => 'Bearer xyz' } }
+
+    before do
+      stub_request(:get, %r{#{base_url}/.*}).with(headers: headers)
+        .to_return(status: 200, body: { schemas: ['urn:x'] }.to_json)
+    end
+
+    it 'forwards them to every discovery request' do
+      subject.load_from(base_url, headers: headers)
+
+      expect(a_request(:get, "#{base_url}/Schemas").with(headers: headers))
+        .to have_been_made
+    end
+  end
 end

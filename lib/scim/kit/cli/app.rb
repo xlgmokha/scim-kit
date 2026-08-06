@@ -40,7 +40,7 @@ module Scim
           exit(yield)
         rescue RequestFailed => error
           exit(report(error.result))
-        rescue Error => error
+        rescue Scim::Kit::Error => error
           exit(reporter.failure(detail: error.message))
         end
 
@@ -126,7 +126,7 @@ module Scim
         end
 
         def client
-          @client ||= Client.new(settings.url, headers: settings.headers)
+          @client ||= V2::Client.new(settings.url, headers: settings.headers)
         end
       end
     end
