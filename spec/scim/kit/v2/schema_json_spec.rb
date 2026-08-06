@@ -2,7 +2,9 @@
 
 # Every document this gem renders is validated against the bundled
 # lib/scim/kit/v2/schema.json, so generated output cannot drift from the RFC.
-RSpec.describe 'lib/scim/kit/v2/schema.json' do
+# Every document this gem renders is validated against the bundled
+# lib/scim/kit/v2/schema.json, so generated output cannot drift from the RFC.
+RSpec.describe Scim::Kit::V2::JsonSchema, '#errors_for' do
   let(:location) { FFaker::Internet.uri('https') }
   let(:user_urn) { Scim::Kit::V2::Schemas::USER }
 
@@ -84,7 +86,7 @@ RSpec.describe 'lib/scim/kit/v2/schema.json' do
         x.user_name = 'mo'
       end
     end
-    let(:derived) { Scim::Kit::V2::JsonSchema.new(schema.to_json_schema) }
+    let(:derived) { described_class.new(schema.to_json_schema) }
 
     specify { expect(derived.errors_for(JSON.parse(resource.to_json, symbolize_names: true))).to be_empty }
   end
