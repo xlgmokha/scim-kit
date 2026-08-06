@@ -3,7 +3,7 @@
 module Scim
   module Kit
     module Cli
-      class Reporter
+      class Console
         SUCCESS = 0
         FAILURE = 1
 

@@ -73,6 +73,15 @@ module Scim
           JsonSchema.new(sparse ? SparseSchema.relax(schema) : schema)
         end
 
+        # Where this resource type and the loaded schemas disagree: an
+        # extension declared by /ResourceTypes that /Schemas never published.
+        def disagreements_for(resource_type)
+          resource_type.undeclared_extensions(schemas: schemas).map do |urn|
+            "schema extension #{urn.inspect} is declared by the resource " \
+              'type but missing from /Schemas'
+          end
+        end
+
         # Reads a server's three discovery documents (RFC 7644 4) and rebuilds
         # them as models. A failed request is raised rather than swallowed: a
         # silently empty configuration is not a useful outcome.
@@ -90,9 +99,39 @@ module Scim
           load_items(body[:resource_types], ResourceType, resource_types)
         end
 
+        # Loaded one collection at a time so a caller that never validates
+        # does not pay for a /Schemas request.
+        def load_schemas(client)
+          return if @schemas_loaded
+
+          load_collection(client, 'Schemas', Schema, schemas)
+          @schemas_loaded = true
+        end
+
+        def load_resource_types(client)
+          return if @resource_types_loaded
+
+          load_collection(client, 'ResourceTypes', ResourceType, resource_types)
+          @resource_types_loaded = true
+        end
+
         private
 
         attr_reader :http
+
+        def load_collection(client, path, type, items)
+          result = client.fetch(path)
+          raise Scim::Kit::RequestFailed, result unless result.ok?
+          raise Scim::Kit::InvalidResponse, "expected #{path} to return a list" \
+            unless listable?(result.body)
+
+          load_items(result.body, type, items)
+          true
+        end
+
+        def listable?(body)
+          body.is_a?(Array) || (body.is_a?(Hash) && body[:Resources].is_a?(Array))
+        end
 
         def load_items(body, type, items)
           collection(body).each do |hash|

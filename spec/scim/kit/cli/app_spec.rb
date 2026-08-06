@@ -424,7 +424,7 @@ RSpec.describe Scim::Kit::Cli::App do
           )
         end
 
-        it 'warns about the undeclared extension' do
+        it 'reports the undeclared extension' do
           allow($stdout).to receive(:puts)
           instance = app('validate' => true)
 
@@ -432,12 +432,14 @@ RSpec.describe Scim::Kit::Cli::App do
             .to output(/#{Regexp.escape(extension_urn)}/).to_stderr
         end
 
-        it 'still exits 0' do
+        # The server's own /ResourceTypes and /Schemas disagree, which is
+        # exactly what this tool exists to catch.
+        it 'exits 1' do
           allow($stdout).to receive(:puts)
           allow($stderr).to receive(:puts)
           instance = app('validate' => true)
 
-          expect(exit_status { instance.list('User') }).to eq(0)
+          expect(exit_status { instance.list('User') }).to eq(1)
         end
       end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Scim::Kit::Cli::Reporter do
+RSpec.describe Scim::Kit::Cli::Console do
   subject { described_class.new }
 
   let(:body) { { id: '123' } }

@@ -25,6 +25,14 @@ module Scim
           @schema_extensions.push(schema: schema, required: required)
         end
 
+        # RFC 7643 6: the endpoint is relative to the base URL, so a leading
+        # slash would resolve against the host rather than the base.
+        def endpoint_path
+          raise Scim::Kit::MissingEndpoint, name || id if endpoint.to_s.empty?
+
+          endpoint.delete_prefix('/')
+        end
+
         # The JSON Schema for a resource of this type: the RFC 7643 3.1
         # common attributes, the base schema's own attributes, and each
         # declared extension namespaced under its URN (3.3).

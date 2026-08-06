@@ -3,11 +3,7 @@
 require 'thor'
 
 require 'scim/kit/cli/app'
-require 'scim/kit/cli/discovery'
-require 'scim/kit/cli/reporter'
-require 'scim/kit/cli/resource_schema_resolver'
-require 'scim/kit/cli/resource_type_resolver'
-require 'scim/kit/cli/resource_validation'
+require 'scim/kit/cli/console'
 require 'scim/kit/cli/settings'
 
 module Scim

@@ -3,6 +3,7 @@
 module Scim
   module Kit
     module Cli
+      # Make the request, hand the response to the library, print the result.
       class App < Thor
         def self.exit_on_failure?
           true
@@ -41,84 +42,86 @@ module Scim
         rescue RequestFailed => error
           exit(report(error.result))
         rescue Scim::Kit::Error => error
-          exit(reporter.failure(detail: error.message))
+          exit(console.failure(detail: error.message))
         end
 
         # A failed request carries the server's Error document, so --validate
         # checks that too -- RFC 7644 3.12 defines its shape.
         def report(result)
-          return reporter.report(result) if result.ok? || !settings.validate?
+          return console.report(result) if result.ok? || !settings.validate?
 
-          reporter.report(
+          console.report(
             result, V2::JsonSchema.fetch(:error).errors_for(result.body)
           )
         end
 
         def fetch_discovery
-          discovery = Discovery.new(client)
-          result = discovery.fetch
+          result = client.discover
           return report(result) unless result.ok? && settings.validate?
 
-          reporter.report_validation(result, discovery.errors_for(result.body))
+          console.report_validation(result, discovery_errors(result.body))
+        end
+
+        # Validated by the endpoint that was asked, not by what came back: a
+        # document missing its own "schemas" is exactly what needs reporting.
+        def discovery_errors(body)
+          body.each_with_object({}) do |(key, document), errors|
+            messages = V2::JsonSchema.fetch(key).errors_for(document)
+            errors[key] = messages unless messages.empty?
+          end
         end
 
         def fetch_list(resource_type)
-          entry = resource_type_entry(resource_type)
-          result = client.fetch(
-            endpoint_for(entry), query: settings.list_query
-          )
+          entry = resource_type_for(resource_type)
+          result = client.fetch(entry.endpoint_path, query: settings.list_query)
           validate_and_report(result, entry) do |schema|
-            V2::JsonSchema.list_of(schema).to_h
+            V2::JsonSchema.list_of(schema.to_h)
           end
         end
 
         def fetch_resource(resource_type, id)
-          entry = resource_type_entry(resource_type)
-          path = "#{endpoint_for(entry)}/#{URI.encode_uri_component(id)}"
+          entry = resource_type_for(resource_type)
+          path = "#{entry.endpoint_path}/#{URI.encode_uri_component(id)}"
           result = client.fetch(path, query: settings.resource_query)
           validate_and_report(result, entry)
         end
 
-        def endpoint_for(entry)
-          endpoint = entry[:endpoint]
-          if endpoint.to_s.empty?
-            raise MissingEndpoint, entry[:name] || entry[:id]
-          end
-
-          endpoint.delete_prefix('/')
-        end
-
-        def resource_type_entry(resource_type)
-          resource_type_resolver.resource_type_for(resource_type)
-        end
-
-        def resource_type_resolver
-          @resource_type_resolver ||= ResourceTypeResolver.new(client)
-        end
-
-        def resource_schema_resolver
-          @resource_schema_resolver ||= ResourceSchemaResolver.new(client)
-        end
-
-        def validate_and_report(result, entry, &transform)
+        def validate_and_report(result, entry)
           return report(result) unless result.ok? && settings.validate?
 
-          errors = validation.errors_for(
-            entry, result.body, sparse: settings.sparse?, &transform
-          )
-          return reporter.report_unvalidated(result) unless errors
+          json_schema = json_schema_for(entry)
+          return console.report_unvalidated(result) unless json_schema
 
-          reporter.report_validation(result, errors)
-        end
-
-        def validation
-          @validation ||= ResourceValidation.new(
-            resource_schema_resolver, reporter
+          json_schema = yield(json_schema) if block_given?
+          console.report_validation(
+            result, configuration.disagreements_for(entry) +
+              json_schema.errors_for(result.body)
           )
         end
 
-        def reporter
-          @reporter ||= Reporter.new
+        def json_schema_for(entry)
+          configuration.load_schemas(client)
+          schema = configuration.json_schema_for(entry, sparse: settings.sparse?)
+          return schema if schema
+
+          console.warn(
+            "no schema found for resource type #{entry.name.inspect}; " \
+            'cannot validate the response'
+          )
+          nil
+        end
+
+        def resource_type_for(name)
+          configuration.load_resource_types(client)
+          configuration.resource_type_for(name)
+        end
+
+        def configuration
+          @configuration ||= V2::Configuration.new
+        end
+
+        def console
+          @console ||= Console.new
         end
 
         def settings
