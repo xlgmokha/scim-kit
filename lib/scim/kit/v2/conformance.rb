@@ -6,19 +6,20 @@ module Scim
       # How far a server's responses conform to RFC 7643 and RFC 7644,
       # measured against what that server declares about itself.
       class Conformance
+        COLLECTIONS = %i[schemas resource_types].freeze
+
         def initialize(configuration = V2.configuration)
           @configuration = configuration
         end
 
         # Each discovery document against its own schema, then against each
-        # other: a contradiction between them belongs to neither alone.
+        # other: a contradiction between them belongs to neither alone. A
+        # document already reported as malformed is not parsed again.
         def discovery_errors(body)
-          errors = body.each_with_object({}) do |(key, document), acc|
-            messages = JsonSchema.fetch(key).errors_for(document)
-            acc[key] = messages unless messages.empty?
-          end
-          configuration.load(body)
-          merge_undeclared_extensions(errors)
+          errors = schema_errors(body)
+          return errors if COLLECTIONS.any? { |key| errors.key?(key) }
+
+          merge_undeclared_extensions(errors, declared_in(body))
         end
 
         # Nil when the server never published the base schema, which is not
@@ -40,8 +41,19 @@ module Scim
 
         attr_reader :configuration
 
-        def merge_undeclared_extensions(errors)
-          messages = undeclared_extension_messages
+        def schema_errors(body)
+          body.each_with_object({}) do |(key, document), acc|
+            messages = JsonSchema.fetch(key).errors_for(document)
+            acc[key] = messages unless messages.empty?
+          end
+        end
+
+        def declared_in(body)
+          Configuration.new.tap { |x| x.load(body.slice(*COLLECTIONS)) }
+        end
+
+        def merge_undeclared_extensions(errors, declared)
+          messages = undeclared_extension_messages(declared)
           return errors if messages.empty?
 
           errors.merge(
@@ -49,9 +61,9 @@ module Scim
           )
         end
 
-        def undeclared_extension_messages
-          configuration.resource_types.values.flat_map do |type|
-            type.undeclared_extensions(schemas: configuration.schemas)
+        def undeclared_extension_messages(declared)
+          declared.resource_types.values.flat_map do |type|
+            type.undeclared_extensions(schemas: declared.schemas)
               .map { |urn| undeclared_extension_message(type, urn) }
           end
         end

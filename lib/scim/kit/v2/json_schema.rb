@@ -64,10 +64,21 @@ module Scim
           @schema = schema
         end
 
+        # RFC 7643 2.1: attribute names are case insensitive. Renaming during
+        # json_schemer's own traversal reaches every attribute it declares,
+        # including those behind a $ref or an allOf.
+        CANONICAL_KEYS = lambda do |data, property, _subschema, _schema|
+          next if data.key?(property)
+
+          match = data.keys.find { |key| key.to_s.casecmp?(property) }
+          data[property] = data.delete(match) if match
+        end
+
         def errors_for(data)
           document = UnassignedValues.strip(normalize(data))
-          JSONSchemer.schema(schema)
-            .validate(CanonicalKeys.apply(schema, document))
+          JSONSchemer
+            .schema(schema, before_property_validation: [CANONICAL_KEYS])
+            .validate(document)
             .map { |error| message_for(error) }
         end
 

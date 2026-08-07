@@ -112,6 +112,48 @@ RSpec.describe Scim::Kit::V2::JsonSchema do
       expect(errors).to eql(["property '/userName' is not of type: string"])
     end
 
+    context 'with case-insensitive attribute names (RFC 7643 2.1)' do
+      let(:schema) do
+        {
+          'type' => 'object',
+          'properties' => {
+            'userName' => { 'type' => 'string' },
+            'name' => {
+              'type' => 'object',
+              'properties' => { 'givenName' => { 'type' => 'string' } }
+            },
+            'emails' => {
+              'type' => 'array',
+              'items' => {
+                'type' => 'object',
+                'properties' => { 'value' => { 'type' => 'string' } }
+              }
+            }
+          },
+          'required' => ['userName']
+        }
+      end
+
+      specify { expect(described_class.new(schema).errors_for({ USERNAME: 'bjensen' })).to be_empty }
+      specify { expect(described_class.new(schema).errors_for({ username: 'bjensen' })).to be_empty }
+      specify { expect(described_class.new(schema).errors_for({ userName: 'bjensen' })).to be_empty }
+      specify { expect(described_class.new(schema).errors_for({ userName: 'bjensen', 'urn:vendor:x': 1 })).to be_empty }
+
+      it 'renames nested sub-attributes' do
+        errors = described_class.new(schema)
+          .errors_for({ userName: 'bjensen', NAME: { GIVENNAME: 1 } })
+
+        expect(errors).to eql(["property '/name/givenName' is not of type: string"])
+      end
+
+      it 'renames keys inside array items' do
+        errors = described_class.new(schema)
+          .errors_for({ userName: 'bjensen', EMAILS: [{ VALUE: 1 }] })
+
+        expect(errors).to eql(["property '/emails/0/value' is not of type: string"])
+      end
+    end
+
     it 'returns a readable error for an undeclared property' do
       errors = described_class.new(schema).errors_for({ userName: 'bjensen', extra: true })
 

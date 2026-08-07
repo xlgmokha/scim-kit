@@ -121,8 +121,10 @@ module Scim
 
         def load_items(body, type, items)
           collection(body).each do |hash|
+            next unless hash.is_a?(Hash)
+
             item = type.from(hash)
-            items[item.id] = item
+            items[item.id || item.name] = item
           end
         end
 

@@ -70,6 +70,24 @@ RSpec.describe Scim::Kit::V2::Configuration do
     specify { expect(subject.resource_types[resource_type.id].to_h).to eql(resource_type.to_h) }
   end
 
+  # RFC 7643 6 makes "id" OPTIONAL on a ResourceType, so it cannot be the key.
+  describe '#load without ids' do
+    subject { described_class.new }
+
+    let(:body) do
+      { resource_types: [
+        { name: 'User', endpoint: '/Users', schema: 'urn:u' },
+        { name: 'Group', endpoint: '/Groups', schema: 'urn:g' }
+      ] }
+    end
+
+    before { subject.load(body) }
+
+    specify { expect(subject.resource_types.size).to be(2) }
+    specify { expect(subject.resource_type_for('User').endpoint).to eql('/Users') }
+    specify { expect(subject.resource_type_for('Group').endpoint).to eql('/Groups') }
+  end
+
   describe 'lookups' do
     let(:base_url) { FFaker::Internet.uri('https') }
     let(:user_urn) { Scim::Kit::V2::Schemas::USER }

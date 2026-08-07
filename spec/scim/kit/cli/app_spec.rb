@@ -175,6 +175,27 @@ RSpec.describe Scim::Kit::Cli::App do
 
     # Neither document is wrong on its own, so only discover can catch it.
     context 'when --validate is set and the documents contradict' do
+      let(:service_provider_configuration) do
+        {
+          schemas: ['urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig'],
+          patch: { supported: true },
+          bulk: { supported: false, maxOperations: 0, maxPayloadSize: 0 },
+          filter: { supported: false, maxResults: 0 },
+          changePassword: { supported: false }, sort: { supported: false },
+          etag: { supported: false }, authenticationSchemes: []
+        }
+      end
+      let(:schemas) do
+        {
+          schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+          totalResults: 1,
+          Resources: [{
+            schemas: ['urn:ietf:params:scim:schemas:core:2.0:Schema'],
+            id: 'urn:ietf:params:scim:schemas:core:2.0:User',
+            name: 'User', attributes: []
+          }]
+        }
+      end
       let(:resource_types) do
         {
           schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
@@ -542,11 +563,11 @@ RSpec.describe Scim::Kit::Cli::App do
 
     context 'when the id needs escaping' do
       it 'escapes a space rather than raising URI::InvalidURIError' do
-        stub = stub_request(:get, "#{base_url}/Users/mo%20khan")
+        stub = stub_request(:get, "#{base_url}/Users/some%20id")
           .to_return(status: 200, body: {}.to_json)
         allow($stdout).to receive(:puts)
 
-        exit_status { app.get('User', 'mo khan') }
+        exit_status { app.get('User', 'some id') }
 
         expect(stub).to have_been_requested
       end

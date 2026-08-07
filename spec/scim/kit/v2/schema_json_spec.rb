@@ -83,7 +83,7 @@ RSpec.describe Scim::Kit::V2::JsonSchema, '#errors_for' do
     let(:resource) do
       Scim::Kit::V2::Resource.new(schemas: [schema], location: location).tap do |x|
         x.id = SecureRandom.uuid
-        x.user_name = 'mo'
+        x.user_name = 'bjensen'
       end
     end
     let(:derived) { described_class.new(schema.to_json_schema) }

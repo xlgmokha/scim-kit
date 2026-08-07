@@ -229,13 +229,13 @@ RSpec.describe Scim::Kit::V2::Attribute do
     end
 
     specify do
-      subject.name = 'mo'
+      subject.name = 'bjensen'
       subject.age = 34
       expect(subject).to be_valid
     end
 
     specify do
-      subject.name = 'mo'
+      subject.name = 'bjensen'
       subject.age = []
       expect(subject).not_to be_valid
     end

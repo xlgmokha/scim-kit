@@ -34,7 +34,7 @@ RSpec.describe Scim::Kit::V2::Conformance do
         x.schema = 'urn:nope'
       end
     end
-    let(:resource) { { schemas: [user_urn], id: '1', userName: 'mo' } }
+    let(:resource) { { schemas: [user_urn], id: '1', userName: 'bjensen' } }
 
     before do
       configuration.schemas[schema.id] = schema
@@ -47,7 +47,7 @@ RSpec.describe Scim::Kit::V2::Conformance do
 
     specify { expect(errors_for(resource)).to be_empty }
     specify { expect(errors_for({ schemas: [user_urn], id: '1' })).to include(/userName/) }
-    specify { expect(errors_for({ schemas: [user_urn], userName: 'mo' })).to include(/id/) }
+    specify { expect(errors_for({ schemas: [user_urn], userName: 'bjensen' })).to include(/id/) }
     specify { expect(errors_for(resource.merge(schemas: ['urn:x']))).not_to be_empty }
     specify { expect(errors_for({ schemas: [user_urn], id: '1' }, sparse: true)).to be_empty }
 
@@ -62,6 +62,10 @@ RSpec.describe Scim::Kit::V2::Conformance do
       expect(errors).to include(/urn:vendor:2.0:Thing/)
     end
 
+    # RFC 7643 2.1 makes attribute names case insensitive, and that has to
+    # hold whichever document the attribute is nested in.
+    specify { expect(errors_for({ schemas: [user_urn], id: '1', USERNAME: 'bjensen' })).to be_empty }
+
     describe 'a list response' do
       let(:list) do
         { schemas: [Scim::Kit::V2::Messages::LIST_RESPONSE],
@@ -69,6 +73,7 @@ RSpec.describe Scim::Kit::V2::Conformance do
       end
 
       specify { expect(errors_for(list, list: true)).to be_empty }
+      specify { expect(errors_for(list.merge(Resources: [{ schemas: [user_urn], id: '1', USERNAME: 'bjensen' }]), list: true)).to be_empty }
       specify { expect(errors_for(list.merge(Resources: [{ id: '1' }]), list: true)).not_to be_empty }
       specify { expect(errors_for(list.merge(totalResults: nil), list: true)).to include(/totalResults/) }
     end
@@ -108,6 +113,25 @@ RSpec.describe Scim::Kit::V2::Conformance do
       errors = subject.discovery_errors(body.merge(service_provider_configuration: {}))
 
       expect(errors[:service_provider_configuration]).to include(/patch/)
+    end
+
+    # Reporting that a document is malformed is this method's whole job, so
+    # it must not parse one it has already rejected.
+    context 'when a document is malformed' do
+      [[1, 2], 'nope', nil, { Resources: ['oops'] }].each do |garbage|
+        it "reports rather than raising for #{garbage.inspect}" do
+          errors = subject.discovery_errors(
+            body.merge(service_provider_configuration: garbage)
+          )
+
+          expect(errors[:service_provider_configuration]).not_to be_empty
+        end
+
+        it "survives #{garbage.inspect} in a collection" do
+          expect { subject.discovery_errors(body.merge(schemas: garbage)) }
+            .not_to raise_error
+        end
+      end
     end
 
     # Neither document is wrong on its own; together they contradict.

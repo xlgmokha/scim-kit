@@ -149,7 +149,7 @@ RSpec.describe Scim::Kit::V2::Schema do
 
     it 'validates a resource built against the same schema' do
       errors = Scim::Kit::V2::JsonSchema.new(result)
-        .errors_for(userName: 'mo', emails: [{ value: 'mo@example.com' }])
+        .errors_for(userName: 'bjensen', emails: [{ value: 'bjensen@example.com' }])
 
       expect(errors).to be_empty
     end
