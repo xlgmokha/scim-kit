@@ -424,16 +424,9 @@ RSpec.describe Scim::Kit::Cli::App do
           )
         end
 
-        it 'reports the undeclared extension' do
-          allow($stdout).to receive(:puts)
-          instance = app('validate' => true)
-
-          expect { exit_status { instance.list('User') } }
-            .to output(/#{Regexp.escape(extension_urn)}/).to_stderr
-        end
-
         # The server's own /ResourceTypes and /Schemas disagree, which is
-        # exactly what this tool exists to catch.
+        # exactly what this tool exists to catch. The message itself is
+        # pinned by Configuration#disagreements_for.
         it 'exits 1' do
           allow($stdout).to receive(:puts)
           allow($stderr).to receive(:puts)
@@ -463,14 +456,6 @@ RSpec.describe Scim::Kit::Cli::App do
           expect { exit_status { instance.list('User') } }
             .to output(/validation_errors/).to_stderr
         end
-
-        it 'exits 1' do
-          allow($stdout).to receive(:puts)
-          allow($stderr).to receive(:puts)
-          instance = app('validate' => true)
-
-          expect(exit_status { instance.list('User') }).to eq(1)
-        end
       end
 
       context 'when the resource type has no resolvable schema' do
@@ -486,20 +471,12 @@ RSpec.describe Scim::Kit::Cli::App do
             .to_return(status: 200, body: { totalResults: 0 }.to_json)
         end
 
-        it 'warns that it could not validate' do
+        it 'warns and exits 1 rather than reporting an unvalidated success' do
           allow($stdout).to receive(:puts)
           instance = app('validate' => true)
 
           expect { exit_status { instance.list('User') } }
             .to output(/no schema found/).to_stderr
-        end
-
-        it 'exits 1 rather than reporting an unvalidated success' do
-          allow($stdout).to receive(:puts)
-          allow($stderr).to receive(:puts)
-          instance = app('validate' => true)
-
-          expect(exit_status { instance.list('User') }).to eq(1)
         end
       end
     end

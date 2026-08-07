@@ -105,6 +105,30 @@ RSpec.describe Scim::Kit::V2::Configuration do
         .to raise_error(Scim::Kit::UnknownResourceType, /User/)
     end
 
+    # A resource type declaring an extension that /Schemas never published
+    # means the server's own discovery documents disagree.
+    describe '#disagreements_for' do
+      let(:extended) do
+        Scim::Kit::V2::ResourceType.build(location: base_url) do |x|
+          x.name = 'User'
+          x.schema = user_urn
+          x.add_schema_extension(schema: 'urn:vendor:2.0:Thing', required: true)
+        end
+      end
+
+      specify { expect(subject.disagreements_for(resource_type)).to be_empty }
+      specify { expect(subject.disagreements_for(extended)).to include(/urn:vendor:2.0:Thing/) }
+      specify { expect(subject.disagreements_for(extended)).to include(%r{missing from /Schemas}) }
+
+      it 'is empty once the extension is published' do
+        subject.schemas['urn:vendor:2.0:Thing'] = Scim::Kit::V2::Schema.build(
+          id: 'urn:vendor:2.0:Thing', name: 'Thing', location: base_url
+        ) { |x| x.add_attribute(name: 'label') }
+
+        expect(subject.disagreements_for(extended)).to be_empty
+      end
+    end
+
     describe '#json_schema_for' do
       let(:json_schema) { subject.json_schema_for(resource_type) }
       let(:resource) { { schemas: [user_urn], id: '1', userName: 'mo' } }
