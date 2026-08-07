@@ -22,13 +22,15 @@ module Scim
           @core = core
         end
 
+        # RFC 7643 3.1 anticipates a server listing the common attributes in
+        # its own schema, and says the characteristics defined there SHALL
+        # take precedence over the server's, so they win both the shape and
+        # the requiredness.
         def to_h
           converted = core.to_json_schema
-          properties = common_properties.merge(converted['properties'])
-          # RFC 7643 3.1 gives the common attributes precedence over any
-          # definition a server repeats in its own schema.
+          properties = converted['properties'].merge(common_properties)
           properties['schemas'] = schemas_property
-          required = converted['required']
+          required = converted['required'] - common_properties.keys
           merge_extensions(properties, required)
           {
             'type' => 'object',

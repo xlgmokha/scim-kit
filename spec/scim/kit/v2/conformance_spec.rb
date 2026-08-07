@@ -62,6 +62,28 @@ RSpec.describe Scim::Kit::V2::Conformance do
       expect(errors).to include(/urn:vendor:2.0:Thing/)
     end
 
+    # RFC 7643 3.1: "some existing schema definitions MAY list common
+    # attributes as part of the schema. The attribute characteristics listed
+    # here SHALL take precedence over older definitions."
+    context 'when the server redefines a common attribute' do
+      let(:redefining) do
+        Scim::Kit::V2::Schema.build(id: user_urn, name: 'User', location: base_url) do |x|
+          x.add_attribute(name: 'userName') { |y| y.required = true }
+          x.add_attribute(name: 'meta', type: :complex) do |y|
+            y.required = true
+            y.add_attribute(name: 'zzz') { |z| z.required = true }
+          end
+          x.add_attribute(name: 'id', type: :integer)
+        end
+      end
+
+      before { configuration.schemas[user_urn] = redefining }
+
+      specify { expect(errors_for(resource)).to be_empty }
+      specify { expect(errors_for(resource.merge(meta: { resourceType: 'User' }))).to be_empty }
+      specify { expect(errors_for(resource.merge(id: 1))).not_to be_empty }
+    end
+
     # RFC 7643 2.1 makes attribute names case insensitive, and that has to
     # hold whichever document the attribute is nested in.
     specify { expect(errors_for({ schemas: [user_urn], id: '1', USERNAME: 'bjensen' })).to be_empty }
