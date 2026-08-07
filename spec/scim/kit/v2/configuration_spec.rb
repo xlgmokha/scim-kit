@@ -87,6 +87,14 @@ RSpec.describe Scim::Kit::V2::Configuration do
       end
     end
 
+    let(:extended) do
+      Scim::Kit::V2::ResourceType.build(location: base_url) do |x|
+        x.name = 'User'
+        x.schema = user_urn
+        x.add_schema_extension(schema: 'urn:vendor:2.0:Thing', required: true)
+      end
+    end
+
     before do
       subject.schemas[schema.id] = schema
       subject.resource_types[resource_type.id] = resource_type
@@ -103,54 +111,6 @@ RSpec.describe Scim::Kit::V2::Configuration do
     it 'names what it knows when a resource type is unknown' do
       expect { subject.resource_type_for('Nope') }
         .to raise_error(Scim::Kit::UnknownResourceType, /User/)
-    end
-
-    # A resource type declaring an extension that /Schemas never published
-    # means the server's own discovery documents disagree.
-    describe '#disagreements_for' do
-      let(:extended) do
-        Scim::Kit::V2::ResourceType.build(location: base_url) do |x|
-          x.name = 'User'
-          x.schema = user_urn
-          x.add_schema_extension(schema: 'urn:vendor:2.0:Thing', required: true)
-        end
-      end
-
-      specify { expect(subject.disagreements_for(resource_type)).to be_empty }
-      specify { expect(subject.disagreements_for(extended)).to include(/urn:vendor:2.0:Thing/) }
-      specify { expect(subject.disagreements_for(extended)).to include(%r{missing from /Schemas}) }
-
-      it 'is empty once the extension is published' do
-        subject.schemas['urn:vendor:2.0:Thing'] = Scim::Kit::V2::Schema.build(
-          id: 'urn:vendor:2.0:Thing', name: 'Thing', location: base_url
-        ) { |x| x.add_attribute(name: 'label') }
-
-        expect(subject.disagreements_for(extended)).to be_empty
-      end
-    end
-
-    describe '#json_schema_for' do
-      let(:json_schema) { subject.json_schema_for(resource_type) }
-      let(:resource) { { schemas: [user_urn], id: '1', userName: 'mo' } }
-
-      let(:unknown_type) do
-        Scim::Kit::V2::ResourceType.build(location: base_url) do |x|
-          x.name = 'Nope'
-          x.schema = 'urn:nope'
-        end
-      end
-
-      specify { expect(json_schema.errors_for(resource)).to be_empty }
-      specify { expect(json_schema.errors_for({ schemas: [user_urn], id: '1' })).to include(/userName/) }
-      specify { expect(json_schema.errors_for({ schemas: [user_urn], userName: 'mo' })).to include(/id/) }
-      specify { expect(json_schema.errors_for(resource.merge(schemas: ['urn:x']))).not_to be_empty }
-      specify { expect(subject.json_schema_for(unknown_type)).to be_nil }
-
-      it 'relaxes required attributes for a sparse response' do
-        sparse = subject.json_schema_for(resource_type, sparse: true)
-
-        expect(sparse.errors_for({ schemas: [user_urn], id: '1' })).to be_empty
-      end
     end
   end
 

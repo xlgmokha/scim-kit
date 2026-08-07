@@ -50,8 +50,6 @@ module Scim
           }
         end
 
-        # RFC 7643 3.1: a non-empty array naming the URIs of the schemas the
-        # representation supports, so the resource type's own schema is one.
         def schemas_property
           SCHEMAS.merge('contains' => { 'const' => resource_type.schema })
         end
@@ -66,11 +64,12 @@ module Scim
 
         def merge_extensions(properties, required)
           resource_type.schema_extensions.each do |extension|
-            schema = schemas[extension[:schema]]
+            urn = extension[:schema]
+            required << urn if extension[:required]
+            schema = schemas[urn]
             next unless schema
 
-            properties[extension[:schema]] = schema.to_json_schema
-            required << extension[:schema] if extension[:required]
+            properties[urn] = schema.to_json_schema
           end
         end
       end

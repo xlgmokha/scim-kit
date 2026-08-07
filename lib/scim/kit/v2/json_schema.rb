@@ -79,8 +79,6 @@ module Scim
 
         attr_reader :schema
 
-        # json_schemer has no wording for "contains", which is how a schema
-        # URI the RFC fixes is pinned, so say which value was expected.
         def message_for(error)
           return JSONSchemer::Errors.pretty(error) unless
             error['type'] == 'contains'

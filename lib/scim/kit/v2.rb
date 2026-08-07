@@ -32,6 +32,7 @@ require 'scim/kit/v2/resource_schema'
 require 'scim/kit/v2/schema_validatable'
 require 'scim/kit/v2/document'
 require 'scim/kit/v2/documents'
+require 'scim/kit/v2/conformance'
 
 module Scim
   module Kit

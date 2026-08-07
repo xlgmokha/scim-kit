@@ -64,37 +64,23 @@ module Scim
           schemas[urn]
         end
 
-        # The JSON Schema a resource of this type must satisfy, or nil when
-        # the server never published its base schema.
-        def json_schema_for(resource_type, sparse: false)
-          schema = resource_type.to_json_schema(schemas: schemas)
-          return nil unless schema
-
-          JsonSchema.new(sparse ? SparseSchema.relax(schema) : schema)
-        end
-
-        # Where this resource type and the loaded schemas disagree: an
-        # extension declared by /ResourceTypes that /Schemas never published.
-        def disagreements_for(resource_type)
-          resource_type.undeclared_extensions(schemas: schemas).map do |urn|
-            "schema extension #{urn.inspect} is declared by the resource " \
-              'type but missing from /Schemas'
-          end
-        end
-
         # Reads a server's three discovery documents (RFC 7644 4) and rebuilds
         # them as models. A failed request is raised rather than swallowed: a
         # silently empty configuration is not a useful outcome.
         def load_from(base_url, headers: {})
-          client = Client.new(base_url, headers: headers, http: http)
-          result = client.discover
+          result = Client.new(base_url, headers: headers, http: http).discover
           raise Scim::Kit::RequestFailed, result unless result.ok?
 
-          body = result.body
-          self.service_provider_configuration =
-            ServiceProviderConfiguration.parse(
-              nil, body[:service_provider_configuration]
-            )
+          load(result.body)
+        end
+
+        # Populates from an already-fetched discovery bundle.
+        def load(body)
+          spc = body[:service_provider_configuration]
+          if spc
+            self.service_provider_configuration =
+              ServiceProviderConfiguration.parse(nil, spc)
+          end
           load_items(body[:schemas], Schema, schemas)
           load_items(body[:resource_types], ResourceType, resource_types)
         end
@@ -140,8 +126,6 @@ module Scim
           end
         end
 
-        # RFC 7644 4 says a collection SHALL use the ListResponse form, but
-        # some servers return a bare array. Read either.
         def collection(body)
           return body if body.is_a?(Array)
           return [] unless body.is_a?(Hash)

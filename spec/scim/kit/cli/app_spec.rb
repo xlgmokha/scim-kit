@@ -173,6 +173,39 @@ RSpec.describe Scim::Kit::Cli::App do
       end
     end
 
+    # Neither document is wrong on its own, so only discover can catch it.
+    context 'when --validate is set and the documents contradict' do
+      let(:resource_types) do
+        {
+          schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
+          totalResults: 1,
+          Resources: [{
+            schemas: ['urn:ietf:params:scim:schemas:core:2.0:ResourceType'],
+            name: 'User', endpoint: '/Users',
+            schema: 'urn:ietf:params:scim:schemas:core:2.0:User',
+            schemaExtensions: [{ schema: 'urn:vendor:2.0:Thing', required: true }]
+          }]
+        }
+      end
+
+      before do
+        stub_request(:get, "#{base_url}/ServiceProviderConfig")
+          .to_return(status: 200, body: service_provider_configuration.to_json)
+        stub_request(:get, "#{base_url}/Schemas")
+          .to_return(status: 200, body: schemas.to_json)
+        stub_request(:get, "#{base_url}/ResourceTypes")
+          .to_return(status: 200, body: resource_types.to_json)
+      end
+
+      it 'reports the extension /Schemas never published' do
+        allow($stdout).to receive(:puts)
+        instance = app('validate' => true)
+
+        expect { exit_status { instance.discover } }
+          .to output(/urn:vendor:2.0:Thing/).to_stderr
+      end
+    end
+
     context 'when --validate is set and a collection is a bare array' do
       let(:schemas) do
         [
@@ -424,15 +457,15 @@ RSpec.describe Scim::Kit::Cli::App do
           )
         end
 
-        # The server's own /ResourceTypes and /Schemas disagree, which is
-        # exactly what this tool exists to catch. The message itself is
-        # pinned by Configuration#disagreements_for.
-        it 'exits 1' do
+        # RFC 7643 6 makes a required extension mandatory whether or not the
+        # server published its definition, so this is a fault in the resource,
+        # named as such. The contradiction itself is discover's business.
+        it 'reports the resource as missing the required extension' do
           allow($stdout).to receive(:puts)
-          allow($stderr).to receive(:puts)
           instance = app('validate' => true)
 
-          expect(exit_status { instance.list('User') }).to eq(1)
+          expect { exit_status { instance.list('User') } }
+            .to output(/#{Regexp.escape(extension_urn)}/).to_stderr
         end
       end
 

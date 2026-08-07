@@ -25,8 +25,6 @@ module Scim
 
           private
 
-          # A null inside a multi-valued attribute is a value the server sent,
-          # not an unassigned attribute, so it stays and is reported.
           def assigned(data)
             data.each_with_object({}) do |(name, value), result|
               result[name] = strip(value) unless value.nil?

@@ -45,8 +45,6 @@ module Scim
           exit(console.failure(detail: error.message))
         end
 
-        # A failed request carries the server's Error document, so --validate
-        # checks that too -- RFC 7644 3.12 defines its shape.
         def report(result)
           return console.report(result) if result.ok? || !settings.validate?
 
@@ -59,24 +57,15 @@ module Scim
           result = client.discover
           return report(result) unless result.ok? && settings.validate?
 
-          console.report_validation(result, discovery_errors(result.body))
-        end
-
-        # Validated by the endpoint that was asked, not by what came back: a
-        # document missing its own "schemas" is exactly what needs reporting.
-        def discovery_errors(body)
-          body.each_with_object({}) do |(key, document), errors|
-            messages = V2::JsonSchema.fetch(key).errors_for(document)
-            errors[key] = messages unless messages.empty?
-          end
+          console.report_validation(
+            result, conformance.discovery_errors(result.body)
+          )
         end
 
         def fetch_list(resource_type)
           entry = resource_type_for(resource_type)
           result = client.fetch(entry.endpoint_path, query: settings.list_query)
-          validate_and_report(result, entry) do |schema|
-            V2::JsonSchema.list_of(schema.to_h)
-          end
+          validate_and_report(result, entry, list: true)
         end
 
         def fetch_resource(resource_type, id)
@@ -86,29 +75,25 @@ module Scim
           validate_and_report(result, entry)
         end
 
-        def validate_and_report(result, entry)
+        def validate_and_report(result, entry, list: false)
           return report(result) unless result.ok? && settings.validate?
 
-          json_schema = json_schema_for(entry)
-          return console.report_unvalidated(result) unless json_schema
-
-          json_schema = yield(json_schema) if block_given?
-          console.report_validation(
-            result, configuration.disagreements_for(entry) +
-              json_schema.errors_for(result.body)
+          configuration.load_schemas(client)
+          errors = conformance.resource_errors(
+            result.body,
+            resource_type: entry, list: list, sparse: settings.sparse?
           )
+          return report_unvalidatable(result, entry) unless errors
+
+          console.report_validation(result, errors)
         end
 
-        def json_schema_for(entry)
-          configuration.load_schemas(client)
-          schema = configuration.json_schema_for(entry, sparse: settings.sparse?)
-          return schema if schema
-
+        def report_unvalidatable(result, entry)
           console.warn(
             "no schema found for resource type #{entry.name.inspect}; " \
             'cannot validate the response'
           )
-          nil
+          console.report_unvalidated(result)
         end
 
         def resource_type_for(name)
@@ -118,6 +103,10 @@ module Scim
 
         def configuration
           @configuration ||= V2::Configuration.new
+        end
+
+        def conformance
+          @conformance ||= V2::Conformance.new(configuration)
         end
 
         def console

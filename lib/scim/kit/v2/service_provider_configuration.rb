@@ -38,8 +38,6 @@ module Scim
 
           private
 
-          # A non-conformant server may omit any of these. Reporting that is
-          # this gem's job, so parsing must survive it rather than raise.
           def assign(config, hash)
             config.meta = Meta.from(hash[:meta]) if hash[:meta]
             config.documentation_uri = hash[:documentationUri]

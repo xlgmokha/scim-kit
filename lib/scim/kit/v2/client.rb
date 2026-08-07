@@ -55,8 +55,6 @@ module Scim
           [uri.scheme, uri.host, uri.port]
         end
 
-        # Percent-encode per RFC 3986 rather than as a form body, so a SCIM
-        # filter arrives with %20 instead of +.
         def encode_query(query)
           query.compact.map do |name, value|
             "#{URI.encode_uri_component(name.to_s)}=" \

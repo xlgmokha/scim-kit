@@ -57,9 +57,6 @@ module Scim
 
           private
 
-          # RFC 7643 3.1 requires no meta sub-attribute and 7 makes attributes
-          # the only mandatory content, so a server may omit either. The
-          # constructor already supplies a default meta.
           def assign(schema, hash)
             schema.meta = Meta.from(hash[:meta]) if hash[:meta]
             schema.description = hash[:description] if hash[:description]

@@ -54,8 +54,6 @@ module Scim
 
       private
 
-      # net-hippie rebuilds the redirected request without the per-request
-      # headers, so follow redirects here to keep them.
       def get_following_redirects(client, uri, headers, limit: MAX_REDIRECTS)
         uri = URI.parse(uri.to_s)
         response = client.get(uri, headers: headers)
@@ -78,8 +76,6 @@ module Scim
         [uri.scheme, uri.host, uri.port]
       end
 
-      # An unparsed body is reported rather than raised, so the caller can
-      # show it, but it is never a successful result.
       def result_for(response)
         Result.new(response.code.to_i, parse(response.body))
       rescue JSON::ParserError => error
