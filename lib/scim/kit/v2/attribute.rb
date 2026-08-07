@@ -5,7 +5,7 @@ module Scim
     module V2
       # Represents a SCIM Attribute
       class Attribute
-        include ::ActiveModel::Validations
+        include Scim::Kit::Validatable
         include Attributable
         include Templatable
         attr_reader :_type

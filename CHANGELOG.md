@@ -1,5 +1,3 @@
-Version 0.8.0
-
 # Changelog
 All notable changes to this project will be documented in this file.
 
@@ -7,6 +5,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.9.0] - 2026-08-04
+### Added
+- Add a `scim-kit` executable with `discover`, `list`, and `get`
+  commands for reading a remote SCIM server, and a `--validate` flag
+  that checks its responses against JSON Schema. This adds `thor` and
+  `json_schemer` as runtime dependencies; `require 'scim/kit'` loads
+  neither.
+
+### Changed
+- Require Ruby 3.3 or newer. Ruby 3.2 reached end of life on
+  2026-03-31 and no longer receives security fixes.
+- `Scim::Kit::Http` no longer passes a logger to its HTTP driver.
+  net-hippie handed it to `Net::HTTP#set_debug_output`, which wrote
+  every request and response — headers and bodies included — to the
+  log.
+- `Scim::Kit::Http#get` returns `{}` for a success response with an
+  unparseable body instead of raising `JSON::ParserError`.
+- `Scim::Kit::V2::Meta#version` defaults to a weak entity-tag such as
+  `W/"1785781881"` instead of the integer `1785781881`. RFC 7643
+  section 3.1 requires the value to equal the ETag response header, and
+  RFC 7232 section 2.3 requires a quoted opaque tag, marked weak with a
+  `W/` prefix when it is not a strong validator. Code that compares
+  `meta.version` verbatim, or expects an Integer, needs updating.
+- `Scim::Kit::V2::ServiceProviderConfiguration` serializes `0` instead
+  of `null` for `bulk.maxOperations`, `bulk.maxPayloadSize`, and
+  `filter.maxResults` when they are left unset. RFC 7643 section 5
+  marks all three REQUIRED, and null is equivalent to unassigned.
+
+### Fixed
+- `Scim::Kit::V2::Schema#to_json` includes the `schemas` attribute,
+  `urn:ietf:params:scim:schemas:core:2.0:Schema`. RFC 7643 section 3.1
+  requires it of every resource representation and section 7 fixes its
+  value for a Schema resource, so a serialized schema was rejected by
+  any validator enforcing it -- including this gem's own `--validate`.
 
 ## [0.8.0] - 2026-03-31
 ### Changed
@@ -93,7 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - \_assign does not coerce values by default.
 - errors are merged together instead of overwritten during attribute validation.
 
-[Unreleased]: https://github.com/xlgmokha/scim-kit/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/xlgmokha/scim-kit/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/xlgmokha/scim-kit/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/xlgmokha/scim-kit/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/xlgmokha/scim-kit/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/xlgmokha/scim-kit/compare/v0.7.0...v0.7.1

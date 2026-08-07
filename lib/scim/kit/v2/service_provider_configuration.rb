@@ -33,16 +33,21 @@ module Scim
 
         class << self
           def parse(json, hash = JSON.parse(json, symbolize_names: true))
-            x = new(location: hash[:location], meta: Meta.from(hash[:meta]))
-            x.documentation_uri = hash[:documentationUri]
+            new(location: hash[:location]).tap { |x| assign(x, hash) }
+          end
+
+          private
+
+          def assign(config, hash)
+            config.meta = Meta.from(hash[:meta]) if hash[:meta]
+            config.documentation_uri = hash[:documentationUri]
             %i[patch changePassword sort etag filter bulk].each do |key|
-              x.send("#{key.to_s.underscore}=", Supportable.from(hash[key]))
+              next unless hash[key]
+
+              config.send("#{key.to_s.underscore}=", Supportable.from(hash[key]))
             end
-            schemes = hash[:authenticationSchemes]
-            x.authentication_schemes = schemes&.map do |auth|
-              AuthenticationScheme.from(auth)
-            end
-            x
+            config.authentication_schemes = Array(hash[:authenticationSchemes])
+              .map { |x| AuthenticationScheme.from(x) }
           end
         end
       end

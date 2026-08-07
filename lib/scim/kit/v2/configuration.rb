@@ -48,27 +48,92 @@ module Scim
           yield Builder.new(self) if block_given?
         end
 
-        def load_from(base_url)
-          base_url = "#{base_url}/"
-          uri = URI.join(base_url, 'ServiceProviderConfig')
-          json = http.get(uri)
+        # RFC 7643 6: a resource type is addressed by its id or its name.
+        def resource_type_for(name)
+          match = resource_types.values.find do |x|
+            x.id&.casecmp?(name) || x.name&.casecmp?(name)
+          end
+          return match if match
 
-          self.service_provider_configuration = ServiceProviderConfiguration.parse(json, json)
+          raise UnknownResourceType.new(
+            name, resource_types.values.map(&:name)
+          )
+        end
 
-          load_items(base_url, 'Schemas', Schema, schemas)
-          load_items(base_url, 'ResourceTypes', ResourceType, resource_types)
+        def schema_for(urn)
+          schemas[urn]
+        end
+
+        # Reads a server's three discovery documents (RFC 7644 4) and rebuilds
+        # them as models. A failed request is raised rather than swallowed: a
+        # silently empty configuration is not a useful outcome.
+        def load_from(base_url, headers: {})
+          result = Client.new(base_url, headers: headers, http: http).discover
+          raise Scim::Kit::RequestFailed, result unless result.ok?
+
+          load(result.body)
+        end
+
+        # Populates from an already-fetched discovery bundle.
+        def load(body)
+          spc = body[:service_provider_configuration]
+          if spc
+            self.service_provider_configuration =
+              ServiceProviderConfiguration.parse(nil, spc)
+          end
+          load_items(body[:schemas], Schema, schemas)
+          load_items(body[:resource_types], ResourceType, resource_types)
+        end
+
+        # Loaded one collection at a time so a caller that never validates
+        # does not pay for a /Schemas request.
+        def load_schemas(client)
+          return if @schemas_loaded
+
+          load_collection(client, 'Schemas', Schema, schemas)
+          @schemas_loaded = true
+        end
+
+        def load_resource_types(client)
+          return if @resource_types_loaded
+
+          load_collection(client, 'ResourceTypes', ResourceType, resource_types)
+          @resource_types_loaded = true
         end
 
         private
 
         attr_reader :http
 
-        def load_items(base_url, path, type, items)
-          hashes = http.get(URI.join(base_url, path))
-          hashes.each do |hash|
+        def load_collection(client, path, type, items)
+          result = client.fetch(path)
+          raise Scim::Kit::RequestFailed, result unless result.ok?
+          raise Scim::Kit::InvalidResponse, "expected #{path} to return a list" \
+            unless listable?(result.body)
+
+          load_items(result.body, type, items)
+          true
+        end
+
+        def listable?(body)
+          body.is_a?(Array) || (body.is_a?(Hash) && body[:Resources].is_a?(Array))
+        end
+
+        def load_items(body, type, items)
+          collection(body).each do |hash|
+            next unless hash.is_a?(Hash)
+
             item = type.from(hash)
-            items[item.id] = item
+            items[item.id || item.name] = item
           end
+        end
+
+        def collection(body)
+          return body if body.is_a?(Array)
+          return [] unless body.is_a?(Hash)
+
+          resources = body[:Resources]
+          resources.is_a?(Array) ? resources : []
         end
       end
     end

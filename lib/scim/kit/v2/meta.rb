@@ -15,7 +15,9 @@ module Scim
           @resource_type = resource_type || 'Unknown'
           @location = location
           @created = @last_modified = Time.now
-          @version = @created.to_i
+          # RFC 7643 3.1: the entity-tag of the resource. A timestamp is not a
+          # strong validator, so it MUST be marked weak with a "W/" prefix.
+          @version = %(W/"#{@created.to_i}")
         end
 
         def disable_timestamps

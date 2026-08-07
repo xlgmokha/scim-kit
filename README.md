@@ -78,6 +78,58 @@ end
 puts user_schema.to_json
 ```
 
+## CLI
+
+The `scim-kit` executable reads a remote SCIM server and can check its
+responses against JSON Schema.
+
+```bash
+scim-kit discover --url https://example.com/scim/v2
+scim-kit list User --filter 'userName eq "bjensen"' --count 10
+scim-kit get User 2819c223-7f76-453a-919d-413861904646
+```
+
+The base URL comes from `--url` or the `SCIM_KIT_URL` environment variable.
+Pass credentials with `--header`, which may be repeated:
+
+```bash
+export SCIM_KIT_URL=https://example.com/scim/v2
+scim-kit list User --header "Authorization: Bearer $TOKEN"
+```
+
+`list` also accepts `--start-index`, `--sort-by`, `--sort-order`, and
+`--attributes`; `get` accepts `--attributes`.
+
+### Validating a server
+
+`--validate` checks responses against JSON Schema and exits non-zero when a
+response does not conform, or when the validation could not be carried out at
+all -- for example when the server's `/Schemas` document is unreachable, so a
+CI job gating on the exit code never passes on an unvalidated response. The
+body is always printed to stdout; validation errors go to stderr.
+
+```bash
+scim-kit discover --validate
+scim-kit list User --validate
+```
+
+`discover` validates `/ServiceProviderConfig`, `/Schemas`, and
+`/ResourceTypes` against the RFC 7643 schemas bundled with this gem. `list`
+and `get` build a schema from the target server's *own* `/Schemas` document,
+so they check that a server's resources match the schema it advertises.
+
+Validation enforces what RFC 7643 §3.1 requires of a returned resource - the
+`schemas` and `id` attributes, except that `id` is optional on the
+`ResourceType` and `ServiceProviderConfig` resources per §6 - along with the
+types, canonical values, and required attributes the server declares. Every
+`meta` sub-attribute is optional. Undeclared vendor properties are permitted,
+and `--attributes` relaxes the required checks so sparse responses are not
+reported as errors.
+
+Attribute names are matched case insensitively per RFC 7643 §2.1, so a server
+that returns `USERNAME` where its schema declares `userName` is not reported as
+non-conforming. Errors always name the attribute as the schema declares it.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

@@ -30,6 +30,12 @@ module Scim
           id.include?(Schemas::CORE) || id.include?(Messages::CORE)
         end
 
+        # The JSON Schema describing a resource of this schema, so a document
+        # can be checked against the schema its server advertises.
+        def to_json_schema
+          AttributeSchema.for(as_json[:attributes] || [])
+        end
+
         class << self
           def build(**args)
             item = new(**args)
@@ -42,12 +48,7 @@ module Scim
               id: hash[:id],
               name: hash[:name],
               location: hash[:location]
-            ) do |x|
-              x.meta = Meta.from(hash[:meta])
-              hash[:attributes].each do |y|
-                x.attributes << parse_attribute_type(y)
-              end
-            end
+            ) { |x| assign(x, hash) }
           end
 
           def parse(json)
@@ -55,6 +56,14 @@ module Scim
           end
 
           private
+
+          def assign(schema, hash)
+            schema.meta = Meta.from(hash[:meta]) if hash[:meta]
+            schema.description = hash[:description] if hash[:description]
+            Array(hash[:attributes]).each do |x|
+              schema.attributes << parse_attribute_type(x)
+            end
+          end
 
           def parse_attribute_type(hash)
             attribute_type = AttributeType.from(hash)

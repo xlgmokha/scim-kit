@@ -3,6 +3,14 @@
 module Scim
   module Kit
     class Http
+      Result = Struct.new(:status, :body, :unparsed) do
+        def ok?
+          !status.nil? && (200..299).cover?(status) && !unparsed
+        end
+      end
+
+      MAX_REDIRECTS = 3
+
       attr_reader :driver, :retries
 
       def initialize(driver: Http.default_driver, retries: 3)
@@ -11,20 +19,26 @@ module Scim
       end
 
       def get(uri)
+        result = fetch(uri)
+        result.ok? ? result.body : {}
+      end
+
+      def fetch(uri, headers: {})
         driver.with_retry(retries: retries) do |client|
-          response = client.get(uri)
-          ok?(response) ? JSON.parse(response.body, symbolize_names: true) : {}
+          result_for(get_following_redirects(client, uri, headers))
         end
       rescue *Net::Hippie::CONNECTION_ERRORS => error
         Scim::Kit.logger.error(error)
-        {}
+        Result.new(nil, { detail: error.message })
       end
 
+      # No :logger here on purpose -- net-hippie hands it to
+      # Net::HTTP#set_debug_output, which dumps raw requests (credentials
+      # included) to the log.
       def self.default_driver
         @default_driver ||= Net::Hippie::Client.new(
-          follow_redirects: 3,
+          follow_redirects: 0,
           headers: headers,
-          logger: Scim::Kit.logger,
           open_timeout: 1,
           read_timeout: 5
         )
@@ -40,8 +54,39 @@ module Scim
 
       private
 
-      def ok?(response)
-        response.is_a?(Net::HTTPSuccess)
+      def get_following_redirects(client, uri, headers, limit: MAX_REDIRECTS)
+        uri = URI.parse(uri.to_s)
+        response = client.get(uri, headers: headers)
+        location = response['location'] if response.is_a?(Net::HTTPRedirection)
+        return response if limit.zero? || location.to_s.empty?
+
+        target = uri.merge(location)
+        get_following_redirects(
+          client, target, forwardable(headers, uri, target), limit: limit - 1
+        )
+      end
+
+      def forwardable(headers, from, to)
+        return headers if origin(from) == origin(to)
+
+        headers.reject { |name, _| name.to_s.casecmp?('authorization') }
+      end
+
+      def origin(uri)
+        [uri.scheme, uri.host, uri.port]
+      end
+
+      def result_for(response)
+        Result.new(response.code.to_i, parse(response.body))
+      rescue JSON::ParserError => error
+        Scim::Kit.logger.error(error)
+        Result.new(response.code.to_i, { detail: response.body }, true)
+      end
+
+      def parse(body)
+        return {} if body.nil?
+
+        JSON.parse(body, symbolize_names: true)
       end
     end
   end
